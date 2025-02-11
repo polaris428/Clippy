@@ -3,11 +3,12 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id ("kotlin-kapt")
+    id ("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.polaris.main"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 28
@@ -37,8 +38,11 @@ android {
     }
 }
 
-dependencies {
 
+dependencies {
+    implementation(projects.core.domin)
+    implementation(projects.core.data)
+    implementation(projects.core.designsystem)
     implementation(projects.core.designsystem)
     implementation(projects.core.util)
     implementation(libs.androidx.core.ktx)
@@ -56,8 +60,9 @@ dependencies {
     implementation(libs.hilt.android)
     implementation (libs.androidx.hilt.common)
 
-
-    kapt (libs.hilt.compiler)
+    implementation (libs.androidx.activity.ktx)
+    kapt(libs.hilt.android.compiler)
+    kapt(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

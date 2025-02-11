@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id ("kotlin-kapt")
 }
 
 android {
@@ -34,9 +35,19 @@ android {
 
 dependencies {
     implementation (libs.androidx.room.runtime)
-    annotationProcessor (libs.androidx.room.compiler)
+    kapt (libs.androidx.room.compiler)
+    //hilt
+    implementation("androidx.room:room-ktx:2.6.1")
 
 
+    implementation(libs.hilt.android)
+    implementation (libs.androidx.hilt.common)
+    kapt(libs.hilt.compiler)
+    kapt(libs.hilt.android.compiler)
+
+    // https://github.com/skydoves/sandwich
+    implementation (libs.sandwich)
+    implementation("javax.inject:javax.inject:1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

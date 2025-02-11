@@ -11,13 +11,25 @@ activityCompose = "1.10.0"
 composeBom = "2024.04.01"
 appcompat = "1.7.0"
 material = "1.12.0"
+roomCompiler = "2.5.2"
 roomRuntime = "2.6.1"
 uiGraphicsAndroid = "1.7.7"
 hiltAndroid = "2.52"
 hilt = "2.52"
 hiltCommon = "1.2.0"
 hiltCompiler = "1.2.0"
+sandwich = "1.3.5"
+jetbrainsKotlinJvm = "2.0.0"
+lifecycleViewmodelAndroid = "2.8.7"
+lifecycleViewmodelKtx = "2.8.7"
+lifecycleViewmodelCompose = "2.8.7"
+hiltNavigationCompose = "1.2.0"
+activity = "1.10.0"
+hiltAndroidCompiler = "2.52"
 [libraries]
+
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
@@ -39,13 +51,19 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graphics-android", version.ref = "uiGraphicsAndroid" }
 androidx-hilt-common = { module = "androidx.hilt:hilt-common", version.ref = "hiltCommon" }
-
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltCommon" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+sandwich = { module = "com.github.skydoves:sandwich", version.ref = "sandwich" }
+androidx-lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-android", version.ref = "lifecycleViewmodelAndroid" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

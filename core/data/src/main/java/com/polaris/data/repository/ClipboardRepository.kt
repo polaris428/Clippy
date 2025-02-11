@@ -2,21 +2,13 @@ package com.polaris.data.repository
 
 import com.polaris.data.local.ClipboardDao
 import com.polaris.data.local.ClipboardItem
+import kotlinx.coroutines.flow.Flow
+import com.skydoves.sandwich.ApiResponse
+interface ClipboardRepository {
+    suspend fun insert(item: ClipboardItem) : Flow<Boolean>
+    suspend fun getAll(): Flow<List<ClipboardItem>>
 
-class ClipboardRepository(private val clipboardDao: ClipboardDao) {
-    suspend fun insert(item: ClipboardItem) {
-        clipboardDao.insertClipboardItem(item)
-    }
+    suspend fun delete(itemId: Int)
 
-    suspend fun getAll(): List<ClipboardItem> {
-        return clipboardDao.getAllClipboardItems()
-    }
-
-    suspend fun delete(itemId: Int) {
-        clipboardDao.deleteClipboardItem(itemId)
-    }
-
-    suspend fun clearAll() {
-        clipboardDao.clearClipboardHistory()
-    }
+    suspend fun clearAll()
 }

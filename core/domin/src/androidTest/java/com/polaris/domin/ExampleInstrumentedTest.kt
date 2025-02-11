@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.polaris.domin", appContext.packageName)
+        assertEquals("com.polaris.domin.test", appContext.packageName)
     }
 }

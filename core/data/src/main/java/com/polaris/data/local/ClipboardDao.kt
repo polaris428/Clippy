@@ -4,18 +4,19 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ClipboardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertClipboardItem(item: ClipboardItem)
+     fun insertClipboardItem(item: ClipboardItem)
 
     @Query("SELECT * FROM clipboard_history ORDER BY timestamp DESC")
-    suspend fun getAllClipboardItems(): List<ClipboardItem>
+     fun getAllClipboardItems(): Flow<List<ClipboardItem>>
 
     @Query("DELETE FROM clipboard_history WHERE id = :itemId")
-    suspend fun deleteClipboardItem(itemId: Int)
+     fun deleteClipboardItem(itemId: Int)
 
     @Query("DELETE FROM clipboard_history")
-    suspend fun clearClipboardHistory()
+     fun clearClipboardHistory()
 }
