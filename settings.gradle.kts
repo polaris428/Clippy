@@ -31,3 +31,7 @@ include(":core:util")
 include(":feature:clipboard")
 include(":feature:clipboard_list")
 include(":core:designsystem")
+include(":core:data")
+include(":core:domin")
+
+include(":feature:main")

@@ -14,3 +14,7 @@ suspend fun fetchWebTitle(url: String): String? {
         }
     }
 }
+
+fun getGoogleFaviconUrl(url: String): String {
+    return "https://www.google.com/s2/favicons?sz=64&domain_url=$url"
+}
