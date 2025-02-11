@@ -3,6 +3,8 @@ package com.polaris.clippy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
+
+//import org.jsoup.Jsoup
 suspend fun fetchWebTitle(url: String): String? {
     return withContext(Dispatchers.IO) { // 네트워크 작업은 IO 스레드에서 실행
         try {

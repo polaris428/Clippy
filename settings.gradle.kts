@@ -18,7 +18,16 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "Clippy"
 include(":app")
+include(":core")
+include(":feature")
 
+
+include(":core:util")
+
+
+include(":feature:clipboard")
+include(":feature:clipboard_list")
+include(":core:designsystem")

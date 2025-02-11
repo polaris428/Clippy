@@ -14,19 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Clippy"
         tools:targetApi="31">
-        <activity
-            android:name=".ShareReceiverActivity"
-            android:exported="true"
-            android:label="@string/title_activity_share_receiver"
-            android:theme="@style/Theme.Clippy">
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-        </activity>
+        
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -35,7 +35,7 @@ class ShareReceiverActivity : ComponentActivity() {
                 Log.e("polaris428", sharedText)
 
 
-                Log.e("polaris428", fetchWebTitle(sharedText).toString())
+                //Log.e("polaris428", fetchWebTitle(sharedText).toString())
             }
 
         }
