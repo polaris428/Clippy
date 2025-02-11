@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Clippy</string>
+    <string name="accessibility_service_description">클립보드를 감지하는 서비스입니다.</string>
+    <string name="title_activity_share_receiver">ShareReceiverActivity</string>
+</resources>
