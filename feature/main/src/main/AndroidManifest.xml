@@ -11,12 +11,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- ✅ 공유 기능 (다른 앱에서 텍스트 공유 시 실행) -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />  <!-- 텍스트 공유 지원 -->
-            </intent-filter>
+
         </activity>
 
     </application>

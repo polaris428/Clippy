@@ -38,9 +38,7 @@ class MainViewModel@Inject constructor(
                 getAllClipboardList()
             }
 
-            is MainIntent.postClipboarInsertIntent -> {
-                postClipboardInsert(intent.txext)
-            }
+
         }
     }
 
@@ -53,31 +51,4 @@ class MainViewModel@Inject constructor(
         Log.d("polaris428",clipboardDataList.value.toString())
     }
 
-    fun postClipboardInsert(text: String): Job = viewModelScope.launch(Dispatchers.IO) {
-        _uiState.value = MainUiState.ClipboardSaved
-        val clipboardItem = if (isUrl(text)) {
-            ClipboardItem(
-                type = "web",
-                url = text,
-                title = fetchWebTitle(text).toString(),
-                faviconUrl = getGoogleFaviconUrl(text)
-            )
-        } else {
-            ClipboardItem(
-                type = "text",
-                url = null,
-                title = text,
-                faviconUrl = null
-            )
-        }
-
-        postClipboardInsertUseCase.execute(
-            item = clipboardItem,
-            onComplete = {
-
-            }).collect {
-
-        }
-        processIntent(MainIntent.getAllClipboardListIntent)
-    }
 }
