@@ -27,12 +27,12 @@ include(":feature")
 
 include(":core:util")
 
-
+include(":feature:main")
 include(":feature:clipboard")
 include(":feature:clipboard_list")
 include(":core:designsystem")
 include(":core:data")
 
 
-include(":feature:main")
+
 include(":core:domin")

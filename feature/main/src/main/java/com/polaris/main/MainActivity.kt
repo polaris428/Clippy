@@ -16,8 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.polaris.clipboard.ClipboardSeen
+import com.polaris.clipboard_list.ClipboardListSeen
 import com.polaris.data.local.ClipboardItem
 import com.polaris.main.ui.theme.ClippyTheme
 import com.polaris.util.fetchWebTitle
@@ -27,20 +31,18 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
-
-        }
         handleIntent(intent)
 
-
-        //  finish() // 화면을 닫고 백그라운드로 실행되도록 처리
+        setContent {
+            MainScreen(viewModel)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -52,89 +54,49 @@ class MainActivity : ComponentActivity() {
         when (intent?.action) {
             Intent.ACTION_MAIN -> {
                 Log.e("polaris428", "main")
-                // ✅ 일반 실행: 기본 UI 표시
-                showNormalUI()
+                viewModel.processIntent(MainIntent.getAllClipboardListIntent)
+                viewModel.getAllClipboardList()
             }
 
             Intent.ACTION_SEND -> {
                 Log.e("polaris428", "send")
-                // ✅ 공유 실행: 클립보드 저장 UI 표시
-                handleSharedContent(intent)
+                val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
+                if (!sharedText.isNullOrEmpty()) {
+                    handleSharedContent(sharedText)
+                }
             }
 
             else -> {
-                // ✅ 기타 액션 (예외 처리)
                 Log.e("polaris428", "dddd")
                 Log.d("MainActivity", "Unknown Intent action: ${intent?.action}")
             }
         }
     }
 
-    private fun showNormalUI() {
-        // 기본 UI 로직
-        Log.d("MainActivity", "앱을 일반 실행함")
-        viewModel.getAllClipboardList()
-    }
-
-    private fun handleSharedContent(intent: Intent) {
-        val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
-        if (!sharedText.isNullOrEmpty()) {
-
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Shared Text", sharedText)
-            clipboard.setPrimaryClip(clip)
-            // ✅ 공유된 텍스트를 처리
-            if (isUrl(sharedText)) {
-                saveWebLinkToClipboard(sharedText)
-            } else {
-                saveToClipboard(sharedText)
-            }
-
-            showSaveAnimation()
-        }
-    }
-
-    private fun saveToClipboard(text: String) {
-        // 클립보드에 저장하는 로직
-
-        if (!text.isNullOrEmpty()) {
-            // 클립보드에 저장
+    private fun handleSharedContent(sharedText: String) {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("Shared Text", sharedText)
+        clipboard.setPrimaryClip(clip)
 
 
-            viewModel.postClipboardInsert(
-                ClipboardItem(
-                    type = "web",
-                    url = null,
-                    title = text,
-                    faviconUrl = null
-                )
-            )
 
-
-            finish()
-        }
-    }
-
-    private fun saveWebLinkToClipboard(text: String) {
-        runBlocking {
-
-            val webTitle = fetchWebTitle(text).toString()
-            val imageUrl = getGoogleFaviconUrl(text)
-            viewModel.postClipboardInsert(
-                ClipboardItem(
-                    type = "web",
-                    url = text,
-                    title = webTitle,
-                    faviconUrl = imageUrl
-                )
-            )
-
-        }
+        viewModel.processIntent(MainIntent.postClipboarInsertIntent(sharedText))
+        showSaveAnimation()
     }
 
     private fun showSaveAnimation() {
-        // ✅ 저장 애니메이션을 표시 (ex: Lottie 애니메이션)
         Log.d("Animation", "저장 애니메이션 실행")
+    }
+}
+
+@Composable
+fun MainScreen(viewModel: MainViewModel) {
+    val state by viewModel.uiState.collectAsState()
+
+    when (state) {
+        is MainUiState.ClipboardList -> ClipboardListSeen()
+        is MainUiState.ClipboardSaved -> ClipboardSeen()
+        else -> Text("로딩 중...")
     }
 
 

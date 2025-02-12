@@ -6,10 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.polaris.data.local.ClipboardItem
 import com.polaris.domin.usecase.clipboard.GetClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
+import com.polaris.util.fetchWebTitle
+import com.polaris.util.getGoogleFaviconUrl
+import com.polaris.util.isUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,6 +23,10 @@ class MainViewModel@Inject constructor(
     private val getClipboardAllUseCase: GetClipboardAllUseCase,
     private val postClipboardInsertUseCase: PostClipboardInsertUseCase
 ) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<MainUiState>(MainUiState.ClipboardList)
+    val uiState: StateFlow<MainUiState> = _uiState
+
     fun processIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.getAllClipboardListIntent -> {
@@ -25,7 +34,7 @@ class MainViewModel@Inject constructor(
             }
 
             is MainIntent.postClipboarInsertIntent -> {
-                postClipboardInsert(intent.clipboardItem)
+                postClipboardInsert(intent.txext)
             }
         }
     }
@@ -37,9 +46,26 @@ class MainViewModel@Inject constructor(
         }
     }
 
-    fun postClipboardInsert(item: ClipboardItem): Job = viewModelScope.launch(Dispatchers.IO) {
+    fun postClipboardInsert(text: String): Job = viewModelScope.launch(Dispatchers.IO) {
+        _uiState.value = MainUiState.ClipboardSaved
+        val clipboardItem = if (isUrl(text)) {
+            ClipboardItem(
+                type = "web",
+                url = text,
+                title = fetchWebTitle(text).toString(),
+                faviconUrl = getGoogleFaviconUrl(text)
+            )
+        } else {
+            ClipboardItem(
+                type = "text",
+                url = null,
+                title = text,
+                faviconUrl = null
+            )
+        }
+
         postClipboardInsertUseCase.execute(
-            item = item,
+            item = clipboardItem,
             onComplete = {
 
             }).collect {

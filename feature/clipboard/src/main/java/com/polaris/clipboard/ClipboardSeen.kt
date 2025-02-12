@@ -19,23 +19,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun  ClipboardSeen(sharedText:String) {
-   // val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
+fun  ClipboardSeen() {
 
-    if (!sharedText.isNullOrEmpty()) {
-        // 클립보드에 저장
-     //   val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-      //  val clip = ClipData.newPlainText("Shared Text", sharedText)
-     //   clipboard.setPrimaryClip(clip)
-
-
-
-    }
-    Column {
-        LocalContext.current
-    }
-
-
-    //finish()
 
 }
