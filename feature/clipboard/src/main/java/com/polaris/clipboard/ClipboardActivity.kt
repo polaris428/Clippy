@@ -31,7 +31,6 @@ class ClipboardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        Toast.makeText(this,"클리퍼가 잘 저장했어요",Toast.LENGTH_SHORT).show()
 
         val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
         if (!sharedText.isNullOrEmpty()) {
@@ -40,6 +39,7 @@ class ClipboardActivity : AppCompatActivity() {
             clipboard.setPrimaryClip(clip)
 
             viewModel.processIntent(ClipboardIntent.postClipboarInsertIntent(sharedText))
+            Toast.makeText(this,"클리퍼가 잘 저장했어요",Toast.LENGTH_SHORT).show()
 
         }
 
