@@ -26,8 +26,7 @@ class MainViewModel@Inject constructor(
     private val postClipboardInsertUseCase: PostClipboardInsertUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MainUiState>(MainUiState.ClipboardList)
-    val uiState: StateFlow<MainUiState> = _uiState
+
 
     private val _clipboardDataList = MutableStateFlow<List<ClipboardItem>>(emptyList())
     val clipboardDataList :StateFlow<List<ClipboardItem>> =  _clipboardDataList
