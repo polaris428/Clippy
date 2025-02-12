@@ -26,6 +26,7 @@ lifecycleViewmodelCompose = "2.8.7"
 hiltNavigationCompose = "1.2.0"
 activity = "1.10.0"
 hiltAndroidCompiler = "2.52"
+runtimeLivedata = "1.7.7"
 [libraries]
 
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
@@ -60,6 +61,7 @@ androidx-lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "l
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

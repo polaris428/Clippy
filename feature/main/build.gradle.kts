@@ -64,6 +64,7 @@ dependencies {
     implementation (libs.androidx.hilt.common)
 
     implementation (libs.androidx.activity.ktx)
+    implementation(libs.androidx.runtime.livedata)
     kapt(libs.hilt.android.compiler)
     kapt(libs.hilt.compiler)
     testImplementation(libs.junit)

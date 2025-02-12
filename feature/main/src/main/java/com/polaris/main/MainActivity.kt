@@ -17,7 +17,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.polaris.clipboard.ClipboardSeen
@@ -64,6 +67,7 @@ class MainActivity : ComponentActivity() {
                 if (!sharedText.isNullOrEmpty()) {
                     handleSharedContent(sharedText)
                 }
+                finish()
             }
 
             else -> {
@@ -92,9 +96,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
     val state by viewModel.uiState.collectAsState()
-
+    val clipboardDataList by viewModel.clipboardDataList.collectAsState()
     when (state) {
-        is MainUiState.ClipboardList -> ClipboardListSeen()
+        is MainUiState.ClipboardList -> ClipboardListSeen(clipboardDataList)
         is MainUiState.ClipboardSaved -> ClipboardSeen()
         else -> Text("로딩 중...")
     }

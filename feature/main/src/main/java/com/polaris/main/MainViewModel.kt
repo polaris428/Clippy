@@ -1,6 +1,8 @@
 package com.polaris.main
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.data.local.ClipboardItem
@@ -27,6 +29,9 @@ class MainViewModel@Inject constructor(
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.ClipboardList)
     val uiState: StateFlow<MainUiState> = _uiState
 
+    private val _clipboardDataList = MutableStateFlow<List<ClipboardItem>>(emptyList())
+    val clipboardDataList :StateFlow<List<ClipboardItem>> =  _clipboardDataList
+
     fun processIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.getAllClipboardListIntent -> {
@@ -42,8 +47,10 @@ class MainViewModel@Inject constructor(
     fun getAllClipboardList(): Job = viewModelScope.launch {
         Log.e("polaris428","가져오기")
         getClipboardAllUseCase.execute(onComplete = {}).collect {
+            _clipboardDataList.value = it
             Log.e("polaris428",it.toString())
         }
+        Log.d("polaris428",clipboardDataList.value.toString())
     }
 
     fun postClipboardInsert(text: String): Job = viewModelScope.launch(Dispatchers.IO) {
@@ -71,5 +78,6 @@ class MainViewModel@Inject constructor(
             }).collect {
 
         }
+        processIntent(MainIntent.getAllClipboardListIntent)
     }
 }
