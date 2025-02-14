@@ -4,6 +4,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import java.net.URL
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 
 suspend fun fetchWebTitle(url: String): String? {
@@ -84,4 +87,10 @@ fun extractMainDomainUrl(url: String): String {
     val regex = Regex("""(?:https?://)?(?:www\.)?(([^./]+\.)?([^./]+\.[a-z]+))(?:/.*)?""")
     val mainDomain = regex.find(url)?.groupValues?.get(3)
     return mainDomain?.let { "https://$it/" } ?: url
+}
+fun convertTimestampToMonthDay(timestamp: Long): String {
+    val formatter = DateTimeFormatter.ofPattern("MM.dd") // "M월 d일" 로 바꾸려면 "M월 d일" 사용
+    val instant = Instant.ofEpochMilli(timestamp)
+    val localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDate()
+    return formatter.format(localDateTime)
 }

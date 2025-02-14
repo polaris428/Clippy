@@ -3,6 +3,7 @@ package com.polaris.clipboard_list
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.polaris.data.local.ClipboardItem
+import com.polaris.util.convertTimestampToMonthDay
 
 @Composable
 fun ClipboardListSeen(clipboardItem: List<ClipboardItem>?) {
@@ -39,7 +41,7 @@ fun ClipboardListSeen(clipboardItem: List<ClipboardItem>?) {
             .padding(20.dp)
     ) {
         Header()
-        LazyColumn() {
+        LazyColumn(modifier = Modifier.padding(top = 10.dp)) {
             if (!clipboardItem.isNullOrEmpty()) {
                 items(clipboardItem) { item ->
                     Log.e("polaris4280", item.title)
@@ -74,7 +76,7 @@ fun ClipboardItemView(clipboardItem: ClipboardItem) {
 
     Row(
         modifier = Modifier
-            .padding(top = 5.dp)
+            .padding(top = 14.dp)
             .fillMaxWidth(1f)
     ) {
         if (!clipboardItem.faviconUrl.isNullOrEmpty()) {
@@ -90,8 +92,9 @@ fun ClipboardItemView(clipboardItem: ClipboardItem) {
                 overflow = TextOverflow.Ellipsis
             )
             Row(
-                modifier = Modifier.padding(top = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(1f).padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
                 if (!clipboardItem.url.isNullOrEmpty()) {
@@ -102,6 +105,8 @@ fun ClipboardItemView(clipboardItem: ClipboardItem) {
                             0xFF808080
                         )
                     )
+
+                    Text(text = convertTimestampToMonthDay(clipboardItem.timestamp))
                 }
 
             }
@@ -141,7 +146,7 @@ fun displayImage(imageUrl: String = "") {
         color = Color.White,
         modifier = Modifier
             .size(48.dp)
-            .border(0.5.dp, Color.Black, RoundedCornerShape(8.dp)) // 테두리 추가
+            .border(0.1.dp, Color.Black, RoundedCornerShape(8.dp)) // 테두리 추가
 
     ) {
         Image(

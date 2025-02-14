@@ -42,6 +42,7 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
     implementation(libs.androidx.core.ktx)
+    implementation(projects.core.util)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation (libs.androidx.lifecycle.viewmodel.compose)
