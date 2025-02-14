@@ -1,8 +1,11 @@
 package com.polaris.clipboard_list
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -73,11 +77,20 @@ fun preView() {
 
 @Composable
 fun ClipboardItemView(clipboardItem: ClipboardItem) {
-
+    val context =  LocalContext.current
     Row(
         modifier = Modifier
             .padding(top = 14.dp)
             .fillMaxWidth(1f)
+            .clickable {
+                if (!clipboardItem.url.isNullOrBlank()){
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(clipboardItem.url))
+                    intent.setPackage("com.android.chrome") // Chrome에서 열도록 설정
+
+                    context.startActivity(intent)
+                }
+
+            }
     ) {
         if (!clipboardItem.faviconUrl.isNullOrEmpty()) {
             displayImage(clipboardItem.faviconUrl!!)
