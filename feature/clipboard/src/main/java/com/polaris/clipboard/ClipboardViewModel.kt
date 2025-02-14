@@ -1,5 +1,6 @@
 package com.polaris.clipboard
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.clipboard.intent.ClipboardIntent
@@ -11,6 +12,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import com.polaris.data.local.ClipboardItem
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
+import com.polaris.util.extractUrl
+import com.polaris.util.getMetaDescription
+import com.polaris.util.getWebTitle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -30,20 +34,22 @@ class ClipboardViewModel @Inject constructor(
         }
     }
 
-    fun postClipboardInsert(text: String): Job = viewModelScope.launch(Dispatchers.IO) {
+    fun postClipboardInsert(url: String): Job = viewModelScope.launch(Dispatchers.IO) {
+        Log.e("polaris0428++",  getMetaDescription(url))
 
-        val clipboardItem = if (isUrl(text)) {
+        val clipboardItem = if (isUrl(url)) {
+            val urlPreprocessing = extractUrl(url)
             ClipboardItem(
-                type = "web",
-                url = text,
-                title = fetchWebTitle(text).toString(),
-                faviconUrl = getGoogleFaviconUrl(text)
+                type = getWebTitle(urlPreprocessing),
+                url = urlPreprocessing,
+                title = fetchWebTitle(urlPreprocessing).toString(),
+                faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
             )
         } else {
             ClipboardItem(
                 type = "text",
                 url = null,
-                title = text,
+                title = url,
                 faviconUrl = null
             )
         }

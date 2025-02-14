@@ -3,6 +3,7 @@ package com.polaris.util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
+import java.net.URL
 import java.util.regex.Pattern
 
 suspend fun fetchWebTitle(url: String): String? {
@@ -17,17 +18,70 @@ suspend fun fetchWebTitle(url: String): String? {
     }
 }
 private val urlPattern = Pattern.compile(
-    "^(https?://)?" +
-            "(([\\da-z.-]+)\\.([a-z.]{2,6})" +
-            "|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))" +
-            "(:[0-9]{1,5})?" +
-            "(/[^\\s]*)?$",
+    "(https?://)?" +  // http:// 또는 https:// (선택적)
+            "(([\\da-z.-]+)\\.([a-z.]{2,6})" + // 도메인 이름 (예: example.com)
+            "|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))" + // 또는 IPv4 주소
+            "(:[0-9]{1,5})?" + // 포트 번호 (선택적)
+            "(/[^\\s]*)?", // 경로 (선택적)
     Pattern.CASE_INSENSITIVE
 )
 
 fun isUrl(text: String): Boolean {
-    return urlPattern.matcher(text).matches()
+    return urlPattern.matcher(text).find() // 부분적으로 URL 포함 여부 확인
 }
 fun getGoogleFaviconUrl(url: String): String {
     return "https://www.google.com/s2/favicons?sz=64&domain_url=$url"
+}
+
+fun getWebTitle(url:String):String{
+    val baseUrl = extractBaseUrl(url)
+    var title = fetchTitle(baseUrl)
+    if (title==null){
+        title = fetchTitle(extractMainDomainUrl(baseUrl))
+    }
+    return title ?: "title not found"
+
+}
+fun extractBaseUrl(url: String): String {
+    return try {
+        val parsedUrl = URL(url)
+        "${parsedUrl.protocol}://${parsedUrl.host}"
+    } catch (e: Exception) {
+        println("Invalid URL: $e")
+        ""
+    }
+}
+
+fun fetchTitle(url: String): String? {
+    return try {
+        val doc = Jsoup.connect(url).get()
+        doc.title()
+    } catch (e: Exception) {
+        null
+    }
+}
+
+fun extractUrl(text: String): String {
+    val urlRegex = """https?:\/\/[^\s]+""".toRegex() // URL만 추출하는 정규식
+    return urlRegex.find(text)?.value ?: ""
+}
+
+fun getMetaDescription(url: String): String {
+    return try {
+        val doc = Jsoup.connect(url)
+            .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+            .get()
+
+        val metaTag = doc.select("meta[name=description]").first()
+
+        metaTag?.attr("content") ?: "No meta description found."
+    } catch (e: Exception) {
+        "Failed to fetch page: ${e.message}"
+    }
+}
+
+fun extractMainDomainUrl(url: String): String {
+    val regex = Regex("""(?:https?://)?(?:www\.)?(([^./]+\.)?([^./]+\.[a-z]+))(?:/.*)?""")
+    val mainDomain = regex.find(url)?.groupValues?.get(3)
+    return mainDomain?.let { "https://$it/" } ?: url
 }
