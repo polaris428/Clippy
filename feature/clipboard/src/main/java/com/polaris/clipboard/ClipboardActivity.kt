@@ -10,12 +10,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.airbnb.lottie.compose.LottieAnimation
@@ -25,6 +30,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.polaris.clipboard.intent.ClipboardIntent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
+
 @AndroidEntryPoint
 class ClipboardActivity : AppCompatActivity() {
     private val viewModel: ClipboardViewModel by viewModels()
@@ -39,7 +45,7 @@ class ClipboardActivity : AppCompatActivity() {
             clipboard.setPrimaryClip(clip)
 
             viewModel.processIntent(ClipboardIntent.postClipboarInsertIntent(sharedText))
-            Toast.makeText(this,"클리퍼가 잘 저장했어요",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
 
         }
 
@@ -50,6 +56,7 @@ class ClipboardActivity : AppCompatActivity() {
         }
     }
 }
+
 @Composable
 fun LottieAnimationAndExit(activity: Activity) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_lottie))
@@ -63,10 +70,16 @@ fun LottieAnimationAndExit(activity: Activity) {
             exitProcess(0)  // 프로세스 종료
         }
     }
+    Column(
+        modifier = Modifier.fillMaxSize(1f),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = { progress },
+            modifier = Modifier.size(100.dp)
+        )
+    }
 
-    LottieAnimation(
-        composition = composition,
-        progress = { progress },
-        modifier = Modifier.fillMaxSize()
-    )
 }
