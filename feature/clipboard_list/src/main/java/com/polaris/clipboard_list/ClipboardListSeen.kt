@@ -87,7 +87,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import com.polaris.designsystem.R
 
 @Composable
 fun ClipboardListSeen(clipboardItem: List<ClipboardItem>?) {
@@ -229,10 +229,10 @@ fun Header() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.logo),
+        Image(
+            painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = null,
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(32.dp),
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
@@ -250,7 +250,7 @@ fun Header() {
 fun displayImage(imageUrl: String = "") {
     val painter = if (LocalInspectionMode.current) {
         // 프리뷰 모드에서는 Image와 painterResource 사용
-        painterResource(id = R.drawable.logo)
+        painterResource(id = R.drawable.ic_logo)
     } else {
         // 실제 모드에서는 rememberAsyncImagePainter 사용
         rememberAsyncImagePainter(model = imageUrl)
