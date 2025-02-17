@@ -54,10 +54,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,6 +77,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.polaris.data.local.ClipboardItem
@@ -94,49 +97,118 @@ import com.polaris.designsystem.ui.theme.bottomSheetTextColor
 
 @Composable
 fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?) {
-    var isSheetOpen by remember { mutableStateOf(false) } // 바텀 시트 열림 상태 관리
-    val coroutineScope = rememberCoroutineScope()
-    var clipboardItem by remember { mutableStateOf<ClipboardItem>(dummyData) }
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(20.dp)
-        ) {
-            Header()
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                if (!clipboardItemList.isNullOrEmpty()) {
-                    clipboardItemList.forEach { item ->
-                        ClipboardItemView(item) { // 📌 onLongPress 이벤트 전달
-                            clipboardItem = item
-                            coroutineScope.launch {
-                                isSheetOpen = true // 롱프레스 시 바텀 시트 열기
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    val viewModel: ClipboardListViewModel = hiltViewModel()
+    val isSheetOpen by viewModel.isSheetOpen.collectAsState()
+    val clipboardItem by viewModel.selectedItem.collectAsState()
 
-        if (isSheetOpen) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent),
-                verticalArrangement = Arrangement.Bottom // ✅ 바텀 시트를 하단 정렬
-            ) {
-                CustomBottomSheet(item = clipboardItem,onDismiss = { isSheetOpen = false })
+    val onLongPressState = rememberUpdatedState(viewModel::processIntent)
+    val onDeleteState = rememberUpdatedState(viewModel::processIntent)
+    val onShearState = rememberUpdatedState(viewModel::processIntent)
+    val onDismissState = rememberUpdatedState(viewModel::processIntent)
+
+
+
+
+    val context = LocalContext.current
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        ClipboardView(clipboardItemList,
+            onLongPress = {
+                onLongPressState
+               viewModel.processIntent(ClipboardListIntent.ItemLongPressed(it))
             }
-        }
+        )
+
+        CustomBottomSheetView(
+            isSheetOpen = isSheetOpen,
+            clipboardItem = clipboardItem,
+            onContent = { item ->
+                val textToCopy = item.url ?: item.title
+                copyToClipboard(context, textToCopy)
+
+            },
+            onEdit = {
+
+            },
+            onShear = { item ->
+
+                val textToShare = item.url ?: item.title
+                shareText(context, textToShare)
+            },
+            onDelete = { item ->
+                onDeleteState.value(ClipboardListIntent.postClipboardDeleteIntent(item.id))
+
+            },
+            onDismiss = { onDismissState.value(ClipboardListIntent.BottomSheetDismissed)  })
 
 
     }
 
+
+}
+
+@Composable
+fun CustomBottomSheetView(
+    isSheetOpen: Boolean,
+    clipboardItem: ClipboardItem,
+    onContent: (item: ClipboardItem) -> Unit = {},
+    onEdit: (item: ClipboardItem) -> Unit = {},
+    onShear: (item: ClipboardItem) -> Unit = {},
+    onDelete: (item: ClipboardItem) -> Unit = {},
+    onDismiss: () -> Unit,
+) {
+
+    if (isSheetOpen) {
+        Column(
+            modifier = Modifier.fillMaxSize().background(Color.Transparent),
+            verticalArrangement = Arrangement.Bottom // ✅ 바텀 시트를 하단 정렬
+        ) {
+            CustomBottomSheet(item = clipboardItem,
+                onContent = {
+                    onContent(it)
+                }, onEdit = {
+                    onEdit(it)
+                }, onShear = {
+                    onShear(it)
+                }, onDelete = {
+                    onDelete(it)
+                }, onDismiss = {
+                    onDismiss()
+                }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ClipboardView(
+    clipboardItemList: List<ClipboardItem>? = listOf(dummyData),
+    onLongPress: (item: ClipboardItem) -> Unit = {},
+
+    ) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(20.dp)
+    ) {
+        Header()
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            if (!clipboardItemList.isNullOrEmpty()) {
+                clipboardItemList.forEach { item ->
+                    ClipboardItemView(item) { // 📌 onLongPress 이벤트 전달
+                        onLongPress(item)
+                    }
+                }
+            }
+        }
+    }
 
 }
 
@@ -160,28 +232,17 @@ fun preView() {
 @Composable
 fun ClipboardItemView(clipboardItem: ClipboardItem, onLongPress: () -> Unit) {
     val context = LocalContext.current
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = {
-                    if (!clipboardItem.url.isNullOrBlank()) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(clipboardItem.url))
-                        intent.setPackage("com.android.chrome")
-                        context.startActivity(intent)
-                    }
-                },
-                onLongClick = {
-                    onLongPress()
-                },
-                indication = rememberRipple(
-                    color = Color.Gray, // 리플 색상 설정
-                    bounded = true // Row 크기 내에서만 리플 퍼지게 설정
-                ),
-                interactionSource = remember { MutableInteractionSource() }
-            )
-            .padding(top = 14.dp, start = 8.dp)
+    val onLongPressState = rememberUpdatedState(onLongPress)
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .combinedClickable(onClick = { openUrl(context, clipboardItem.url)
+        }, onLongClick = {
+            onLongPressState.value()
+        }, indication = rememberRipple(
+            color = Color.Gray, // 리플 색상 설정
+            bounded = true // Row 크기 내에서만 리플 퍼지게 설정
+        ), interactionSource = remember { MutableInteractionSource() })
+        .padding(top = 14.dp, start = 8.dp)
     ) {
         if (!clipboardItem.faviconUrl.isNullOrEmpty()) {
             displayImage(clipboardItem.faviconUrl!!)
@@ -207,14 +268,10 @@ fun ClipboardItemView(clipboardItem: ClipboardItem, onLongPress: () -> Unit) {
                         fontSize = 12.sp
                     )
                     Text(
-                        text = " | ",
-                        color = Gray50,
-                        fontSize = 14.sp
+                        text = " | ", color = Gray50, fontSize = 14.sp
                     )
                     Text(
-                        text = clipboardItem.type,
-                        color = Gray50,
-                        fontSize = 12.sp
+                        text = clipboardItem.type, color = Gray50, fontSize = 12.sp
                     )
                 }
             }
@@ -261,9 +318,7 @@ fun displayImage(imageUrl: String = "") {
     Surface(
         shape = RoundedCornerShape(8.dp),
 
-        color = Color.White,
-        modifier = Modifier
-            .size(48.dp)
+        color = Color.White, modifier = Modifier.size(48.dp)
 
 
     ) {
@@ -283,12 +338,20 @@ fun displayImage(imageUrl: String = "") {
 @Composable
 fun CustomBottomSheetPreview() {
     val isPreview = LocalInspectionMode.current // ✅ 프리뷰 모드 감지
-    CustomBottomSheet(dummyData,onDismiss = {}, isPreview = isPreview)
+    CustomBottomSheet(dummyData, onDismiss = {}, isPreview = isPreview)
 }
 
 @Composable
-fun CustomBottomSheet(item: ClipboardItem, onDismiss: () -> Unit, isPreview: Boolean = false) {
-    val context = LocalContext.current
+fun CustomBottomSheet(
+    item: ClipboardItem,
+    onContent: (item: ClipboardItem) -> Unit = {},
+    onEdit: (item: ClipboardItem) -> Unit = {},
+    onShear: (item: ClipboardItem) -> Unit = {},
+    onDelete: (item: ClipboardItem) -> Unit = {},
+    onDismiss: () -> Unit,
+    isPreview: Boolean = false
+) {
+
     var isVisible by remember { mutableStateOf(isPreview) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -299,8 +362,7 @@ fun CustomBottomSheet(item: ClipboardItem, onDismiss: () -> Unit, isPreview: Boo
             isVisible = true
             coroutineScope.launch {
                 animOffset.animateTo(
-                    0f,
-                    animationSpec = tween(500, easing = FastOutSlowInEasing)
+                    0f, animationSpec = tween(500, easing = FastOutSlowInEasing)
                 )
             }
         }
@@ -309,8 +371,7 @@ fun CustomBottomSheet(item: ClipboardItem, onDismiss: () -> Unit, isPreview: Boo
     BackHandler(isVisible) {
         coroutineScope.launch {
             animOffset.animateTo(
-                500f,
-                animationSpec = tween(300, easing = FastOutSlowInEasing)
+                500f, animationSpec = tween(300, easing = FastOutSlowInEasing)
             )
             isVisible = false
             onDismiss()
@@ -328,29 +389,38 @@ fun CustomBottomSheet(item: ClipboardItem, onDismiss: () -> Unit, isPreview: Boo
             modifier = Modifier
                 .fillMaxWidth()
                 .offset(y = animOffset.value.dp) // ✅ 애니메이션 적용 (프리뷰에서는 0)
-                .background(Color.White),
-            verticalAlignment = Alignment.CenterVertically
+                .background(Color.White), verticalAlignment = Alignment.CenterVertically
         ) {
             SheetOption("복사", R.drawable.ic_content_paste, Modifier.weight(1f)) {
-                if (item.url != null) {
-                    copyToClipboard(context, item.url.toString())
-                } else {
-                    copyToClipboard(context, item.title)
+
+                onContent(item)
+                coroutineScope.launch {
+                    animOffset.animateTo(
+                        500f, animationSpec = tween(300, easing = FastOutSlowInEasing)
+                    )
+                    isVisible = false
+                    onDismiss()
                 }
+
             }
-            SheetOption("수정", R.drawable.ic_edit, Modifier.weight(1f)) { }
+            SheetOption("수정", R.drawable.ic_edit, Modifier.weight(1f)) {
+                onEdit(item)
+            }
             SheetOption("공유", R.drawable.ic_share, Modifier.weight(1f)) {
-                if (item.url != null) {
-                    shareText(context, item.url.toString())
-                } else {
-                    shareText(context, item.title)
+                onShear(item)
+                coroutineScope.launch {
+                    animOffset.animateTo(
+                        500f, animationSpec = tween(300, easing = FastOutSlowInEasing)
+                    )
+                    isVisible = false
+                    onDismiss()
                 }
             }
             SheetOption("삭제", R.drawable.ic_delete, Modifier.weight(1f)) {
+                onDelete(item)
                 coroutineScope.launch {
                     animOffset.animateTo(
-                        500f,
-                        animationSpec = tween(300, easing = FastOutSlowInEasing)
+                        500f, animationSpec = tween(300, easing = FastOutSlowInEasing)
                     )
                     isVisible = false
                     onDismiss()
@@ -361,16 +431,16 @@ fun CustomBottomSheet(item: ClipboardItem, onDismiss: () -> Unit, isPreview: Boo
 }
 
 @Composable
-fun SheetOption(text: String, @DrawableRes imageId: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)) // ✅ 사각형이지만 모서리를 둥글게
-            .clickable(){ onClick() }
-            .padding(vertical = 8.dp),
+fun SheetOption(
+    text: String, @DrawableRes imageId: Int, modifier: Modifier = Modifier, onClick: () -> Unit
+) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(16.dp))
+        .clickable() { onClick() }
+        .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+        verticalArrangement = Arrangement.Center) {
         Image(
             painter = painterResource(id = imageId),
             contentDescription = null,
@@ -379,7 +449,7 @@ fun SheetOption(text: String, @DrawableRes imageId: Int, modifier: Modifier = Mo
                 .size(24.dp)
                 .clip(RoundedCornerShape(4.dp))
         )
-        Spacer(modifier = Modifier.height(4.dp)) // ✅ 아이콘과 텍스트 간 간격 추가
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = text,
             fontSize = 14.sp,
@@ -395,6 +465,7 @@ fun copyToClipboard(context: Context, text: String) {
     val clip = ClipData.newPlainText("Copied Text", text)
     clipboard.setPrimaryClip(clip)
 }
+
 fun shareText(context: Context, text: String, title: String = "Share via") {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
@@ -404,14 +475,11 @@ fun shareText(context: Context, text: String, title: String = "Share via") {
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewTest() {
-    Column {
-
-        ClipboardListSeen(listOf(dummyData, dummyData, dummyData, dummyData, dummyData))
-
+fun openUrl(context: Context, url: String?) {
+    if (!url.isNullOrBlank()) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            setPackage("com.android.chrome")
+        }
+        context.startActivity(intent)
     }
-
-
 }

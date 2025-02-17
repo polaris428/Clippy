@@ -15,7 +15,7 @@ interface ClipboardDao {
      fun getAllClipboardItems(): Flow<List<ClipboardItem>>
 
     @Query("DELETE FROM clipboard_history WHERE id = :itemId")
-     fun deleteClipboardItem(itemId: Int)
+     fun deleteClipboardItem(itemId: Int) :Int
 
     @Query("DELETE FROM clipboard_history")
      fun clearClipboardHistory()

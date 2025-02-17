@@ -8,7 +8,7 @@ interface ClipboardRepository {
     suspend fun insert(item: ClipboardItem) : Flow<Boolean>
     suspend fun getAll(): Flow<List<ClipboardItem>>
 
-    suspend fun delete(itemId: Int)
+    suspend fun delete(itemId: Int) :Flow<Boolean>
 
     suspend fun clearAll()
 }

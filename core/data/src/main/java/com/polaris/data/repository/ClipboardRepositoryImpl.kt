@@ -18,8 +18,8 @@ internal class ClipboardRepositoryImpl  @Inject constructor(
        return clipboardDao.getAllClipboardItems()
     }
 
-    override suspend fun delete(itemId: Int) {
-        //clipboardDao.deleteClipboardItem(itemId)
+    override suspend fun delete(itemId: Int):Flow<Boolean> {
+        return  flowOf(clipboardDao.deleteClipboardItem(itemId)>0)
     }
 
     override suspend fun clearAll() {
