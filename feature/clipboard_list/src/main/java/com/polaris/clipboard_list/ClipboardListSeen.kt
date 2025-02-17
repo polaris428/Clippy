@@ -1,9 +1,13 @@
 package com.polaris.clipboard_list
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -21,9 +25,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-
-
-
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -69,6 +70,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,12 +90,13 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.polaris.designsystem.R
+import com.polaris.designsystem.ui.theme.bottomSheetTextColor
 
 @Composable
-fun ClipboardListSeen(clipboardItem: List<ClipboardItem>?) {
+fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?) {
     var isSheetOpen by remember { mutableStateOf(false) } // 바텀 시트 열림 상태 관리
     val coroutineScope = rememberCoroutineScope()
-
+    var clipboardItem by remember { mutableStateOf<ClipboardItem>(dummyData) }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -107,9 +110,10 @@ fun ClipboardListSeen(clipboardItem: List<ClipboardItem>?) {
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                if (!clipboardItem.isNullOrEmpty()) {
-                    clipboardItem.forEach { item ->
+                if (!clipboardItemList.isNullOrEmpty()) {
+                    clipboardItemList.forEach { item ->
                         ClipboardItemView(item) { // 📌 onLongPress 이벤트 전달
+                            clipboardItem = item
                             coroutineScope.launch {
                                 isSheetOpen = true // 롱프레스 시 바텀 시트 열기
                             }
@@ -126,10 +130,9 @@ fun ClipboardListSeen(clipboardItem: List<ClipboardItem>?) {
                     .background(Color.Transparent),
                 verticalArrangement = Arrangement.Bottom // ✅ 바텀 시트를 하단 정렬
             ) {
-                CustomBottomSheet(onDismiss = { isSheetOpen = false })
+                CustomBottomSheet(item = clipboardItem,onDismiss = { isSheetOpen = false })
             }
         }
-
 
 
     }
@@ -276,26 +279,40 @@ fun displayImage(imageUrl: String = "") {
 
 }
 
+@Preview(showBackground = true)
 @Composable
-fun CustomBottomSheet(onDismiss: () -> Unit) {
-    var isVisible by remember { mutableStateOf(false) }
+fun CustomBottomSheetPreview() {
+    val isPreview = LocalInspectionMode.current // ✅ 프리뷰 모드 감지
+    CustomBottomSheet(dummyData,onDismiss = {}, isPreview = isPreview)
+}
+
+@Composable
+fun CustomBottomSheet(item: ClipboardItem, onDismiss: () -> Unit, isPreview: Boolean = false) {
+    val context = LocalContext.current
+    var isVisible by remember { mutableStateOf(isPreview) }
     val coroutineScope = rememberCoroutineScope()
 
-    val animOffset = remember { Animatable(500f) } //  초기 위치는 500.dp 아래
+    val animOffset = remember { Animatable(if (isPreview) 0f else 500f) } // ✅ 프리뷰에서는 바로 표시
 
     LaunchedEffect(Unit) {
-        isVisible = true
-        coroutineScope.launch {
-
+        if (!isPreview) { // ✅ 프리뷰가 아닐 때만 애니메이션 실행
+            isVisible = true
+            coroutineScope.launch {
+                animOffset.animateTo(
+                    0f,
+                    animationSpec = tween(500, easing = FastOutSlowInEasing)
+                )
+            }
         }
-        animOffset.animateTo(0f, animationSpec = tween(500, easing = FastOutSlowInEasing)) // ✅ 부드러운 슬라이드 업 애니메이션
     }
 
     BackHandler(isVisible) {
         coroutineScope.launch {
-            animOffset.animateTo(500f, animationSpec = tween(300, easing = FastOutSlowInEasing)) // ✅ 부드럽게 아래로 사라짐
-
-            isVisible = false //  UI가 바로 사라지지 않도록 마지막에 변경
+            animOffset.animateTo(
+                500f,
+                animationSpec = tween(300, easing = FastOutSlowInEasing)
+            )
+            isVisible = false
             onDismiss()
         }
     }
@@ -303,47 +320,88 @@ fun CustomBottomSheet(onDismiss: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Transparent) // 필요하면 배경 추가
+            .background(Color.Transparent)
     ) {
-        Spacer(modifier = Modifier.weight(1f)) // 상단 공간을 차지하여 Row를 하단으로 밀어냄
+        Spacer(modifier = Modifier.weight(1f))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .offset(y = animOffset.value.dp) // 애니메이션 적용
+                .offset(y = animOffset.value.dp) // ✅ 애니메이션 적용 (프리뷰에서는 0)
                 .background(Color.White),
-            horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SheetOption("복사") { /* 복사 기능 */ }
-            SheetOption("수정") { /* 공유 기능 */ }
-            SheetOption("공유") { /* 삭제 기능 */ }
-            SheetOption("삭제") {
+            SheetOption("복사", R.drawable.ic_content_paste, Modifier.weight(1f)) {
+                if (item.url != null) {
+                    copyToClipboard(context, item.url.toString())
+                } else {
+                    copyToClipboard(context, item.title)
+                }
+            }
+            SheetOption("수정", R.drawable.ic_edit, Modifier.weight(1f)) { }
+            SheetOption("공유", R.drawable.ic_share, Modifier.weight(1f)) {
+                if (item.url != null) {
+                    shareText(context, item.url.toString())
+                } else {
+                    shareText(context, item.title)
+                }
+            }
+            SheetOption("삭제", R.drawable.ic_delete, Modifier.weight(1f)) {
                 coroutineScope.launch {
-                    animOffset.animateTo(500f, animationSpec = tween(300, easing = FastOutSlowInEasing)) // ✅ 부드럽게 아래로 사라짐
-                    isVisible = false // ✅ UI가 바로 사라지지 않도록 마지막에 변경
+                    animOffset.animateTo(
+                        500f,
+                        animationSpec = tween(300, easing = FastOutSlowInEasing)
+                    )
+                    isVisible = false
                     onDismiss()
                 }
             }
         }
     }
-
 }
-
-
 
 @Composable
-fun SheetOption(text: String, onClick: () -> Unit) { // ✅ 일반 람다로 변경
-    Text(
-        text = text,
-        fontSize = 16.sp,
-        color = Color.Blue,
-        modifier = Modifier
-            .clickable { onClick() } // ✅ 일반 람다 실행 가능
-
-    )
+fun SheetOption(text: String, @DrawableRes imageId: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp)) // ✅ 사각형이지만 모서리를 둥글게
+            .clickable(){ onClick() }
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(id = imageId),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .size(24.dp)
+                .clip(RoundedCornerShape(4.dp))
+        )
+        Spacer(modifier = Modifier.height(4.dp)) // ✅ 아이콘과 텍스트 간 간격 추가
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            color = bottomSheetTextColor,
+            textAlign = TextAlign.Center
+        )
+    }
 }
 
+
+fun copyToClipboard(context: Context, text: String) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Copied Text", text)
+    clipboard.setPrimaryClip(clip)
+}
+fun shareText(context: Context, text: String, title: String = "Share via") {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, text)
+    }
+    context.startActivity(Intent.createChooser(intent, title))
+}
 
 
 @Preview(showBackground = true)
