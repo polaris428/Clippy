@@ -1,5 +1,6 @@
 package com.polaris.domin.usecase.clipboard
 
+import android.util.Log
 import com.polaris.data.local.ClipboardItem
 import com.polaris.data.repository.ClipboardRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,9 +19,10 @@ class PostClipboardDeleteUseCase@Inject constructor(
 
 
         return flow {
+            Log.e("polaris0428","흐으으음")
             onComplete()
             emitAll(clipboardRepository.delete(id))
-
+            Log.e("polaris0428","흐으으음1")
 
         }
     }

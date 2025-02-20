@@ -10,5 +10,6 @@ data class ClipboardItem(
     val url: String?=null,
     val title: String = "",
     val faviconUrl: String? = null,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val isPinned: Boolean = false
 )

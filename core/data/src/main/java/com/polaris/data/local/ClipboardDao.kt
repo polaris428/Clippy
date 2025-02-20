@@ -17,6 +17,9 @@ interface ClipboardDao {
     @Query("DELETE FROM clipboard_history WHERE id = :itemId")
      fun deleteClipboardItem(itemId: Int) :Int
 
+    @Query("UPDATE clipboard_history SET isPinned = :isPinned WHERE id = :id")
+    suspend fun updatePinStatus(id: Int, isPinned: Boolean)
+
     @Query("DELETE FROM clipboard_history")
      fun clearClipboardHistory()
 }

@@ -173,6 +173,8 @@ fun CustomBottomSheetView(
                     onEdit(it)
                 }, onShear = {
                     onShear(it)
+                }, onKeep = {
+
                 }, onDelete = {
                     onDelete(it)
                 }, onDismiss = {
@@ -382,6 +384,7 @@ fun CustomBottomSheet(
     item: ClipboardItem,
     onContent: (item: ClipboardItem) -> Unit = {},
     onEdit: (item: ClipboardItem) -> Unit = {},
+    onKeep: (item:ClipboardItem) -> Unit = {},
     onShear: (item: ClipboardItem) -> Unit = {},
     onDelete: (item: ClipboardItem) -> Unit = {},
     onDismiss: () -> Unit,
@@ -441,6 +444,16 @@ fun CustomBottomSheet(
             }
             SheetOption("수정", R.drawable.ic_edit, Modifier.weight(1f)) {
                 onEdit(item)
+            }
+            SheetOption("핀", R.drawable.ic_keep, Modifier.weight(1f)) {
+                onShear(item)
+                coroutineScope.launch {
+                    animOffset.animateTo(
+                        500f, animationSpec = tween(300, easing = FastOutSlowInEasing)
+                    )
+                    isVisible = false
+                    onDismiss()
+                }
             }
             SheetOption("공유", R.drawable.ic_share, Modifier.weight(1f)) {
                 onShear(item)

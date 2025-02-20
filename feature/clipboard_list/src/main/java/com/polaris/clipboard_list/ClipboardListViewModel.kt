@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polaris.data.local.ClipboardItem
 import com.polaris.domin.usecase.clipboard.PostClipboardDeleteUseCase
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -62,10 +63,13 @@ class ClipboardListViewModel @Inject constructor(
         }
     }
 
-    fun postClipboardDelete(id:Int) = viewModelScope.launch  {
+    fun postClipboardDelete(id:Int) = viewModelScope.launch(Dispatchers.IO)  {
         postClipboardDeleteUseCase.execute(id = id){
 
-        }
+        }.collect({ result ->
+
+
+        })
     }
 
 }
