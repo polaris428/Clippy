@@ -72,6 +72,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -94,6 +95,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.bottomSheetTextColor
+import com.polaris.util.getTodayStartTimestamp
+import com.polaris.util.getYearMonth
 
 @Composable
 fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?) {
@@ -185,8 +188,13 @@ fun CustomBottomSheetView(
 fun ClipboardView(
     clipboardItemList: List<ClipboardItem>? = listOf(dummyData),
     onLongPress: (item: ClipboardItem) -> Unit = {},
+) {
+    val todayStartTimestamp = getTodayStartTimestamp()
+    val todayItems = clipboardItemList?.filter { it.timestamp >= todayStartTimestamp }.orEmpty()
+    val previousItems = clipboardItemList?.filter { it.timestamp < todayStartTimestamp }.orEmpty()
 
-    ) {
+    // 📌 월 단위로 그룹화
+    val groupedByMonth = previousItems.groupBy { getYearMonth(it.timestamp) }
 
     Column(
         modifier = Modifier
@@ -195,21 +203,49 @@ fun ClipboardView(
             .padding(20.dp)
     ) {
         Header()
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            if (!clipboardItemList.isNullOrEmpty()) {
-                clipboardItemList.forEach { item ->
-                    ClipboardItemView(item) { // 📌 onLongPress 이벤트 전달
-                        onLongPress(item)
-                    }
+
+        // ✅ 오늘 데이터 표시
+        if (todayItems.isNotEmpty()) {
+            Text(
+                "Today",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF333333)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                todayItems.forEach { item ->
+                    ClipboardItemView(item) { onLongPress(item) }
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp)) // 구분을 위한 간격
+        }
+
+        // ✅ 월별로 데이터 표시
+        groupedByMonth.forEach { (month, items) ->
+            Text(
+                text = month, // ex: "2024년 2월"
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF333333),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                items.forEach { item ->
+                    ClipboardItemView(item) { onLongPress(item) }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp)) // 월 간격
         }
     }
-
 }
 
 val dummyData = ClipboardItem(

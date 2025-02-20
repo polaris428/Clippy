@@ -7,6 +7,7 @@ import java.net.URL
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.regex.Pattern
 
 suspend fun fetchWebTitle(url: String): String? {
@@ -93,4 +94,21 @@ fun convertTimestampToMonthDay(timestamp: Long): String {
     val instant = Instant.ofEpochMilli(timestamp)
     val localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDate()
     return formatter.format(localDateTime)
+}
+fun getTodayStartTimestamp(): Long {
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.timeInMillis
+}
+
+fun getYearMonth(timestamp: Long): String {
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = timestamp
+    }
+    //val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH는 0부터 시작
+    return "${month}월"
 }
