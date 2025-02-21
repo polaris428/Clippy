@@ -5,28 +5,21 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,23 +28,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -65,12 +49,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -79,19 +60,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.polaris.data.local.ClipboardItem
-import com.polaris.designsystem.ui.theme.Gray20
 import com.polaris.designsystem.ui.theme.Gray50
-import com.polaris.designsystem.ui.theme.Gray60
-import com.polaris.designsystem.ui.theme.Gray80
-import com.polaris.designsystem.ui.theme.Gray90
 import com.polaris.designsystem.ui.theme.LineView
 import com.polaris.util.convertTimestampToMonthDay
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.bottomSheetTextColor
@@ -130,13 +103,16 @@ fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?) {
                 copyToClipboard(context, textToCopy)
 
             },
-            onEdit = {
+            onEdit = { item ->
 
             },
             onShear = { item ->
 
                 val textToShare = item.url ?: item.title
                 shareText(context, textToShare)
+            },
+            onPin = {  item ->
+                viewModel.processIntent(ClipboardListIntent.UpdatePinClipboardDeleteIntent(id =item.id, pinState = item.isPinned ))
             },
             onDelete = { item ->
                 onDeleteState.value(ClipboardListIntent.postClipboardDeleteIntent(item.id))
@@ -157,6 +133,7 @@ fun CustomBottomSheetView(
     onContent: (item: ClipboardItem) -> Unit = {},
     onEdit: (item: ClipboardItem) -> Unit = {},
     onShear: (item: ClipboardItem) -> Unit = {},
+    onPin:(item:ClipboardItem) -> Unit ={},
     onDelete: (item: ClipboardItem) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
@@ -173,7 +150,8 @@ fun CustomBottomSheetView(
                     onEdit(it)
                 }, onShear = {
                     onShear(it)
-                }, onKeep = {
+                }, onPin = {
+                    onPin(it)
 
                 }, onDelete = {
                     onDelete(it)
@@ -192,11 +170,20 @@ fun ClipboardView(
     onLongPress: (item: ClipboardItem) -> Unit = {},
 ) {
     val todayStartTimestamp = getTodayStartTimestamp()
-    val todayItems = clipboardItemList?.filter { it.timestamp >= todayStartTimestamp }.orEmpty()
-    val previousItems = clipboardItemList?.filter { it.timestamp < todayStartTimestamp }.orEmpty()
+
+    // ✅ Pinned 아이템을 먼저 가져옴
+    val pinnedItems = clipboardItemList?.filter { it.isPinned }?.sortedByDescending { it.timestamp }.orEmpty()
+
+    // ✅ 나머지 아이템을 시간순으로 정렬
+    val otherItems = clipboardItemList?.filter { !it.isPinned }?.sortedByDescending { it.timestamp }.orEmpty()
+
+    val todayItems = otherItems.filter { it.timestamp >= todayStartTimestamp }
+    val previousItems = otherItems.filter { it.timestamp < todayStartTimestamp }
+
 
     // 📌 월 단위로 그룹화
     val groupedByMonth = previousItems.groupBy { getYearMonth(it.timestamp) }
+
 
     Column(
         modifier = Modifier
@@ -205,6 +192,27 @@ fun ClipboardView(
             .padding(20.dp)
     ) {
         Header()
+
+        // ✅ Pinned 아이템 표시
+        if (pinnedItems.isNotEmpty()) {
+            Text(
+                "Pinned",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF333333)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                pinnedItems.forEach { item ->
+                    ClipboardItemView(item) { onLongPress(item) }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         // ✅ 오늘 데이터 표시
         if (todayItems.isNotEmpty()) {
@@ -224,13 +232,13 @@ fun ClipboardView(
                     ClipboardItemView(item) { onLongPress(item) }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp)) // 구분을 위한 간격
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // ✅ 월별로 데이터 표시
+        // ✅ 월별 데이터 표시
         groupedByMonth.forEach { (month, items) ->
             Text(
-                text = month, // ex: "2024년 2월"
+                text = month,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF333333),
@@ -245,7 +253,7 @@ fun ClipboardView(
                     ClipboardItemView(item) { onLongPress(item) }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp)) // 월 간격
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -384,7 +392,7 @@ fun CustomBottomSheet(
     item: ClipboardItem,
     onContent: (item: ClipboardItem) -> Unit = {},
     onEdit: (item: ClipboardItem) -> Unit = {},
-    onKeep: (item:ClipboardItem) -> Unit = {},
+    onPin: (item:ClipboardItem) -> Unit = {},
     onShear: (item: ClipboardItem) -> Unit = {},
     onDelete: (item: ClipboardItem) -> Unit = {},
     onDismiss: () -> Unit,
@@ -395,6 +403,8 @@ fun CustomBottomSheet(
     val coroutineScope = rememberCoroutineScope()
 
     val animOffset = remember { Animatable(if (isPreview) 0f else 500f) } // ✅ 프리뷰에서는 바로 표시
+
+    var pinIcon = if(item.isPinned) R.drawable.ic_pin_off else R.drawable.ic_pin_on
 
     LaunchedEffect(Unit) {
         if (!isPreview) { // ✅ 프리뷰가 아닐 때만 애니메이션 실행
@@ -445,8 +455,8 @@ fun CustomBottomSheet(
             SheetOption("수정", R.drawable.ic_edit, Modifier.weight(1f)) {
                 onEdit(item)
             }
-            SheetOption("핀", R.drawable.ic_keep, Modifier.weight(1f)) {
-                onShear(item)
+            SheetOption("핀", pinIcon, Modifier.weight(1f)) {
+                onPin(item)
                 coroutineScope.launch {
                     animOffset.animateTo(
                         500f, animationSpec = tween(300, easing = FastOutSlowInEasing)

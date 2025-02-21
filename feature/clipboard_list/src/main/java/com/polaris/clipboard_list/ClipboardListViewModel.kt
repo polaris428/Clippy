@@ -13,13 +13,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.polaris.data.local.ClipboardItem
 import com.polaris.domin.usecase.clipboard.PostClipboardDeleteUseCase
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
+import com.polaris.domin.usecase.clipboard.UpdateClipboardPinStateUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
 class ClipboardListViewModel @Inject constructor(
-    private val postClipboardDeleteUseCase: PostClipboardDeleteUseCase
+    private val postClipboardDeleteUseCase: PostClipboardDeleteUseCase,
+    private val updateClipboardPinStateUseCase: UpdateClipboardPinStateUseCase
 ) : ViewModel() {
 
     // 바텀시트 열림 상태 (초기값 false)
@@ -46,16 +48,21 @@ class ClipboardListViewModel @Inject constructor(
     }
 
 
-
     fun processIntent(intent: ClipboardListIntent) {
         when (intent) {
             is ClipboardListIntent.ItemLongPressed -> {
                 _selectedItem.value = intent.item
                 _isSheetOpen.value = true
             }
+
             is ClipboardListIntent.postClipboardDeleteIntent -> {
                 postClipboardDelete(id = intent.id)
             }
+
+            is ClipboardListIntent.UpdatePinClipboardDeleteIntent -> {
+                updateClipboardPinState(id = intent.id ,intent.pinState)
+            }
+
             ClipboardListIntent.BottomSheetDismissed -> {
                 _isSheetOpen.value = false
             }
@@ -63,11 +70,19 @@ class ClipboardListViewModel @Inject constructor(
         }
     }
 
-    fun postClipboardDelete(id:Int) = viewModelScope.launch(Dispatchers.IO)  {
-        postClipboardDeleteUseCase.execute(id = id){
+    fun postClipboardDelete(id: Int) = viewModelScope.launch(Dispatchers.IO) {
+        postClipboardDeleteUseCase.execute(id = id) {
 
         }.collect({ result ->
 
+
+        })
+    }
+
+    fun updateClipboardPinState(id: Int, pinState: Boolean) = viewModelScope.launch {
+        updateClipboardPinStateUseCase.execute(itemId = id, pinState = !pinState) {
+
+        }.collect({
 
         })
     }
