@@ -40,13 +40,19 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.designsystem)
-    implementation(projects.core.util)
-    implementation(projects.core.data)
     implementation(projects.core.domin)
+    implementation(projects.core.data)
+    implementation(projects.core.designsystem)
     implementation(libs.androidx.core.ktx)
+    implementation(projects.core.util)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation (libs.androidx.lifecycle.viewmodel.compose)
+
+    //hilt
+    implementation (libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    implementation (libs.androidx.hilt.common)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -54,15 +60,16 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    //hilt
-    implementation(libs.hilt.android)
-    implementation (libs.androidx.hilt.common)
-
-    implementation (libs.androidx.activity.ktx)
-    implementation(libs.androidx.runtime.livedata)
-    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.animation.core.android)
+    implementation(libs.androidx.animation.core.android)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
     kapt(libs.hilt.compiler)
+    kapt(libs.hilt.android.compiler)
     //lottie
     implementation(libs.lottie.compose)
 

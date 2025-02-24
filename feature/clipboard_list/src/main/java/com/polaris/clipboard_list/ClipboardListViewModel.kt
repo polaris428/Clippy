@@ -70,7 +70,7 @@ class ClipboardListViewModel @Inject constructor(
         }
     }
 
-    fun postClipboardDelete(id: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun postClipboardDelete(id: Int) = viewModelScope.launch {
         postClipboardDeleteUseCase.execute(id = id) {
 
         }.collect({ result ->

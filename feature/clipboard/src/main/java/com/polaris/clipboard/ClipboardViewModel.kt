@@ -1,6 +1,10 @@
 package com.polaris.clipboard
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.clipboard.intent.ClipboardIntent
@@ -29,6 +33,13 @@ class ClipboardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ClipboardUiState>(ClipboardUiState.Initialize)
     val uiState: StateFlow<ClipboardUiState> = _uiState
 
+    private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
+    val clipboardItem : StateFlow<ClipboardItem> = _clipboardItem
+
+    var url by mutableStateOf(TextFieldValue(""))
+    var siteName by mutableStateOf(TextFieldValue(""))
+    var isExpanded by mutableStateOf(false) // 📌 ViewModel에서 상태 유지
+
     fun processIntent(intent: ClipboardIntent) {
         when (intent) {
 
@@ -39,8 +50,8 @@ class ClipboardViewModel @Inject constructor(
         }
     }
 
-    suspend fun siteInformation(url: String): Job = viewModelScope.launch {
-        val clipboardItem = if (isUrl(url)) {
+     fun siteInformation(url: String): Job = viewModelScope.launch {
+         _clipboardItem.value = if (isUrl(url)) {
             val urlPreprocessing = extractUrl(url)
             ClipboardItem(
                 type = getWebTitle(urlPreprocessing),
@@ -88,5 +99,12 @@ class ClipboardViewModel @Inject constructor(
 
         }
 
+    }
+    fun expandView() {
+        isExpanded = true
+    }
+
+    fun collapseView() {
+        isExpanded = false
     }
 }
