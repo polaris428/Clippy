@@ -1,7 +1,7 @@
 package com.polaris.clipboard
 
 import android.app.Activity
-
+import kotlinx.coroutines.*
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -13,9 +13,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +56,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,6 +96,7 @@ import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.CDSTransparentButton
 import com.polaris.designsystem.ui.theme.ClippyTheme
 import com.polaris.designsystem.ui.theme.textColorGray
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class ClipboardActivity : AppCompatActivity() {
@@ -107,7 +119,8 @@ class ClipboardActivity : AppCompatActivity() {
 
         setContent {
 
-            ClipboardView() {
+            ClipboardView(onClick = {
+
                 if (!sharedText.isNullOrEmpty()) {
                     val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Shared Text", sharedText)
@@ -117,15 +130,23 @@ class ClipboardActivity : AppCompatActivity() {
                     Toast.makeText(this, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
 
                 }
+            }, onDismiss = {
 
-            }
+                finish()
+
+
+            })
 
         }
     }
 }
 
 @Composable
-fun ClipboardView(viewModel: ClipboardViewModel = hiltViewModel(), onClick: () -> Unit = {}) {
+fun ClipboardView(
+    viewModel: ClipboardViewModel = hiltViewModel(),
+    onClick: () -> Unit = {},
+    onDismiss: () -> Unit
+) {
 
     val uiState by viewModel.uiState.collectAsState()
     val activity = LocalActivity.current
@@ -134,11 +155,19 @@ fun ClipboardView(viewModel: ClipboardViewModel = hiltViewModel(), onClick: () -
 
     when (uiState) {
         is ClipboardUiState.Initialize -> {
-            ClipboardSaveView(title = clipboardItem.value.title, siteName = clipboardItem.value.type, onDismiss = {}, onConfirm = {
+            ClipboardSaveView(
+                title = clipboardItem.value.title,
+                siteName = clipboardItem.value.type,
+                isAnimation = true,
+                onDismiss = {
+                    onDismiss()
 
-                onClick()
+                },
+                onConfirm = {
 
-            })
+                    onClick()
+
+                })
         }
 
         is ClipboardUiState.ClipboardSave -> {
@@ -178,54 +207,88 @@ fun LottieAnimationAndExit(activity: Activity?) {
 
 
 @Composable
-@Preview(showBackground = true)
+@Preview
 fun ClipboardSaveView(
     title: String = "제목",
     siteName: String = "사이트 제목",
     onDismiss: () -> Unit = {},
-    onConfirm: () -> Unit = {}
+    onConfirm: () -> Unit = {},
+    isAnimation: Boolean = false
 ) {
-    ClippyTheme{
-        Box(
-            modifier = Modifier
-                .fillMaxSize().background(Color(0x3B363636)),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                    .navigationBarsPadding(),
-
-                color = Color.White,
-                shadowElevation = 4.dp
-            ) {
-
-                Column(Modifier.padding(  20.dp)) {
-                    Text(text = "클리피가 링크를 저장할께요!",style = MaterialTheme.typography.headlineMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = "링크 제목",style= MaterialTheme.typography.bodySmall, color = textColorGray)
-                    Text(text = title.toString(),style= MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(text = "링크 제목",style= MaterialTheme.typography.bodySmall, color = textColorGray)
-                    Text(text = siteName.toString(),style= MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CDSButton(buttonText = "저장 하기", onClick = { onConfirm()}) {
-
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    CDSTransparentButton(buttonText = "세부 설정", onClick =  { onDismiss() }) {
-
-                    }
-
-                }
-            }
-
-
-        }
+    var isVisible by remember { mutableStateOf(isAnimation) }
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        if (isAnimation) isVisible = false
     }
 
+    ClippyTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0x3B363636))
+                .clickable {
+                    isVisible = !isVisible
+                    coroutineScope.launch {
+                        delay(300) // 2초 대기
+                        onDismiss()
+                    }
+
+                },
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            AnimatedVisibility(
+                visible = !isVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { it * 2 }, // 화면 아래에서 올라옴
+                    animationSpec = tween(durationMillis = 700, easing = EaseInOutCubic)
+                ) + fadeIn(animationSpec = tween(700)),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(durationMillis = 500, easing = EaseInOutCubic)
+                ) + fadeOut(animationSpec = tween(500))
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                        .navigationBarsPadding(),
+                    color = Color.White,
+                    shadowElevation = 4.dp
+                ) {
+                    Column(Modifier.padding(20.dp)) {
+                        Text(
+                            text = "클리피가 링크를 저장할께요!",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "링크 제목",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = textColorGray
+                        )
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "사이트 제목",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = textColorGray
+                        )
+                        Text(
+                            text = siteName,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        CDSButton(buttonText = "저장 하기", onClick = onConfirm)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        CDSTransparentButton(buttonText = "세부 설정", onClick = onDismiss)
+                    }
+                }
+            }
+        }
+    }
 }
 
 
