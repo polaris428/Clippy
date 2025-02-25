@@ -74,6 +74,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -218,6 +219,7 @@ fun ClipboardSaveView(
     var isVisible by remember { mutableStateOf(isAnimation) }
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
+
         if (isAnimation) isVisible = false
     }
 
@@ -240,8 +242,8 @@ fun ClipboardSaveView(
                 visible = !isVisible,
                 enter = slideInVertically(
                     initialOffsetY = { it * 2 }, // 화면 아래에서 올라옴
-                    animationSpec = tween(durationMillis = 700, easing = EaseInOutCubic)
-                ) + fadeIn(animationSpec = tween(700)),
+                    animationSpec = tween(durationMillis = 1200, easing = EaseInOutCubic)
+                ) + fadeIn(animationSpec = tween(1200)),
                 exit = slideOutVertically(
                     targetOffsetY = { it },
                     animationSpec = tween(durationMillis = 500, easing = EaseInOutCubic)
@@ -268,22 +270,29 @@ fun ClipboardSaveView(
                         )
                         Text(
                             text = title,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = "사이트 제목",
                             style = MaterialTheme.typography.bodySmall,
-                            color = textColorGray
+                            color = textColorGray,
                         )
                         Text(
                             text = siteName,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        CDSButton(buttonText = "저장 하기", onClick = onConfirm)
+                        Spacer(modifier = Modifier.height(32.dp))
+                        CDSButton(buttonText = "저장 하기", onClick = {
+                            onConfirm()
+                            onDismiss()
+                        })
                         Spacer(modifier = Modifier.height(12.dp))
-                        CDSTransparentButton(buttonText = "세부 설정", onClick = onDismiss)
+                        CDSTransparentButton(buttonText = "편집", onClick = onDismiss)
                     }
                 }
             }
