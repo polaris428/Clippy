@@ -85,6 +85,41 @@ fun CDSButton(
 
     Button(
         onClick = onClick,
+        modifier = modifier.fillMaxWidth(1f).padding(0.dp),
+        enabled = enabled,
+        shape = shape,
+        colors = colors,
+        elevation = elevation,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource
+    ) {
+        Text(text = buttonText,modifier= Modifier.padding(6.dp))
+        content()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CDSNegativeButton(
+    buttonText:String = "버튼 텍스트",
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = RoundedCornerShape(8.dp),
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = PrimaryGray,  // 버튼 배경색
+        contentColor = Color.Black   // 버튼 내 텍스트 색상
+    ),
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit = {}
+) {
+
+    Button(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(1f),
         enabled = enabled,
         shape = shape,
@@ -94,11 +129,10 @@ fun CDSButton(
         contentPadding = contentPadding,
         interactionSource = interactionSource
     ) {
-        Text(text = buttonText)
+        Text(text = buttonText,modifier= Modifier.padding(6.dp))
         content()
     }
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

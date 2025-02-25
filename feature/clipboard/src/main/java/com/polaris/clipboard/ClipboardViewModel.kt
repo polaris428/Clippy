@@ -23,6 +23,7 @@ import com.polaris.util.getWebTitle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,13 +51,22 @@ class ClipboardViewModel @Inject constructor(
         }
     }
 
-     fun siteInformation(url: String): Job = viewModelScope.launch {
-         _clipboardItem.value = if (isUrl(url)) {
+    fun siteInformation(url: String): Job = viewModelScope.launch {
+        val clipboardItem = if (isUrl(url)) {
             val urlPreprocessing = extractUrl(url)
+
+            // 비동기 처리 보장
+            val type = withContext(Dispatchers.IO) {
+                getWebTitle(urlPreprocessing)
+            }
+            val title = withContext(Dispatchers.IO){
+                fetchWebTitle(urlPreprocessing)
+            }
+
             ClipboardItem(
-                type = getWebTitle(urlPreprocessing),
+                type = type,
                 url = urlPreprocessing,
-                title = fetchWebTitle(urlPreprocessing).toString(),
+                title = title?:"",
                 faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
             )
         } else {
@@ -68,7 +78,7 @@ class ClipboardViewModel @Inject constructor(
             )
         }
 
-
+        _clipboardItem.emit(clipboardItem) // value 대신 emit 사용
     }
 
     fun postClipboardInsert(url: String): Job = viewModelScope.launch(Dispatchers.IO) {

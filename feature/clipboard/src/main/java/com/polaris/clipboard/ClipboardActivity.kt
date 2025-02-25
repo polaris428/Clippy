@@ -15,6 +15,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,9 +24,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -46,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
@@ -76,6 +80,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.polaris.designsystem.ui.theme.CDSButton
+import com.polaris.designsystem.ui.theme.CDSNegativeButton
 import com.polaris.designsystem.ui.theme.CDSTextField
 
 @AndroidEntryPoint
@@ -100,12 +105,16 @@ class ClipboardActivity : AppCompatActivity() {
         setContent {
 
             ClipboardView() {
-                val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Shared Text", sharedText)
-                clipboard.setPrimaryClip(clip)
+                if (!sharedText.isNullOrEmpty()) {
+                    val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("Shared Text", sharedText)
+                    clipboard.setPrimaryClip(clip)
 
-                //  viewModel.processIntent(ClipboardIntent.postClipboarInsertIntent(sharedText))
-                Toast.makeText(this, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+                    viewModel.processIntent(ClipboardIntent.postClipboarInsertIntent(sharedText))
+                    Toast.makeText(this, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+
+                }
+
             }
 
         }
@@ -117,12 +126,12 @@ fun ClipboardView(viewModel: ClipboardViewModel = hiltViewModel(), onClick: () -
 
     val uiState by viewModel.uiState.collectAsState()
     val activity = LocalActivity.current
-    val title = viewModel.clipboardItem.collectAsState().value.title
-    val type = viewModel.clipboardItem.collectAsState().value.type
-    Log.e("polaris0428", title + "제목")
+    val clipboardItem = viewModel.clipboardItem.collectAsState()
+
+
     when (uiState) {
         is ClipboardUiState.Initialize -> {
-            ClipboardSaveView(title = title, siteName = type, onDismiss = {}, onConfirm = {
+            ClipboardSaveView(title = clipboardItem.value.title, siteName = clipboardItem.value.type, onDismiss = {}, onConfirm = {
 
                 onClick()
 
@@ -163,26 +172,70 @@ fun LottieAnimationAndExit(activity: Activity?) {
     }
 
 }
+
+
 @Composable
 @Preview(showBackground = true)
 fun ClipboardSaveView(
+    title: String = "제목",
+    siteName: String = "사이트 제목",
+    onDismiss: () -> Unit = {},
+    onConfirm: () -> Unit = {}
+) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize().background(Color(0x3B363636)),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                .navigationBarsPadding(),
+
+            color = Color.White,
+            shadowElevation = 4.dp
+        ) {
+
+            Column(Modifier.padding(  20.dp)) {
+                Text(text = "클리피가 링크를 잘 저장할께요!")
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = title.toString())
+                Text(text = siteName.toString())
+                Spacer(modifier = Modifier.height(16.dp))
+                CDSButton(buttonText = "저장 하기", onClick = { onConfirm()}) {
+
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                CDSNegativeButton(buttonText = "세부 설정", onClick =  { onDismiss() }) {
+
+                }
+
+            }
+        }
+
+
+    }
+}
+
+
+@Composable
+@Preview(showBackground = true)
+fun ClipboardSaveViewTest(
     title: String = "",
     siteName: String = "",
     onDismiss: () -> Unit = {},
     onConfirm: () -> Unit = {}
 ) {
-   // val viewModel: ClipboardViewModel = hiltViewModel()
 
     var url by remember { mutableStateOf(TextFieldValue(title)) }
     var siteNameState by remember { mutableStateOf(TextFieldValue(siteName)) }
 
-   // val targetHeight = if (viewModel.isExpanded) LocalConfiguration.current.screenHeightDp.dp else 200.dp
-   // val animatedHeight by animateDpAsState(targetValue = targetHeight, label = "heightAnimation")
-
     Box(
         modifier = Modifier
-
-            .fillMaxWidth(),
+            .fillMaxSize(),
         contentAlignment = Alignment.BottomCenter
     ) {
         Column(Modifier.padding(horizontal = 20.dp)) {
@@ -194,7 +247,7 @@ fun ClipboardSaveView(
                 onValueChange = { url = url.copy(text = it) },
                 onFocusChange = {
                     Log.e("FocusChanged", "URL 입력란에 포커스됨")
-                  //  viewModel.expandView()  // ✅ ViewModel의 상태를 변경
+                    //  viewModel.expandView()  // ✅ ViewModel의 상태를 변경
                 }
             )
 
@@ -205,7 +258,7 @@ fun ClipboardSaveView(
             )
 
             CDSButton(buttonText = "저장하기") {
-               // viewModel.collapseView() // ✅ 저장 버튼 누르면 축소되도록 설정
+                // viewModel.collapseView() // ✅ 저장 버튼 누르면 축소되도록 설정
             }
         }
     }
