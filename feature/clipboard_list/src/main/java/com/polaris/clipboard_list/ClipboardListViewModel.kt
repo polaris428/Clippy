@@ -79,7 +79,7 @@ class ClipboardListViewModel @Inject constructor(
         })
     }
 
-    fun updateClipboardPinState(id: Int, pinState: Boolean) = viewModelScope.launch {
+    fun updateClipboardPinState(id: Int, pinState: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         updateClipboardPinStateUseCase.execute(itemId = id, pinState = !pinState) {
 
         }.collect({

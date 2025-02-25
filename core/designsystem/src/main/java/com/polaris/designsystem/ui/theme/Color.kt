@@ -23,5 +23,6 @@ val Gray30 = Color(0xFF495057)
 val Gray20 = Color(0xFF343A40)
 val Gray10 = Color(0xFF212529)
 
-val PrimaryGray = Gray60
+val PrimaryGray = Gray70
 val bottomSheetTextColor = Color(0xFF5F6368)
+val textColorGray = Gray40

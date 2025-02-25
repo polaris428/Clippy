@@ -82,6 +82,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSNegativeButton
 import com.polaris.designsystem.ui.theme.CDSTextField
+import com.polaris.designsystem.ui.theme.CDSTransparentButton
+import com.polaris.designsystem.ui.theme.ClippyTheme
+import com.polaris.designsystem.ui.theme.textColorGray
 
 @AndroidEntryPoint
 class ClipboardActivity : AppCompatActivity() {
@@ -182,42 +185,47 @@ fun ClipboardSaveView(
     onDismiss: () -> Unit = {},
     onConfirm: () -> Unit = {}
 ) {
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize().background(Color(0x3B363636)),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-
-        Surface(
+    ClippyTheme{
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                .navigationBarsPadding(),
-
-            color = Color.White,
-            shadowElevation = 4.dp
+                .fillMaxSize().background(Color(0x3B363636)),
+            contentAlignment = Alignment.BottomCenter
         ) {
 
-            Column(Modifier.padding(  20.dp)) {
-                Text(text = "클리피가 링크를 잘 저장할께요!")
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = title.toString())
-                Text(text = siteName.toString())
-                Spacer(modifier = Modifier.height(16.dp))
-                CDSButton(buttonText = "저장 하기", onClick = { onConfirm()}) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                    .navigationBarsPadding(),
+
+                color = Color.White,
+                shadowElevation = 4.dp
+            ) {
+
+                Column(Modifier.padding(  20.dp)) {
+                    Text(text = "클리피가 링크를 저장할께요!",style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = "링크 제목",style= MaterialTheme.typography.bodySmall, color = textColorGray)
+                    Text(text = title.toString(),style= MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(text = "링크 제목",style= MaterialTheme.typography.bodySmall, color = textColorGray)
+                    Text(text = siteName.toString(),style= MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CDSButton(buttonText = "저장 하기", onClick = { onConfirm()}) {
+
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    CDSTransparentButton(buttonText = "세부 설정", onClick =  { onDismiss() }) {
+
+                    }
 
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                CDSNegativeButton(buttonText = "세부 설정", onClick =  { onDismiss() }) {
-
-                }
-
             }
+
+
         }
-
-
     }
+
 }
 
 
