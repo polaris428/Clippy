@@ -23,6 +23,7 @@ import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -67,7 +68,7 @@ fun LineView() {
 @Preview(showBackground = true)
 @Composable
 fun CDSButton(
-    buttonText:String = "버튼 텍스트",
+    buttonText: String = "버튼 텍스트",
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -82,27 +83,31 @@ fun CDSButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit = {}
 ) {
-
-    Button(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(1f).padding(0.dp),
-        enabled = enabled,
-        shape = shape,
-        colors = colors,
-        elevation = elevation,
-        border = border,
-        contentPadding = contentPadding,
-        interactionSource = interactionSource
-    ) {
-        Text(text = buttonText,modifier= Modifier.padding(6.dp))
-        content()
+    ClippyTheme {
+        Button(
+            onClick = onClick,
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .padding(0.dp),
+            enabled = enabled,
+            shape = shape,
+            colors = colors,
+            elevation = elevation,
+            border = border,
+            contentPadding = contentPadding,
+            interactionSource = interactionSource
+        ) {
+            Text(text = buttonText, modifier = Modifier.padding(6.dp), style = MaterialTheme.typography.labelLarge)
+            content()
+        }
     }
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun CDSNegativeButton(
-    buttonText:String = "버튼 텍스트",
+    buttonText: String = "버튼 텍스트",
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -129,18 +134,53 @@ fun CDSNegativeButton(
         contentPadding = contentPadding,
         interactionSource = interactionSource
     ) {
-        Text(text = buttonText,modifier= Modifier.padding(6.dp))
+        Text(text = buttonText, modifier = Modifier.padding(6.dp), style = MaterialTheme.typography.labelLarge)
         content()
     }
 }
 
 
+@Preview(showBackground = true)
+@Composable
+fun CDSTransparentButton(
+    buttonText: String = "버튼 텍스트",
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = RoundedCornerShape(8.dp),
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = Color.Transparent,  // 버튼 배경색
+        contentColor = Gray40   // 버튼 내 텍스트 색상
+    ),
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit = {}
+) {
+
+    Button(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(1f),
+        enabled = enabled,
+        shape = shape,
+        colors = colors,
+        elevation = elevation,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource
+    ) {
+        Text(text = buttonText, modifier = Modifier.padding(6.dp), style = MaterialTheme.typography.labelLarge)
+        content()
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CDSTextField(
-    modifier: Modifier=Modifier,
-    value: String ="",  // 외부에서 값을 받도록 수정
-    onValueChange: (String) -> Unit={}, // 값이 변경될 때 외부로 전달
+    modifier: Modifier = Modifier,
+    value: String = "",  // 외부에서 값을 받도록 수정
+    onValueChange: (String) -> Unit = {}, // 값이 변경될 때 외부로 전달
     label: String = "라벨",
     textColor: Color = Color.Black,
     underlineColor: Color = Color.Gray,
@@ -169,7 +209,7 @@ fun CDSTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged { onFocusChange(it.isFocused) }
-                .offset(x=(-10).dp)
+                .offset(x = (-10).dp)
         )
 
         Canvas(
