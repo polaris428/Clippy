@@ -29,14 +29,14 @@ class ClipboardListViewModel @Inject constructor(
     val isSheetOpen: StateFlow<Boolean> = _isSheetOpen
 
     // 선택된 ClipboardItem (기본값 dummyData)
-    private val _selectedItem = MutableStateFlow(dummyData)
-    val selectedItem: StateFlow<ClipboardItem> = _selectedItem
+    private val _selectedClipboardItem = MutableStateFlow<ClipboardItem>(dummyData)
+    val selectedClipboardItem: StateFlow<ClipboardItem> = _selectedClipboardItem
 
     /**
      * 특정 아이템 롱클릭 시 바텀 시트를 열고 선택한 아이템 저장
      */
     fun onItemLongPressed(item: ClipboardItem) {
-        _selectedItem.value = item
+        _selectedClipboardItem.value = item
         _isSheetOpen.value = true
     }
 
@@ -51,8 +51,9 @@ class ClipboardListViewModel @Inject constructor(
     fun processIntent(intent: ClipboardListIntent) {
         when (intent) {
             is ClipboardListIntent.ItemLongPressed -> {
-                _selectedItem.value = intent.item
                 _isSheetOpen.value = true
+                _selectedClipboardItem.value = intent.item
+
             }
 
             is ClipboardListIntent.postClipboardDeleteIntent -> {
@@ -63,14 +64,21 @@ class ClipboardListViewModel @Inject constructor(
                 updateClipboardPinState(id = intent.id ,intent.pinState)
             }
 
-            ClipboardListIntent.BottomSheetDismissed -> {
+            is ClipboardListIntent.BottomSheetDismissed -> {
                 _isSheetOpen.value = false
+
             }
 
         }
     }
 
-    fun postClipboardDelete(id: Int) = viewModelScope.launch {
+
+
+    fun clearSelectedClipboard(){
+        _selectedClipboardItem.value = dummyData
+    }
+
+    fun postClipboardDelete(id: Int) = viewModelScope.launch(Dispatchers.IO) {
         postClipboardDeleteUseCase.execute(id = id) {
 
         }.collect({ result ->

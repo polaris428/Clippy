@@ -84,25 +84,9 @@ class ClipboardViewModel @Inject constructor(
     fun postClipboardInsert(url: String): Job = viewModelScope.launch(Dispatchers.IO) {
 
 
-        val clipboardItem = if (isUrl(url)) {
-            val urlPreprocessing = extractUrl(url)
-            ClipboardItem(
-                type = getWebTitle(urlPreprocessing),
-                url = urlPreprocessing,
-                title = fetchWebTitle(urlPreprocessing).toString(),
-                faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
-            )
-        } else {
-            ClipboardItem(
-                type = "text",
-                url = null,
-                title = url,
-                faviconUrl = null
-            )
-        }
 
         postClipboardInsertUseCase.execute(
-            item = clipboardItem,
+            item = clipboardItem.value,
             onComplete = {
 
             }).collect {

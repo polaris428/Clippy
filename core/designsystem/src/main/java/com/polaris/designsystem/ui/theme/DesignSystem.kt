@@ -6,12 +6,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -239,17 +241,42 @@ fun CDSTextField(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
-fun AnimatedCheckmarkWithCircle() {
-    val isPreview = LocalInspectionMode.current  // 프리뷰 모드 감지
-    val circleProgress = remember { Animatable(if (isPreview) 1f else 0f) }
-    val checkProgress = remember { Animatable(if (isPreview) 1f else 0f) }
+fun AnimatedCheckmarkWithCirclePreview() {
+    var isVisible by remember { mutableStateOf(true) } // 🔹 디폴트: 안 보이도록 설정
 
-    LaunchedEffect(Unit) {
-        if (!isPreview) {
-            circleProgress.animateTo(1f, animationSpec = tween(500, easing = FastOutSlowInEasing))
-            checkProgress.animateTo(1f, animationSpec = tween(500, easing = FastOutSlowInEasing))
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        AnimatedCheckmarkWithCircle(isVisible = isVisible)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { isVisible = !isVisible }) {
+            Text(if (isVisible) "사라지게 하기" else "보이게 하기")
+        }
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun AnimatedCheckmarkWithCircle(isVisible: Boolean = false) {
+    var isPreView = LocalInspectionMode.current
+    val circleProgress = remember { Animatable(if (isPreView) 1f else 0f) } // 🔹 프리뷰에서 1f 설정
+    val checkProgress = remember { Animatable(if (isPreView) 1f else 0f) } // 🔹 프리뷰에서 1f 설정
+
+    LaunchedEffect(isVisible) {
+        if (!isPreView) { // 🔹 프리뷰에서는 애니메이션 실행 X (즉시 보이도록)
+            if (isVisible) {
+                circleProgress.animateTo(1f, animationSpec = tween(150))
+                checkProgress.animateTo(1f, animationSpec = tween(150))
+            } else {
+                checkProgress.animateTo(0f, animationSpec = tween(150)) // 🔹 체크가 먼저 사라짐
+                circleProgress.animateTo(0f, animationSpec = tween(150)) // 🔹 원이 나중에 사라짐
+            }
         }
     }
 
@@ -285,4 +312,3 @@ fun AnimatedCheckmarkWithCircle() {
         )
     }
 }
-
