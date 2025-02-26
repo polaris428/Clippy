@@ -1,5 +1,8 @@
 package com.polaris.designsystem.ui.theme
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -29,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +44,13 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -228,3 +238,51 @@ fun CDSTextField(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun AnimatedCheckmarkWithCircle() {
+    val isPreview = LocalInspectionMode.current  // 프리뷰 모드 감지
+    val circleProgress = remember { Animatable(if (isPreview) 1f else 0f) }
+    val checkProgress = remember { Animatable(if (isPreview) 1f else 0f) }
+
+    LaunchedEffect(Unit) {
+        if (!isPreview) {
+            circleProgress.animateTo(1f, animationSpec = tween(500, easing = FastOutSlowInEasing))
+            checkProgress.animateTo(1f, animationSpec = tween(500, easing = FastOutSlowInEasing))
+        }
+    }
+
+    Canvas(modifier = Modifier.size(24.dp)) {
+        val center = Offset(size.width / 2, size.height / 2)
+        val maxRadius = size.minDimension / 2.2f
+        val currentRadius = maxRadius * circleProgress.value
+
+        drawCircle(
+            color = PrimaryColor,
+            radius = currentRadius,
+            center = center,
+            style = Fill
+        )
+
+        val checkPath = Path().apply {
+            moveTo(size.width * 0.3f, size.height * 0.5f)
+            lineTo(size.width * 0.45f, size.height * 0.65f)
+            lineTo(size.width * 0.75f, size.height * 0.35f)
+        }
+
+        val pathMeasure = PathMeasure()
+        pathMeasure.setPath(checkPath, false)
+        val length = pathMeasure.length * checkProgress.value
+
+        val drawnPath = Path()
+        pathMeasure.getSegment(0f, length, drawnPath, true)
+
+        drawPath(
+            path = drawnPath,
+            color = Color.White,
+            style = Stroke(width = 10f)
+        )
+    }
+}
+
