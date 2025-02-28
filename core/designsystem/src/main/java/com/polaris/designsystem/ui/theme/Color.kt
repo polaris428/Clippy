@@ -13,10 +13,10 @@ val Pink40 = Color(0xFF7D5260)
 val PrimaryColor = Color(0xFFfdbf0a)
 
 val Gray100 = Color(0xFFF8F9FA)
-val Gray90 = Color(0xFFF1F3F5)
+val Gray90 = Color(0xFFF2F3F5)
 val Gray80 = Color(0xFFE9ECEF)
 val Gray70 = Color(0xFFDEE2E6)
-val Gray60 = Color(0xFFCED4DA)
+val Gray60 = Color(0xFFC9C9D0)
 val Gray50 = Color(0xFFADB5BD)
 val Gray40 = Color(0xFF6C757D)
 val Gray30 = Color(0xFF495057)
@@ -26,3 +26,4 @@ val Gray10 = Color(0xFF212529)
 val PrimaryGray = Gray70
 val bottomSheetTextColor = Color(0xFF5F6368)
 val textColorGray = Gray40
+val UnderlineColor =Gray60

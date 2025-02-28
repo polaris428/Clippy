@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/core/util" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/clipboard" />
+            <option value="$PROJECT_DIR$/feature/clipboard_edit" />
             <option value="$PROJECT_DIR$/feature/clipboard_list" />
             <option value="$PROJECT_DIR$/feature/main" />
           </set>

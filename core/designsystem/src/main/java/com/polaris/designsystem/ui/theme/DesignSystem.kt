@@ -189,13 +189,14 @@ fun CDSTransparentButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+@Preview(showBackground = true)
 fun CDSTextField(
     modifier: Modifier = Modifier,
     value: String = "",  // 외부에서 값을 받도록 수정
     onValueChange: (String) -> Unit = {}, // 값이 변경될 때 외부로 전달
     label: String = "라벨",
     textColor: Color = Color.Black,
-    underlineColor: Color = Color.Gray,
+    underlineColor: Color = UnderlineColor,
     focusedUnderlineColor: Color = Color.Blue,
     underlineThickness: Dp = 2.dp,
     keyboardType: KeyboardType = KeyboardType.Number,
