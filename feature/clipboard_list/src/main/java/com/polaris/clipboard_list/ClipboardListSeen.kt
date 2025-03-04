@@ -180,7 +180,7 @@ fun CustomBottomSheetView(
 @Composable
 fun ClipboardView(
     clipboardItemList: List<ClipboardItem>? = listOf(dummyData),
-    selectedClipboardItem: ClipboardItem?= dummyData,
+    selectedClipboardItem: ClipboardItem?= null,
     onLongPress: (item: ClipboardItem) -> Unit = {},
 ) {
     val todayStartTimestamp = getTodayStartTimestamp()
@@ -274,7 +274,7 @@ fun ClipboardView(
 }
 
 val dummyData = ClipboardItem(
-    id = 3,
+    id = -1,
     type = "GitHub",
     url = "https://www.github.com",
     title = "안드로이드 라이브러리 모음",

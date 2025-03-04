@@ -29,7 +29,7 @@ class ClipboardListViewModel @Inject constructor(
     val isSheetOpen: StateFlow<Boolean> = _isSheetOpen
 
     // 선택된 ClipboardItem (기본값 dummyData)
-    private val _selectedClipboardItem = MutableStateFlow<ClipboardItem>(dummyData)
+    private val _selectedClipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
     val selectedClipboardItem: StateFlow<ClipboardItem> = _selectedClipboardItem
 
     /**
