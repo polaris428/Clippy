@@ -37,9 +37,9 @@ class ClipboardViewModel @Inject constructor(
     private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
     val clipboardItem : StateFlow<ClipboardItem> = _clipboardItem
 
-    var url by mutableStateOf(TextFieldValue(""))
-    var siteName by mutableStateOf(TextFieldValue(""))
-    var isExpanded by mutableStateOf(false) // 📌 ViewModel에서 상태 유지
+
+    private val _sharedText = MutableStateFlow<String>("")
+    val sharedText : StateFlow<String> = _sharedText
 
     fun processIntent(intent: ClipboardIntent) {
         when (intent) {
@@ -62,7 +62,8 @@ class ClipboardViewModel @Inject constructor(
             val title = withContext(Dispatchers.IO){
                 fetchWebTitle(urlPreprocessing)
             }
-
+            Log.e("polaris0428",type)
+            Log.e("polaris0428",title)
             ClipboardItem(
                 type = type,
                 url = urlPreprocessing,
@@ -94,11 +95,6 @@ class ClipboardViewModel @Inject constructor(
         }
 
     }
-    fun expandView() {
-        isExpanded = true
-    }
 
-    fun collapseView() {
-        isExpanded = false
-    }
+
 }

@@ -199,7 +199,7 @@ fun CDSTextField(
     underlineColor: Color = UnderlineColor,
     focusedUnderlineColor: Color = Color.Blue,
     underlineThickness: Dp = 2.dp,
-    keyboardType: KeyboardType = KeyboardType.Number,
+    keyboardType: KeyboardType = KeyboardType.Text,
     isFocused: Boolean = false,
     onFocusChange: (Boolean) -> Unit = {}
 ) {
@@ -212,7 +212,7 @@ fun CDSTextField(
             label = { Text(label, color = textColor) },
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType),
-            textStyle = TextStyle(fontSize = 22.sp, color = textColor),
+            textStyle = TextStyle(fontSize = 18.sp, color = textColor),
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,

@@ -13,24 +13,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity.CLIPBOARD_SERVICE
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOutCubic
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,19 +33,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,32 +48,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathMeasure
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -97,12 +63,16 @@ import com.polaris.clipboard.state.ClipboardUiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.polaris.clipboard.navigation.ClipboardRoute
+import com.polaris.clipboard.navigation.clipboardNavGraph
+import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
+import com.polaris.clipboard_edit.navigation.questionNavGraph
 import com.polaris.designsystem.ui.theme.CDSButton
-import com.polaris.designsystem.ui.theme.CDSNegativeButton
 import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.CDSTransparentButton
 import com.polaris.designsystem.ui.theme.ClippyTheme
-import com.polaris.designsystem.ui.theme.PrimaryColor
 import com.polaris.designsystem.ui.theme.textColorGray
 import kotlinx.coroutines.delay
 
@@ -116,49 +86,51 @@ class ClipboardActivity : AppCompatActivity() {
         val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
         if (!sharedText.isNullOrEmpty()) {
             viewModel.siteInformation(url = sharedText)
-//            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-//            val clip = ClipData.newPlainText("Shared Text", sharedText)
-//            clipboard.setPrimaryClip(clip)
-//
-//            viewModel.processIntent(ClipboardIntent.postClipboarInsertIntent(sharedText))
-//            Toast.makeText(this, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+
 
         }
 
+
         setContent {
-
-            ClipboardView(onClick = {
-
-                if (!sharedText.isNullOrEmpty()) {
-                    val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("Shared Text", sharedText)
-                    clipboard.setPrimaryClip(clip)
-
-                    viewModel.processIntent(ClipboardIntent.postClipboarInsertIntent(sharedText))
-                    Toast.makeText(this, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
-
-                }
-            }, onDismiss = {
-
-                finish()
+            val navController = rememberNavController()
 
 
-            })
+            NavHost(navController = navController, startDestination = ClipboardRoute.route) {
+                clipboardNavGraph(viewModel =viewModel,onEditClick = {
+                    navController.navigateClipboardEdit()
+                }, onDismiss = {
+                   finish()
+                })
+                questionNavGraph(viewModel.clipboardItem)
+
+            }
+
 
         }
     }
 }
 
 @Composable
+fun ClipboardSeen(
+    viewModel: ClipboardViewModel = hiltViewModel(),
+    onEditClick: () -> Unit = {},
+    onDismiss: () -> Unit = {}
+) {
+
+    ClipboardView(viewModel, onEditClick, onDismiss)
+}
+
+@Composable
 fun ClipboardView(
     viewModel: ClipboardViewModel = hiltViewModel(),
-    onClick: () -> Unit = {},
+    onEditClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
     val activity = LocalActivity.current
     val clipboardItem = viewModel.clipboardItem.collectAsState()
+    val context = LocalContext.current
 
 
     when (uiState) {
@@ -168,14 +140,23 @@ fun ClipboardView(
                 siteName = clipboardItem.value.type,
                 isAnimation = true,
                 onDismiss = {
+
                     onDismiss()
 
                 },
                 onConfirm = {
 
-                    onClick()
+                    val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("Shared Text", viewModel.sharedText.value)
+                    clipboard.setPrimaryClip(clip)
 
-                })
+                    viewModel.processIntent(ClipboardIntent.postClipboarInsertIntent(viewModel.sharedText.value))
+                    Toast.makeText(context, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+
+
+                },
+                onEditClick  = onEditClick
+            )
         }
 
         is ClipboardUiState.ClipboardSave -> {
@@ -221,6 +202,7 @@ fun ClipboardSaveView(
     siteName: String = "사이트 제목",
     onDismiss: () -> Unit = {},
     onConfirm: () -> Unit = {},
+    onEditClick:()-> Unit ={},
     isAnimation: Boolean = false
 ) {
     var isVisible by remember { mutableStateOf(isAnimation) }
@@ -299,7 +281,7 @@ fun ClipboardSaveView(
                             onDismiss()
                         })
                         Spacer(modifier = Modifier.height(12.dp))
-                        CDSTransparentButton(buttonText = "편집", onClick = onDismiss)
+                        CDSTransparentButton(buttonText = "편집", onClick = onEditClick)
                     }
                 }
             }
