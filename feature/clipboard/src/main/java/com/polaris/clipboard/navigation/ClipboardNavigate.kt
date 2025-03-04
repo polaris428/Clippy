@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.polaris.clipboard.ClipboardSeen
 import com.polaris.clipboard.ClipboardViewModel
+import com.polaris.shared.MainViewModel
 
 
 fun NavController.navigateClipboard() {
@@ -14,12 +15,13 @@ fun NavController.navigateClipboard() {
 }
 
 fun NavGraphBuilder.clipboardNavGraph(
-    viewModel: ClipboardViewModel,
+    mainViewModel: MainViewModel,
+    onSaveClick:()->Unit,
     onEditClick:()->Unit,
     onDismiss : () ->Unit
 ) {
     composable(route = ClipboardRoute.route) {
-        ClipboardSeen(viewModel,onEditClick = onEditClick , onDismiss = onDismiss)
+        ClipboardSeen(viewModel = mainViewModel,onSaveClick = onSaveClick,onEditClick = onEditClick , onDismiss = onDismiss)
     }
 }
 

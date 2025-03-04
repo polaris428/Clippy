@@ -74,11 +74,13 @@ import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.CDSTransparentButton
 import com.polaris.designsystem.ui.theme.ClippyTheme
 import com.polaris.designsystem.ui.theme.textColorGray
+import com.polaris.shared.MainViewModel
+import com.polaris.shared.intent.MainIntent
 import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class ClipboardActivity : AppCompatActivity() {
-    private val viewModel: ClipboardViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -93,106 +95,78 @@ class ClipboardActivity : AppCompatActivity() {
 
         setContent {
             val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = ClipboardRoute.route ) {
+                clipboardNavGraph(
+                    mainViewModel = viewModel,
+                    onSaveClick = {
+                        saveClipboard()
 
-
-            NavHost(navController = navController, startDestination = ClipboardRoute.route) {
-                clipboardNavGraph(viewModel =viewModel,onEditClick = {
-                    navController.navigateClipboardEdit()
-                }, onDismiss = {
-                   finish()
-                })
-                questionNavGraph(viewModel.clipboardItem)
+                    }, onEditClick = {
+                        navController.navigateClipboardEdit()
+                    }, onDismiss = {
+                        finish()
+                    })
+                questionNavGraph(mainViewModel = viewModel, onSaveClick = { saveClipboard() })
 
             }
 
-
         }
+    }
+
+    fun saveClipboard() {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("Shared Text", viewModel.clipboardItem.value.url)
+        clipboard.setPrimaryClip(clip)
+
+        viewModel.processIntent(MainIntent.postClipboarInsertIntent)
+        Toast.makeText(this@ClipboardActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
     }
 }
 
 @Composable
 fun ClipboardSeen(
-    viewModel: ClipboardViewModel = hiltViewModel(),
+    viewModel: MainViewModel,
+    onSaveClick:()->Unit = {},
     onEditClick: () -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
 
-    ClipboardView(viewModel, onEditClick, onDismiss)
+    ClipboardView(viewModel, onSaveClick,onEditClick, onDismiss)
 }
 
 @Composable
 fun ClipboardView(
-    viewModel: ClipboardViewModel = hiltViewModel(),
+    viewModel: MainViewModel ,
+    onSaveClick:() ->Unit,
     onEditClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
 
-    val uiState by viewModel.uiState.collectAsState()
-    val activity = LocalActivity.current
+
     val clipboardItem = viewModel.clipboardItem.collectAsState()
-    val context = LocalContext.current
+
+    ClipboardSaveView(
+        title = clipboardItem.value.title,
+        siteName = clipboardItem.value.type,
+        isAnimation = true,
+        onDismiss = {
+
+            onDismiss()
+
+        },
+        onConfirm = {
+            onSaveClick()
 
 
-    when (uiState) {
-        is ClipboardUiState.Initialize -> {
-            ClipboardSaveView(
-                title = clipboardItem.value.title,
-                siteName = clipboardItem.value.type,
-                isAnimation = true,
-                onDismiss = {
 
-                    onDismiss()
+        },
+        onEditClick  = onEditClick
+    )
 
-                },
-                onConfirm = {
-
-                    val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("Shared Text", viewModel.sharedText.value)
-                    clipboard.setPrimaryClip(clip)
-
-                    viewModel.processIntent(ClipboardIntent.postClipboarInsertIntent(viewModel.sharedText.value))
-                    Toast.makeText(context, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
-
-
-                },
-                onEditClick  = onEditClick
-            )
-        }
-
-        is ClipboardUiState.ClipboardSave -> {
-            LottieAnimationAndExit(activity)
-        }
-    }
 
 }
 
 
-@Composable
-fun LottieAnimationAndExit(activity: Activity?) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_lottie))
-    val progress by animateLottieCompositionAsState(composition)
-
-
-    // 애니메이션 종료 감지 후 앱 종료
-    LaunchedEffect(progress) {
-        if (progress == 1f) {
-            activity?.finish()  // Activity 종료
-            exitProcess(0)  // 프로세스 종료
-        }
-    }
-    Column(
-        modifier = Modifier.fillMaxSize(1f),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        LottieAnimation(
-            composition = composition,
-            progress = { progress },
-            modifier = Modifier.size(100.dp)
-        )
-    }
-
-}
 
 
 @Composable

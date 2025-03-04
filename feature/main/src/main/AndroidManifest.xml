@@ -3,7 +3,7 @@
 
     <application>
         <activity
-            android:name=".MainActivity"
+            android:name="com.polaris.main.MainActivity"
             android:exported="true">
             <!-- ✅ 일반 실행 (런처 아이콘 클릭 시 실행) -->
             <intent-filter>

@@ -1,6 +1,5 @@
 package com.polaris.clipboard_edit
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -23,22 +22,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.polaris.clipboard_edit.intent.ClipboardEditIntent
 import com.polaris.data.local.ClipboardItem
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSTextField
+import com.polaris.shared.MainViewModel
 
 
 @Composable
-fun ClipboardEditSeen(clipboardItem: ClipboardItem) {
-    val viewModel: ClipboardEditViewModel = hiltViewModel()
-    viewModel.updateClipboardItem(clipboardItem)
-    val viewModelClipboardItem = viewModel.clipboardItem.collectAsState()
-    ClipboardEditView(clipboardItem = viewModelClipboardItem.value) {
-        viewModel.processIntent(ClipboardEditIntent.postClipboarInsertIntent(viewModel.clipboardItem.value.url.toString()))
-    }
+fun ClipboardEditSeen(viewModel: MainViewModel, onSaveClick:()->Unit = {}) {
+
+
+
+    ClipboardEditView(clipboardItem = viewModel.clipboardItem.collectAsState().value, onClick = { onSaveClick()})
 }
 
 @Composable

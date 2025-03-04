@@ -38,3 +38,5 @@ include(":core:data")
 include(":core:domin")
 include(":feature:clipboard_edit")
 
+include(":feature:clipboard_save_animation")
+include(":feature:shared")

@@ -20,7 +20,9 @@
             <option value="$PROJECT_DIR$/feature/clipboard" />
             <option value="$PROJECT_DIR$/feature/clipboard_edit" />
             <option value="$PROJECT_DIR$/feature/clipboard_list" />
+            <option value="$PROJECT_DIR$/feature/clipboard_save_animation" />
             <option value="$PROJECT_DIR$/feature/main" />
+            <option value="$PROJECT_DIR$/feature/shared" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

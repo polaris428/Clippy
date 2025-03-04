@@ -7,6 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.polaris.clipboard_edit.ClipboardEditSeen
 import com.polaris.data.local.ClipboardItem
+import com.polaris.shared.MainViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 fun NavController.navigateClipboardEdit() {
@@ -16,11 +17,12 @@ fun NavController.navigateClipboardEdit() {
 }
 
 fun NavGraphBuilder.questionNavGraph(
-    clipboardItem: StateFlow<ClipboardItem>
+    mainViewModel: MainViewModel,
+    onSaveClick:()->Unit = {},
 ) {
     composable(route = ClipboardEditRoute.route) {
-        val clipboardState by clipboardItem.collectAsState()
-        ClipboardEditSeen(clipboardState)
+
+        ClipboardEditSeen(mainViewModel,onSaveClick = onSaveClick)
     }
 }
 object ClipboardEditRoute {
