@@ -1,6 +1,7 @@
 package com.polaris.clippy
 
 import android.app.Application
+import com.polaris.util.PrefManager
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
