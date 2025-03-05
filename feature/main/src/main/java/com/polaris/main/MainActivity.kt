@@ -27,15 +27,30 @@ import com.polaris.clipboard_list.navigation.navigateClipboardList
 import com.polaris.data.local.ClipboardItem
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
+import com.polaris.util.GoogleSignInHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private lateinit var googleSignInHelper: GoogleSignInHelper
     private val viewModel: MainViewModel by viewModels()
     lateinit var  navController : NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        googleSignInHelper = GoogleSignInHelper(
+            activity = this,
+            onSignInSuccess = { task->
+                PrefManager.userUid=task.result.user!!.uid
+                // 로그인 성공
+                PrefManager.userName=task.result.user!!.displayName.toString()
 
+
+            },
+            onSignInFailure = { exception ->
+
+                // viewModel.onGoogleSignInFailure(exception)
+            }
+        )
         viewModel.processIntent(MainIntent.getAllClipboardListIntent)
         setContent {
 

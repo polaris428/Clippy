@@ -40,3 +40,4 @@ include(":feature:clipboard_edit")
 
 include(":feature:clipboard_save_animation")
 include(":feature:shared")
+include(":feature:sign_in")

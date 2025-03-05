@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -109,7 +111,11 @@ fun CDSButton(
             contentPadding = contentPadding,
             interactionSource = interactionSource
         ) {
-            Text(text = buttonText, modifier = Modifier.padding(6.dp), style = MaterialTheme.typography.labelLarge)
+            Text(
+                text = buttonText,
+                modifier = Modifier.padding(6.dp),
+                style = MaterialTheme.typography.labelLarge
+            )
             content()
         }
     }
@@ -146,7 +152,11 @@ fun CDSNegativeButton(
         contentPadding = contentPadding,
         interactionSource = interactionSource
     ) {
-        Text(text = buttonText, modifier = Modifier.padding(6.dp), style = MaterialTheme.typography.labelLarge)
+        Text(
+            text = buttonText,
+            modifier = Modifier.padding(6.dp),
+            style = MaterialTheme.typography.labelLarge
+        )
         content()
     }
 }
@@ -182,7 +192,11 @@ fun CDSTransparentButton(
         contentPadding = contentPadding,
         interactionSource = interactionSource
     ) {
-        Text(text = buttonText, modifier = Modifier.padding(6.dp), style = MaterialTheme.typography.labelLarge)
+        Text(
+            text = buttonText,
+            modifier = Modifier.padding(6.dp),
+            style = MaterialTheme.typography.labelLarge
+        )
         content()
     }
 }
@@ -262,6 +276,7 @@ fun AnimatedCheckmarkWithCirclePreview() {
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun AnimatedCheckmarkWithCircle(isVisible: Boolean = false) {
@@ -311,5 +326,26 @@ fun AnimatedCheckmarkWithCircle(isVisible: Boolean = false) {
             color = Color.White,
             style = Stroke(width = 10f)
         )
+    }
+}
+
+@Composable
+fun CDSColumn(
+    modifier: Modifier = Modifier,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+            .padding(20.dp),
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment
+    ) {
+
+        content()
+
     }
 }

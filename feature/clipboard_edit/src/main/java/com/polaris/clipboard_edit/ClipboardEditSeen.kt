@@ -49,7 +49,7 @@ fun ClipboardEditView(
         Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(Color.White)
+
             .padding(20.dp)
     ) {
         Row(Modifier.weight(1f)) {

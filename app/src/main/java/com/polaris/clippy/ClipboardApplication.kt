@@ -21,6 +21,7 @@ class ClipboardApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        PrefManager.init(applicationContext)
 
     }
 }

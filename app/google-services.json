@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "918882902549",
+    "project_id": "clippy-33ab8",
+    "storage_bucket": "clippy-33ab8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918882902549:android:2dc006d67c624ec245641c",
+        "android_client_info": {
+          "package_name": "com.polaris.clippy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918882902549-m90l96ejovbhg9q567liin4qafj4toba.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8PQan3io2fCRcT9Uwu7x2lO8Yw4cEIa4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "918882902549-m90l96ejovbhg9q567liin4qafj4toba.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

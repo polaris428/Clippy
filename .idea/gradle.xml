@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/feature/clipboard_save_animation" />
             <option value="$PROJECT_DIR$/feature/main" />
             <option value="$PROJECT_DIR$/feature/shared" />
+            <option value="$PROJECT_DIR$/feature/sign_in" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
