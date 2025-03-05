@@ -106,7 +106,7 @@ class ClipboardActivity : AppCompatActivity() {
                     }, onDismiss = {
                         finish()
                     })
-                clipboardEdit(mainViewModel = viewModel, onSaveClick = { saveClipboard() })
+                clipboardEdit(mainViewModel = viewModel, onSaveClick = { type, title ->  saveClipboard() })
 
             }
 

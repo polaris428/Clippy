@@ -11,19 +11,21 @@ import kotlinx.coroutines.flow.StateFlow
 
 fun NavController.navigateClipboardList() {
     navigate(ClipboardList.route){
-
+        popUpTo(0) { inclusive = true }
+        launchSingleTop = true
     }
 }
 
 fun NavGraphBuilder.clipboardListNavGraph(
     clipboardItemList: StateFlow<List<ClipboardItem>>,
+    onEditClick:(item:ClipboardItem)->Unit
 
 ) {
     composable(route = ClipboardList.route) {
 
-        ClipboardListSeen(clipboardItemList.collectAsState().value)
+        ClipboardListSeen(clipboardItemList.collectAsState().value, onEditClick = onEditClick)
     }
 }
 object ClipboardList {
-    const val route = "clipboard_edit"
+    const val route = "clipboard_list"
 }

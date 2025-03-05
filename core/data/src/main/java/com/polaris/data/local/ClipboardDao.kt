@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,6 +21,13 @@ interface ClipboardDao {
     @Query("UPDATE clipboard_history SET isPinned = :isPinned WHERE id = :id")
     suspend fun updatePinStatus(id: Int, isPinned: Boolean) :Int
 
+    @Update
+    suspend fun updateClipboardItem(item: ClipboardItem): Int
+
+
+
     @Query("DELETE FROM clipboard_history")
      fun clearClipboardHistory()
+
+
 }

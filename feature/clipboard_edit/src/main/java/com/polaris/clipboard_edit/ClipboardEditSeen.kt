@@ -28,20 +28,23 @@ import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.shared.MainViewModel
 
-
 @Composable
-fun ClipboardEditSeen(viewModel: MainViewModel, onSaveClick:()->Unit = {}) {
-
-
-
-    ClipboardEditView(clipboardItem = viewModel.clipboardItem.collectAsState().value, onClick = { onSaveClick()})
+fun ClipboardEditSeen(viewModel: MainViewModel, onSaveClick: (type: String, title: String) -> Unit = { _, _ -> }) {
+    ClipboardEditView(
+        clipboardItem = viewModel.clipboardItem.collectAsState().value,
+        onSaveClick = { type, title -> onSaveClick(type, title) }
+    )
 }
 
 @Composable
 @Preview(showBackground = true)
-fun ClipboardEditView(clipboardItem: ClipboardItem = ClipboardItem(), onClick: () -> Unit = {}) {
-    var title by remember { mutableStateOf(clipboardItem.title) }
-    var type by remember { mutableStateOf(clipboardItem.type) }
+fun ClipboardEditView(
+    clipboardItem: ClipboardItem = ClipboardItem(),
+    onSaveClick: (type: String, title: String) -> Unit = { _, _ -> }
+) {
+    var title by remember(clipboardItem) { mutableStateOf(clipboardItem.title) }
+    var type by remember(clipboardItem) { mutableStateOf(clipboardItem.type) }
+
     Column(
         Modifier
             .fillMaxSize()
@@ -49,19 +52,19 @@ fun ClipboardEditView(clipboardItem: ClipboardItem = ClipboardItem(), onClick: (
             .background(Color.White)
             .padding(20.dp)
     ) {
-        Row(Modifier.weight(1f)) { // Row가 가능한 모든 공간을 차지하도록 설정
-            Column {
+        Row(Modifier.weight(1f)) {
+            Column(Modifier.weight(1f)) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_logo),
                     contentDescription = null,
                     modifier = Modifier.size(40.dp),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                CDSTextField(label = "사이트 설명" , value = type, onValueChange = {type = it})
+                CDSTextField(label = "사이트 설명", value = type, onValueChange = { type = it })
                 Spacer(modifier = Modifier.height(8.dp))
                 CDSTextField(label = "사이트 제목", value = title, onValueChange = { title = it })
             }
         }
-        CDSButton(buttonText = "저장하기", onClick = { onClick() })
+        CDSButton(buttonText = "저장하기", onClick = { onSaveClick(type, title) })
     }
 }

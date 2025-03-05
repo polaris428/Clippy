@@ -75,7 +75,7 @@ import com.polaris.util.getTodayStartTimestamp
 import com.polaris.util.getYearMonth
 
 @Composable
-fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?) {
+fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?,  onEditClick:(item:ClipboardItem)->Unit) {
     val viewModel: ClipboardListViewModel = hiltViewModel()
     val isSheetOpen by viewModel.isSheetOpen.collectAsState()
     val selectedClipboardItem by viewModel.selectedClipboardItem.collectAsState()
@@ -107,7 +107,7 @@ fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?) {
 
             },
             onEdit = { item ->
-
+                onEditClick(item)
             },
             onShear = { item ->
 
@@ -486,6 +486,8 @@ fun CustomBottomSheet(
             }
             SheetOption("수정", R.drawable.ic_edit, Modifier.weight(1f)) {
                 onEdit(selectedClipboardItem)
+                onDismissEvent()
+                onDismiss()
             }
             SheetOption("핀", pinIcon, Modifier.weight(1f)) {
                 onPin(selectedClipboardItem)

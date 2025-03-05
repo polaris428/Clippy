@@ -6,12 +6,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.polaris.clipboard.navigation.ClipboardRoute
@@ -21,6 +23,8 @@ import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
 import com.polaris.clipboard_list.ClipboardListSeen
 import com.polaris.clipboard_list.navigation.ClipboardList
 import com.polaris.clipboard_list.navigation.clipboardListNavGraph
+import com.polaris.clipboard_list.navigation.navigateClipboardList
+import com.polaris.data.local.ClipboardItem
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,50 +32,49 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
-    var startDestination = ""
+    lateinit var  navController : NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
-        if (sharedText.isNullOrEmpty()) {
-            viewModel.processIntent(MainIntent.getAllClipboardListIntent)
-            startDestination = ClipboardList.route
-
-        } else {
-            viewModel.siteInformation(url = sharedText)
-            startDestination = ClipboardRoute.route
-        }
+        viewModel.processIntent(MainIntent.getAllClipboardListIntent)
         setContent {
 
-            val navController = rememberNavController()
+             navController = rememberNavController()
 
 
-            NavHost(navController = navController, startDestination = startDestination) {
-                clipboardNavGraph(
-                    mainViewModel = viewModel,
-                    onSaveClick = {
-                    saveClipboard()
+            NavHost(navController = navController, startDestination = ClipboardList.route) {
 
-                }, onEditClick = {
+                clipboardListNavGraph(viewModel.clipboardDataList, onEditClick = { item: ClipboardItem ->
+                    viewModel.updateClipboardItem(item)
                     navController.navigateClipboardEdit()
-                }, onDismiss = {
-                    finish()
+
                 })
-                clipboardEdit(mainViewModel = viewModel, onSaveClick = { saveClipboard() })
-                clipboardListNavGraph(viewModel.clipboardDataList)
+
+                clipboardEdit(mainViewModel = viewModel, onSaveClick = { type, title ->
+                    updateClipDate(type,title)
+                    saveClipboard()
+                })
             }
 
-           // MainScreen(viewModel)
+
         }
     }
+
+    fun updateClipDate(type:String , title:String){
+        viewModel.updateClipboardItem(type,title)
+    }
+
 
     fun saveClipboard() {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Shared Text", viewModel.clipboardItem.value.url)
         clipboard.setPrimaryClip(clip)
 
-        viewModel.processIntent(MainIntent.postClipboarInsertIntent)
+        viewModel.processIntent(MainIntent.updateClipboarIntent)
         Toast.makeText(this@MainActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+
+        navController.navigateClipboardList()
+
     }
 
 }
@@ -79,7 +82,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
 
-    ClipboardListSeen(viewModel.clipboardDataList.collectAsState().value)
+
 
 
 }

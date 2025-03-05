@@ -31,6 +31,12 @@ internal class ClipboardRepositoryImpl  @Inject constructor(
         return   test
     }
 
+    override suspend fun updateClipboardItem(clipboardItem: ClipboardItem) :Flow<Boolean> {
+        val test = flowOf(clipboardDao.updateClipboardItem(clipboardItem)>0)
+        Log.e("polaris428",test.toString())
+        return   test
+    }
+
     override suspend fun clearAll() {
        // clipboardDao.clearClipboardHistory()
     }

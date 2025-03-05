@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.polaris.data.local.ClipboardItem
 import com.polaris.domin.usecase.clipboard.GetClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
+import com.polaris.domin.usecase.clipboard.UpdateClipboardUseCase
 import com.polaris.shared.intent.MainIntent
 import com.polaris.util.extractUrl
 import com.polaris.util.fetchWebTitle
@@ -23,25 +24,31 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel@Inject constructor(
+class MainViewModel @Inject constructor(
     private val getClipboardAllUseCase: GetClipboardAllUseCase,
-    private val postClipboardInsertUseCase: PostClipboardInsertUseCase
+    private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
+    private val updateClipboardUseCase: UpdateClipboardUseCase,
 ) : ViewModel() {
 
 
     private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
-    val clipboardItem : StateFlow<ClipboardItem> = _clipboardItem
+    val clipboardItem: StateFlow<ClipboardItem> = _clipboardItem
 
     private val _clipboardDataList = MutableStateFlow<List<ClipboardItem>>(emptyList())
-    val clipboardDataList :StateFlow<List<ClipboardItem>> =  _clipboardDataList
+    val clipboardDataList: StateFlow<List<ClipboardItem>> = _clipboardDataList
 
     fun processIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.getAllClipboardListIntent -> {
                 getAllClipboardList()
             }
-            is MainIntent.postClipboarInsertIntent ->{
+
+            is MainIntent.postClipboarInsertIntent -> {
                 postClipboardInsert()
+            }
+
+            is MainIntent.updateClipboarIntent -> {
+                updateClipboard()
             }
 
 
@@ -49,16 +56,15 @@ class MainViewModel@Inject constructor(
     }
 
     fun getAllClipboardList(): Job = viewModelScope.launch {
-        Log.e("polaris428","가져오기")
+
         getClipboardAllUseCase.execute(onComplete = {}).collect {
             _clipboardDataList.value = it
-            Log.e("polaris428",it.toString())
+
         }
-        Log.d("polaris428",clipboardDataList.value.toString())
+
     }
 
     fun postClipboardInsert(): Job = viewModelScope.launch(Dispatchers.IO) {
-
 
 
         postClipboardInsertUseCase.execute(
@@ -79,15 +85,14 @@ class MainViewModel@Inject constructor(
             val type = withContext(Dispatchers.IO) {
                 getWebTitle(urlPreprocessing)
             }
-            val title = withContext(Dispatchers.IO){
+            val title = withContext(Dispatchers.IO) {
                 fetchWebTitle(urlPreprocessing)
             }
-            Log.e("polaris0428",type)
-            Log.e("polaris0428",title)
+
             ClipboardItem(
                 type = type,
                 url = urlPreprocessing,
-                title = title?:"",
+                title = title ?: "",
                 faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
             )
         } else {
@@ -102,4 +107,25 @@ class MainViewModel@Inject constructor(
         _clipboardItem.emit(clipboardItem) // value 대신 emit 사용
     }
 
+    fun updateClipboardItem(item: ClipboardItem) {
+        _clipboardItem.value = item
+    }
+
+    fun updateClipboardItem(type: String, title: String) {
+        _clipboardItem.value.type = type
+        _clipboardItem.value.title = title
+
+
+    }
+
+
+    fun updateClipboard(): Job = viewModelScope.launch {
+        updateClipboardUseCase.execute(clipboardItem = clipboardItem.value, onComplete = {})
+            .collect {
+
+                processIntent(MainIntent.getAllClipboardListIntent)
+            }
+
+
+    }
 }
