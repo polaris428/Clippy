@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.polaris.data.local.ClipboardItem
 import com.polaris.designsystem.ui.theme.Gray50
 import com.polaris.designsystem.ui.theme.LineView
@@ -317,6 +318,7 @@ fun ClipboardItemView(clipboardItem: ClipboardItem, selectedClipboardItem: Clipb
                 displayImage(clipboardItem.faviconUrl!!)
             }
 
+
             Column(modifier = Modifier.padding(start = 10.dp)) {
                 Text(
                     text = clipboardItem.title,
@@ -381,12 +383,24 @@ fun Header() {
 @Preview
 @Composable
 fun displayImage(imageUrl: String = "") {
+
+    val context = LocalContext.current
+
+    val imageRequest = ImageRequest.Builder(context)
+        .data(imageUrl)
+        .crossfade(true)  // 부드러운 이미지 전환
+        .error(R.drawable.ic_logo)  // 오류 발생 시 기본 이미지
+      //  .placeholder(R.drawable.ic_logo) // 로딩 중 기본 이미지
+        .build()
+
+
+
     val painter = if (LocalInspectionMode.current) {
         // 프리뷰 모드에서는 Image와 painterResource 사용
         painterResource(id = R.drawable.ic_logo)
     } else {
         // 실제 모드에서는 rememberAsyncImagePainter 사용
-        rememberAsyncImagePainter(model = imageUrl)
+        rememberAsyncImagePainter(model = imageRequest)
     }
     Surface(
         shape = RoundedCornerShape(8.dp),
