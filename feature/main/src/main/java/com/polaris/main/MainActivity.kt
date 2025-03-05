@@ -28,6 +28,7 @@ import com.polaris.data.local.ClipboardItem
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
 import com.polaris.util.GoogleSignInHelper
+import com.polaris.util.PrefManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -40,9 +41,8 @@ class MainActivity : ComponentActivity() {
         googleSignInHelper = GoogleSignInHelper(
             activity = this,
             onSignInSuccess = { task->
-                PrefManager.userUid=task.result.user!!.uid
-                // 로그인 성공
-                PrefManager.userName=task.result.user!!.displayName.toString()
+//                PrefManager.userUid=task.result.user!!.uid
+//                PrefManager.userName=task.result.user!!.displayName.toString()
 
 
             },
