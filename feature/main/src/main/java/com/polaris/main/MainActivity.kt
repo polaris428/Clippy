@@ -16,9 +16,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.polaris.clipboard.navigation.ClipboardRoute
 import com.polaris.clipboard.navigation.clipboardNavGraph
+import com.polaris.clipboard_edit.navigation.clipboardEdit
 import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
-import com.polaris.clipboard_edit.navigation.questionNavGraph
-
 import com.polaris.clipboard_list.ClipboardListSeen
 import com.polaris.clipboard_list.navigation.ClipboardList
 import com.polaris.clipboard_list.navigation.clipboardListNavGraph
@@ -58,7 +57,7 @@ class MainActivity : ComponentActivity() {
                 }, onDismiss = {
                     finish()
                 })
-                questionNavGraph(mainViewModel = viewModel, onSaveClick = { saveClipboard() })
+                clipboardEdit(mainViewModel = viewModel, onSaveClick = { saveClipboard() })
                 clipboardListNavGraph(viewModel.clipboardDataList)
             }
 

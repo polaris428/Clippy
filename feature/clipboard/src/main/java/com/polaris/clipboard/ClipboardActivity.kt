@@ -67,8 +67,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.polaris.clipboard.navigation.ClipboardRoute
 import com.polaris.clipboard.navigation.clipboardNavGraph
+import com.polaris.clipboard_edit.navigation.clipboardEdit
 import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
-import com.polaris.clipboard_edit.navigation.questionNavGraph
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.CDSTransparentButton
@@ -106,7 +106,7 @@ class ClipboardActivity : AppCompatActivity() {
                     }, onDismiss = {
                         finish()
                     })
-                questionNavGraph(mainViewModel = viewModel, onSaveClick = { saveClipboard() })
+                clipboardEdit(mainViewModel = viewModel, onSaveClick = { saveClipboard() })
 
             }
 

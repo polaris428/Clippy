@@ -16,7 +16,7 @@ fun NavController.navigateClipboardEdit() {
     }
 }
 
-fun NavGraphBuilder.questionNavGraph(
+fun NavGraphBuilder.clipboardEdit(
     mainViewModel: MainViewModel,
     onSaveClick:()->Unit = {},
 ) {
