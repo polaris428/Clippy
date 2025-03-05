@@ -20,12 +20,12 @@ import com.polaris.data.local.ClipboardItem
 import kotlin.system.exitProcess
 
 @Composable
-fun SaveAnimationSeen(clipboardItem: ClipboardItem){
-  //  viewModel.processIntent(SaveAnimationSeenIntent.postClipboarInsertIntent(clipboardItem))
-    SaveAnimationView()
+fun SaveAnimationSeen(afterAnimation:()->Unit){
+
+    SaveAnimationView(afterAnimation)
 }
 @Composable
-fun SaveAnimationView(){
+fun SaveAnimationView(afterAnimation:()->Unit){
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_lottie))
     val progress by animateLottieCompositionAsState(composition)
 
@@ -33,8 +33,9 @@ fun SaveAnimationView(){
     // 애니메이션 종료 감지 후 앱 종료
     LaunchedEffect(progress) {
         if (progress == 1f) {
-            //activity?.finish()  // Activity 종료
-            exitProcess(0)  // 프로세스 종료
+
+            afterAnimation()
+
         }
     }
     Column(

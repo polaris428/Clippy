@@ -63,12 +63,16 @@ import com.polaris.clipboard.state.ClipboardUiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.polaris.clipboard.navigation.ClipboardRoute
 import com.polaris.clipboard.navigation.clipboardNavGraph
 import com.polaris.clipboard_edit.navigation.clipboardEdit
 import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
+import com.polaris.clipboard_save_animation.navigation.clipboardSaveAnimation
+import com.polaris.clipboard_save_animation.navigation.navigateClipboardSaveAnimation
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.CDSTransparentButton
@@ -81,6 +85,7 @@ import kotlinx.coroutines.delay
 @AndroidEntryPoint
 class ClipboardActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
+    lateinit var navController : NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -94,7 +99,7 @@ class ClipboardActivity : AppCompatActivity() {
 
 
         setContent {
-            val navController = rememberNavController()
+            navController = rememberNavController()
             NavHost(navController = navController, startDestination = ClipboardRoute.route ) {
                 clipboardNavGraph(
                     mainViewModel = viewModel,
@@ -104,12 +109,16 @@ class ClipboardActivity : AppCompatActivity() {
                     }, onEditClick = {
                         navController.navigateClipboardEdit()
                     }, onDismiss = {
-                        finish()
+
                     })
                 clipboardEdit(mainViewModel = viewModel, onSaveClick = { type, title ->
                     viewModel.updateClipboardItem(type = type , title= title)
                     saveClipboard()
 
+                })
+                clipboardSaveAnimation(afterAnimation = {
+                    finish()
+                    exitProcess(0)  // 프로세스 종료
                 })
 
             }
@@ -124,6 +133,7 @@ class ClipboardActivity : AppCompatActivity() {
 
         viewModel.processIntent(MainIntent.postClipboarInsertIntent)
         Toast.makeText(this@ClipboardActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+        navController.navigateClipboardSaveAnimation()
     }
 }
 
