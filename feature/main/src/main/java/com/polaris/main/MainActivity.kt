@@ -66,12 +66,9 @@ class MainActivity : ComponentActivity() {
 
 
     fun saveClipboard() {
-        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("Shared Text", viewModel.clipboardItem.value.url)
-        clipboard.setPrimaryClip(clip)
+
 
         viewModel.processIntent(MainIntent.updateClipboarIntent)
-        Toast.makeText(this@MainActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
 
         navController.navigateClipboardList()
 
