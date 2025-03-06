@@ -31,16 +31,22 @@ class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         googleSignInHelper = GoogleSignInHelper(activity = this, onSignInSuccess = { task ->
             Log.d("polaris0428", "성공")
             PrefManager.userSignInCheck = true
             PrefManager.userUid = task.result.user!!.uid
-            navController.navigateClipboardList()
+            if (PrefManager.userUid!=""){
+                navController.navigateClipboardList()
+                viewModel.postClipboardMigrationUseCase(viewModel.clipboardDataList.value)
+            }
+
 
 
         }, onSignInFailure = { exception ->
             Toast.makeText(this, "로그인에 실패했어요, 잠시 후에 다시 시도해주세요", Toast.LENGTH_SHORT).show()
         })
+        googleSignInHelper.googleSignOut()
         viewModel.processIntent(MainIntent.getAllClipboardListIntent)
         setContent {
 

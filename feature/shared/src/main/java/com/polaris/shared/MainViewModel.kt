@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.domin.usecase.clipboard.GetClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
+import com.polaris.domin.usecase.clipboard.PostDataMigrationUseCase
 import com.polaris.domin.usecase.clipboard.UpdateClipboardUseCase
 import com.polaris.model.ClipboardItem
 import com.polaris.shared.intent.MainIntent
+import com.polaris.util.PrefManager
 import com.polaris.util.extractUrl
 import com.polaris.util.fetchWebTitle
 import com.polaris.util.getGoogleFaviconUrl
@@ -27,14 +29,15 @@ class MainViewModel @Inject constructor(
     private val getClipboardAllUseCase: GetClipboardAllUseCase,
     private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
     private val updateClipboardUseCase: UpdateClipboardUseCase,
+    private val postClipboardMigrationUseCase: PostDataMigrationUseCase
 ) : ViewModel() {
 
 
-    private val _clipboardItem = MutableStateFlow<ClipboardItem>(com.polaris.model.ClipboardItem())
+    private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
     val clipboardItem: StateFlow<ClipboardItem> = _clipboardItem
 
-    private val _clipboardDataList = MutableStateFlow<List<com.polaris.model.ClipboardItem>>(emptyList())
-    val clipboardDataList: StateFlow<List<com.polaris.model.ClipboardItem>> = _clipboardDataList
+    private val _clipboardDataList = MutableStateFlow<List<ClipboardItem>>(emptyList())
+    val clipboardDataList: StateFlow<List<ClipboardItem>> = _clipboardDataList
 
     fun processIntent(intent: MainIntent) {
         when (intent) {
@@ -48,6 +51,9 @@ class MainViewModel @Inject constructor(
 
             is MainIntent.updateClipboarIntent -> {
                 updateClipboard()
+            }
+            is MainIntent.postClipboardMigrationUseCase ->{
+                postClipboardMigrationUseCase(intent.list)
             }
 
 
@@ -68,6 +74,7 @@ class MainViewModel @Inject constructor(
 
         postClipboardInsertUseCase.execute(
             item = clipboardItem.value,
+            isLogin = PrefManager.userSignInCheck,
             onComplete = {
 
             }).collect {
@@ -88,14 +95,14 @@ class MainViewModel @Inject constructor(
                 fetchWebTitle(urlPreprocessing)
             }
 
-            com.polaris.model.ClipboardItem(
+            ClipboardItem(
                 type = type,
                 url = urlPreprocessing,
                 title = title ?: "",
                 faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
             )
         } else {
-            com.polaris.model.ClipboardItem(
+            ClipboardItem(
                 type = "text",
                 url = null,
                 title = url,
@@ -106,7 +113,7 @@ class MainViewModel @Inject constructor(
         _clipboardItem.emit(clipboardItem) // value 대신 emit 사용
     }
 
-    fun updateClipboardItem(item: com.polaris.model.ClipboardItem) {
+    fun updateClipboardItem(item: ClipboardItem) {
         _clipboardItem.value = item
     }
 
@@ -127,5 +134,11 @@ class MainViewModel @Inject constructor(
             }
 
 
+    }
+
+    fun postClipboardMigrationUseCase(clipboardList: List<ClipboardItem>):Job = viewModelScope.launch {
+        postClipboardMigrationUseCase.execute(clipboardList, onComplete = {}).collect{
+
+        }
     }
 }

@@ -1,9 +1,11 @@
 package com.polaris.domin.repository
 
+
 import com.polaris.model.ClipboardItem
 import kotlinx.coroutines.flow.Flow
 
 interface RemoteClipboardRepository {
+    suspend fun postDataMigration(itemList: List<ClipboardItem>):Flow<Boolean>
     suspend fun insert(item: ClipboardItem) : Flow<Boolean>
     suspend fun getAll(): Flow<List<ClipboardItem>>
 

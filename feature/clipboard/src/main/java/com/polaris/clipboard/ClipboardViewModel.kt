@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import com.polaris.model.ClipboardItem
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
+import com.polaris.util.PrefManager
 import com.polaris.util.extractUrl
 import com.polaris.util.getWebTitle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -83,6 +84,7 @@ class ClipboardViewModel @Inject constructor(
 
         postClipboardInsertUseCase.execute(
             item = clipboardItem.value,
+            isLogin = PrefManager.userSignInCheck,
             onComplete = {
 
             }).collect {
