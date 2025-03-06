@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation (projects.core.domin)
     implementation (libs.androidx.room.runtime)
     kapt (libs.androidx.room.compiler)
     //hilt

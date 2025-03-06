@@ -2,7 +2,7 @@ package com.polaris.domin.usecase.clipboard
 
 
 import com.polaris.data.local.ClipboardItem
-import com.polaris.data.repository.ClipboardRepository
+import com.polaris.domin.repository.LocalClipboardRepository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GetClipboardAllUseCase @Inject constructor(
-    private val clipboardRepository: ClipboardRepository
+    private val clipboardRepository: LocalClipboardRepository
 ) {
     suspend fun execute(
         onComplete: () -> Unit,

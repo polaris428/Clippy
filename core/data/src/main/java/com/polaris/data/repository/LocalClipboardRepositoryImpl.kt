@@ -3,13 +3,14 @@ package com.polaris.data.repository
 import android.util.Log
 import com.polaris.data.local.ClipboardDao
 import com.polaris.data.local.ClipboardItem
+import com.polaris.domin.repository.LocalClipboardRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
-internal class ClipboardRepositoryImpl  @Inject constructor(
+internal class LocalClipboardRepositoryImpl  @Inject constructor(
     private val clipboardDao:ClipboardDao
-) :ClipboardRepository{
+) : LocalClipboardRepository {
     override suspend fun insert(item: ClipboardItem) :Flow<Boolean>{
         Log.e("polaris428","저장")
         clipboardDao.insertClipboardItem(item)

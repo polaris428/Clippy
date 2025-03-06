@@ -1,10 +1,9 @@
-package com.polaris.data.repository
+package com.polaris.domin.repository
 
-import com.polaris.data.local.ClipboardDao
 import com.polaris.data.local.ClipboardItem
 import kotlinx.coroutines.flow.Flow
-import com.skydoves.sandwich.ApiResponse
-interface ClipboardRepository {
+
+interface LocalClipboardRepository {
     suspend fun insert(item: ClipboardItem) : Flow<Boolean>
     suspend fun getAll(): Flow<List<ClipboardItem>>
 
