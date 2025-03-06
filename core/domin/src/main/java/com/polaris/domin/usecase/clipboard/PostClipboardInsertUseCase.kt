@@ -1,7 +1,7 @@
 package com.polaris.domin.usecase.clipboard
 
 
-import android.preference.PreferenceManager
+
 import com.polaris.domin.repository.LocalClipboardRepository
 import com.polaris.domin.repository.RemoteClipboardRepository
 import com.polaris.model.ClipboardItem

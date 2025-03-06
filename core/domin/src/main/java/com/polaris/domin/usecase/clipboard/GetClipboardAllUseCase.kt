@@ -3,6 +3,7 @@ package com.polaris.domin.usecase.clipboard
 
 
 import com.polaris.domin.repository.LocalClipboardRepository
+import com.polaris.domin.repository.RemoteClipboardRepository
 import com.polaris.model.ClipboardItem
 
 import kotlinx.coroutines.flow.Flow
@@ -13,17 +14,23 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GetClipboardAllUseCase @Inject constructor(
-    private val clipboardRepository: LocalClipboardRepository
+    private val localClipboardRepository: LocalClipboardRepository,
+    private val remoteClipboardRepository: RemoteClipboardRepository
 ) {
     suspend fun execute(
+        isLogin:Boolean,
         onComplete: () -> Unit,
-
         ): Flow<List<ClipboardItem>> {
 
 
         return flow {
             onComplete()
-            emitAll(clipboardRepository.getAll())
+            if (isLogin){
+                emitAll(remoteClipboardRepository.getAll())
+            }else{
+                emitAll(localClipboardRepository.getAll())
+
+            }
 
 
         }

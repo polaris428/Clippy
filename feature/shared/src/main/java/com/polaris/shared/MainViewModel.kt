@@ -29,7 +29,9 @@ class MainViewModel @Inject constructor(
     private val getClipboardAllUseCase: GetClipboardAllUseCase,
     private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
     private val updateClipboardUseCase: UpdateClipboardUseCase,
-    private val postClipboardMigrationUseCase: PostDataMigrationUseCase
+    private val postClipboardMigrationUseCase: PostDataMigrationUseCase,
+
+
 ) : ViewModel() {
 
 
@@ -62,7 +64,7 @@ class MainViewModel @Inject constructor(
 
     fun getAllClipboardList(): Job = viewModelScope.launch {
 
-        getClipboardAllUseCase.execute(onComplete = {}).collect {
+        getClipboardAllUseCase.execute(isLogin = PrefManager.userSignInCheck,onComplete = {}).collect {
             _clipboardDataList.value = it
 
         }
