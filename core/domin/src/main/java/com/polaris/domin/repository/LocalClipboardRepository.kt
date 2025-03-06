@@ -1,6 +1,7 @@
 package com.polaris.domin.repository
 
-import com.polaris.data.local.ClipboardItem
+
+import com.polaris.model.ClipboardItem
 import kotlinx.coroutines.flow.Flow
 
 interface LocalClipboardRepository {

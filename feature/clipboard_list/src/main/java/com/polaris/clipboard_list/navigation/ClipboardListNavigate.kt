@@ -1,12 +1,11 @@
 package com.polaris.clipboard_list.navigation
 
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.polaris.clipboard_list.ClipboardListSeen
-import com.polaris.data.local.ClipboardItem
+import com.polaris.model.ClipboardItem
 import kotlinx.coroutines.flow.StateFlow
 
 fun NavController.navigateClipboardList() {
@@ -17,8 +16,8 @@ fun NavController.navigateClipboardList() {
 }
 
 fun NavGraphBuilder.clipboardListNavGraph(
-    clipboardItemList: StateFlow<List<ClipboardItem>>,
-    onEditClick:(item:ClipboardItem)->Unit
+    clipboardItemList: StateFlow<List<com.polaris.model.ClipboardItem>>,
+    onEditClick:(item: com.polaris.model.ClipboardItem)->Unit
 
 ) {
     composable(route = ClipboardList.route) {

@@ -1,12 +1,11 @@
 package com.polaris.shared
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polaris.data.local.ClipboardItem
 import com.polaris.domin.usecase.clipboard.GetClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
 import com.polaris.domin.usecase.clipboard.UpdateClipboardUseCase
+import com.polaris.model.ClipboardItem
 import com.polaris.shared.intent.MainIntent
 import com.polaris.util.extractUrl
 import com.polaris.util.fetchWebTitle
@@ -31,11 +30,11 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
+    private val _clipboardItem = MutableStateFlow<ClipboardItem>(com.polaris.model.ClipboardItem())
     val clipboardItem: StateFlow<ClipboardItem> = _clipboardItem
 
-    private val _clipboardDataList = MutableStateFlow<List<ClipboardItem>>(emptyList())
-    val clipboardDataList: StateFlow<List<ClipboardItem>> = _clipboardDataList
+    private val _clipboardDataList = MutableStateFlow<List<com.polaris.model.ClipboardItem>>(emptyList())
+    val clipboardDataList: StateFlow<List<com.polaris.model.ClipboardItem>> = _clipboardDataList
 
     fun processIntent(intent: MainIntent) {
         when (intent) {
@@ -89,14 +88,14 @@ class MainViewModel @Inject constructor(
                 fetchWebTitle(urlPreprocessing)
             }
 
-            ClipboardItem(
+            com.polaris.model.ClipboardItem(
                 type = type,
                 url = urlPreprocessing,
                 title = title ?: "",
                 faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
             )
         } else {
-            ClipboardItem(
+            com.polaris.model.ClipboardItem(
                 type = "text",
                 url = null,
                 title = url,
@@ -107,7 +106,7 @@ class MainViewModel @Inject constructor(
         _clipboardItem.emit(clipboardItem) // value 대신 emit 사용
     }
 
-    fun updateClipboardItem(item: ClipboardItem) {
+    fun updateClipboardItem(item: com.polaris.model.ClipboardItem) {
         _clipboardItem.value = item
     }
 

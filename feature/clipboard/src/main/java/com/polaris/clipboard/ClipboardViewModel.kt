@@ -1,10 +1,6 @@
 package com.polaris.clipboard
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.clipboard.intent.ClipboardIntent
@@ -15,10 +11,9 @@ import com.polaris.util.isUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import com.polaris.data.local.ClipboardItem
+import com.polaris.model.ClipboardItem
 import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
 import com.polaris.util.extractUrl
-import com.polaris.util.getMetaDescription
 import com.polaris.util.getWebTitle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,8 +29,8 @@ class ClipboardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ClipboardUiState>(ClipboardUiState.Initialize)
     val uiState: StateFlow<ClipboardUiState> = _uiState
 
-    private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
-    val clipboardItem : StateFlow<ClipboardItem> = _clipboardItem
+    private val _clipboardItem = MutableStateFlow<com.polaris.model.ClipboardItem>(com.polaris.model.ClipboardItem())
+    val clipboardItem : StateFlow<com.polaris.model.ClipboardItem> = _clipboardItem
 
 
     private val _sharedText = MutableStateFlow<String>("")
@@ -64,14 +59,14 @@ class ClipboardViewModel @Inject constructor(
             }
             Log.e("polaris0428",type)
             Log.e("polaris0428",title)
-            ClipboardItem(
+            com.polaris.model.ClipboardItem(
                 type = type,
                 url = urlPreprocessing,
-                title = title?:"",
+                title = title ?: "",
                 faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
             )
         } else {
-            ClipboardItem(
+            com.polaris.model.ClipboardItem(
                 type = "text",
                 url = null,
                 title = url,

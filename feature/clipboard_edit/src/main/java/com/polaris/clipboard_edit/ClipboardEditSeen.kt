@@ -1,7 +1,6 @@
 package com.polaris.clipboard_edit
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,17 +16,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.polaris.data.local.ClipboardItem
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.shared.MainViewModel
-
+import com.polaris.model.ClipboardItem
 @Composable
 fun ClipboardEditSeen(viewModel: MainViewModel, onSaveClick: (type: String, title: String) -> Unit = { _, _ -> }) {
     ClipboardEditView(

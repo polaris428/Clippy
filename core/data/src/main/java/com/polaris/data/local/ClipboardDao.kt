@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ClipboardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-     fun insertClipboardItem(item: ClipboardItem)
+     fun insertClipboardItem(item: com.polaris.model.ClipboardItem)
 
     @Query("SELECT * FROM clipboard_history ORDER BY timestamp DESC")
-     fun getAllClipboardItems(): Flow<List<ClipboardItem>>
+     fun getAllClipboardItems(): Flow<List<com.polaris.model.ClipboardItem>>
 
     @Query("DELETE FROM clipboard_history WHERE id = :itemId")
      fun deleteClipboardItem(itemId: Int) :Int
@@ -22,7 +22,7 @@ interface ClipboardDao {
     suspend fun updatePinStatus(id: Int, isPinned: Boolean) :Int
 
     @Update
-    suspend fun updateClipboardItem(item: ClipboardItem): Int
+    suspend fun updateClipboardItem(item: com.polaris.model.ClipboardItem): Int
 
 
 

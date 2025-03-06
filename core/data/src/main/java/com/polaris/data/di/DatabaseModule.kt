@@ -2,6 +2,7 @@ package com.polaris.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.google.firebase.database.FirebaseDatabase
 import com.polaris.data.local.ClipboardDao
 import com.polaris.data.local.ClipboardDatabase
 import dagger.Module
@@ -32,5 +33,10 @@ object DatabaseModule {
     @Provides
     fun provideClipboardDao(database: ClipboardDatabase): ClipboardDao {
         return database.clipboardDao()
+    }
+    @Provides
+    @Singleton
+    fun provideFirebaseDatabase(): FirebaseDatabase {
+        return FirebaseDatabase.getInstance()
     }
 }

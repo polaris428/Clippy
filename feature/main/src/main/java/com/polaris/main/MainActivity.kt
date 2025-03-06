@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -14,7 +13,7 @@ import com.polaris.clipboard_edit.navigation.clipboardEdit
 import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
 import com.polaris.clipboard_list.navigation.clipboardListNavGraph
 import com.polaris.clipboard_list.navigation.navigateClipboardList
-import com.polaris.data.local.ClipboardItem
+import com.polaris.model.ClipboardItem
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
 import com.polaris.sign_in.navigation.navigateSignIn
@@ -62,7 +61,7 @@ class MainActivity : ComponentActivity() {
                 signInNavGraph(onSignInClick = { googleSignInHelper.startGoogleSignIn() })
                 clipboardListNavGraph(
                     viewModel.clipboardDataList,
-                    onEditClick = { item: ClipboardItem ->
+                    onEditClick = { item: com.polaris.model.ClipboardItem ->
                         viewModel.updateClipboardItem(item)
                         navController.navigateClipboardEdit()
 

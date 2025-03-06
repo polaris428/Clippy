@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-
+    implementation(projects.core.model)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -52,7 +52,7 @@ dependencies {
     // https://github.com/skydoves/sandwich
     implementation (libs.sandwich)
 
-    implementation(project(":core:data"))
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -10,14 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.polaris.clipboard_save_animation.intent.SaveAnimationSeenIntent
-import com.polaris.data.local.ClipboardItem
-import kotlin.system.exitProcess
 
 @Composable
 fun SaveAnimationSeen(afterAnimation:()->Unit){

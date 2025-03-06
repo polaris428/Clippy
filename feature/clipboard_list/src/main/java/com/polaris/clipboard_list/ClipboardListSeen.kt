@@ -61,10 +61,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.polaris.data.local.ClipboardItem
+import com.polaris.model.ClipboardItem
 import com.polaris.designsystem.ui.theme.Gray50
 import com.polaris.designsystem.ui.theme.LineView
 import com.polaris.util.convertTimestampToMonthDay
@@ -76,7 +75,7 @@ import com.polaris.util.getTodayStartTimestamp
 import com.polaris.util.getYearMonth
 
 @Composable
-fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?,  onEditClick:(item:ClipboardItem)->Unit) {
+fun ClipboardListSeen(clipboardItemList: List<com.polaris.model.ClipboardItem>?, onEditClick:(item: com.polaris.model.ClipboardItem)->Unit) {
     val viewModel: ClipboardListViewModel = hiltViewModel()
     val isSheetOpen by viewModel.isSheetOpen.collectAsState()
     val selectedClipboardItem by viewModel.selectedClipboardItem.collectAsState()
@@ -138,12 +137,12 @@ fun ClipboardListSeen(clipboardItemList: List<ClipboardItem>?,  onEditClick:(ite
 @Composable
 fun CustomBottomSheetView(
     isSheetOpen: Boolean,
-    selectedClipboardItem: ClipboardItem,
-    onContent: (item: ClipboardItem) -> Unit = {},
-    onEdit: (item: ClipboardItem) -> Unit = {},
-    onShear: (item: ClipboardItem) -> Unit = {},
-    onPin:(item:ClipboardItem) -> Unit ={},
-    onDelete: (item: ClipboardItem) -> Unit = {},
+    selectedClipboardItem: com.polaris.model.ClipboardItem,
+    onContent: (item: com.polaris.model.ClipboardItem) -> Unit = {},
+    onEdit: (item: com.polaris.model.ClipboardItem) -> Unit = {},
+    onShear: (item: com.polaris.model.ClipboardItem) -> Unit = {},
+    onPin:(item: com.polaris.model.ClipboardItem) -> Unit ={},
+    onDelete: (item: com.polaris.model.ClipboardItem) -> Unit = {},
     onDismissEvent:()->Unit,
     onDismiss: () -> Unit,
 ) {
@@ -180,9 +179,9 @@ fun CustomBottomSheetView(
 @Preview(showBackground = true)
 @Composable
 fun ClipboardView(
-    clipboardItemList: List<ClipboardItem>? = listOf(dummyData),
-    selectedClipboardItem: ClipboardItem?= null,
-    onLongPress: (item: ClipboardItem) -> Unit = {},
+    clipboardItemList: List<com.polaris.model.ClipboardItem>? = listOf(dummyData),
+    selectedClipboardItem: com.polaris.model.ClipboardItem?= null,
+    onLongPress: (item: com.polaris.model.ClipboardItem) -> Unit = {},
 ) {
     val todayStartTimestamp = getTodayStartTimestamp()
 
@@ -274,7 +273,7 @@ fun ClipboardView(
     }
 }
 
-val dummyData = ClipboardItem(
+val dummyData = com.polaris.model.ClipboardItem(
     id = -1,
     type = "GitHub",
     url = "https://www.github.com",
@@ -292,7 +291,7 @@ fun preView() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ClipboardItemView(clipboardItem: ClipboardItem, selectedClipboardItem: ClipboardItem?,onLongPress: () -> Unit) {
+fun ClipboardItemView(clipboardItem: com.polaris.model.ClipboardItem, selectedClipboardItem: com.polaris.model.ClipboardItem?, onLongPress: () -> Unit) {
     val context = LocalContext.current
 
 
@@ -430,12 +429,12 @@ fun CustomBottomSheetPreview() {
 
 @Composable
 fun CustomBottomSheet(
-    selectedClipboardItem: ClipboardItem,
-    onContent: (item: ClipboardItem) -> Unit = {},
-    onEdit: (item: ClipboardItem) -> Unit = {},
-    onPin: (item:ClipboardItem) -> Unit = {},
-    onShear: (item: ClipboardItem) -> Unit = {},
-    onDelete: (item: ClipboardItem) -> Unit = {},
+    selectedClipboardItem: com.polaris.model.ClipboardItem,
+    onContent: (item: com.polaris.model.ClipboardItem) -> Unit = {},
+    onEdit: (item: com.polaris.model.ClipboardItem) -> Unit = {},
+    onPin: (item: com.polaris.model.ClipboardItem) -> Unit = {},
+    onShear: (item: com.polaris.model.ClipboardItem) -> Unit = {},
+    onDelete: (item: com.polaris.model.ClipboardItem) -> Unit = {},
     onDismissEvent :()-> Unit ={},
     onDismiss: () -> Unit,
     isPreview: Boolean = false

@@ -1,8 +1,9 @@
 package com.polaris.domin.usecase.clipboard
 
 
-import com.polaris.data.local.ClipboardItem
+
 import com.polaris.domin.repository.LocalClipboardRepository
+import com.polaris.model.ClipboardItem
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
