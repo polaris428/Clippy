@@ -21,4 +21,15 @@ object PrefManager {
             pref.edit().putBoolean(PreferenceConstants.USER_SIGN_IN_CHECK, v).apply()
         }
 
+    var userUid:String
+        get() = pref.getString(PreferenceConstants.USER_UID, "").toString()
+        set(v) {
+            pref.edit().putString(PreferenceConstants.USER_UID, v).apply()
+        }
+    var userName: String
+        get() = pref.getString(PreferenceConstants.USER_NAME, "")!!
+        set(v) {
+            pref.edit().putString(PreferenceConstants.USER_NAME, v).apply()
+        }
+
 }

@@ -44,7 +44,7 @@ android {
 }
 
 dependencies {
-
+    implementation (libs.play.services.auth)
     implementation(projects.feature.main)
     implementation(projects.core.data)
     implementation(projects.core.util)

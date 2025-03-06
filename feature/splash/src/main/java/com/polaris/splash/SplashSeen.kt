@@ -1,4 +1,4 @@
-package com.polaris.sign_in
+package com.polaris.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -7,12 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,17 +23,21 @@ import androidx.compose.ui.unit.sp
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSColumn
-import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.Gray40
+import kotlinx.coroutines.delay
 
 @Composable
-fun SignInSeen(onSignInClick:()->Unit ) {
-    SignInView(onSignInClick)
-}
+fun SplashSeen(onSplashCompleted:()->Unit){
+    LaunchedEffect(Unit) {
+        delay(2000) // 3초 딜레이
+        onSplashCompleted()
+    }
+    SplashView()
 
+}
 @Composable
 @Preview(showBackground = true)
-fun SignInView(onSignInClick:()->Unit ={}) {
+fun SplashView(){
     CDSColumn(horizontalAlignment = Alignment.CenterHorizontally){
         Row(Modifier.weight(1f)) {
             Column(modifier = Modifier.fillMaxSize(1f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -59,12 +62,7 @@ fun SignInView(onSignInClick:()->Unit ={}) {
 
             }
         }
-        Text(
-            "로그인 없이 계속하기",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Gray40
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        CDSButton(buttonText = "로그인 하기", onClick = { onSignInClick() })
+
+
     }
 }
