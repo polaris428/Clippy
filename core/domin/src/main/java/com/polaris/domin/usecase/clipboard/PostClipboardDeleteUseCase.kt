@@ -11,7 +11,7 @@ class PostClipboardDeleteUseCase@Inject constructor(
     private val clipboardRepository: LocalClipboardRepository
 ) {
     suspend fun execute(
-        id:Int,
+        timestamp:Long,
         onComplete: () -> Unit,
 
         ): Flow<Boolean> {
@@ -20,7 +20,7 @@ class PostClipboardDeleteUseCase@Inject constructor(
         return flow {
             Log.e("polaris0428","흐으으음")
             onComplete()
-            emitAll(clipboardRepository.delete(id))
+            emitAll(clipboardRepository.delete(timestamp))
             Log.e("polaris0428","흐으으음1")
 
         }

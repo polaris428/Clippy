@@ -51,11 +51,11 @@ class ClipboardListViewModel @Inject constructor(
             }
 
             is ClipboardListIntent.postClipboardDeleteIntent -> {
-                postClipboardDelete(id = intent.id)
+                postClipboardDelete(timestamp = intent.timestamp)
             }
 
             is ClipboardListIntent.UpdatePinClipboardDeleteIntent -> {
-                updateClipboardPinState(id = intent.id ,intent.pinState)
+                updateClipboardPinState(timestamp = intent.timestamp ,intent.pinState)
             }
 
             is ClipboardListIntent.BottomSheetDismissed -> {
@@ -72,8 +72,8 @@ class ClipboardListViewModel @Inject constructor(
         _selectedClipboardItem.value = dummyData
     }
 
-    fun postClipboardDelete(id: Int) = viewModelScope.launch(Dispatchers.IO) {
-        postClipboardDeleteUseCase.execute(id = id) {
+    fun postClipboardDelete(timestamp: Long) = viewModelScope.launch(Dispatchers.IO) {
+        postClipboardDeleteUseCase.execute(timestamp = timestamp) {
 
         }.collect({ result ->
 
@@ -81,8 +81,8 @@ class ClipboardListViewModel @Inject constructor(
         })
     }
 
-    fun updateClipboardPinState(id: Int, pinState: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-        updateClipboardPinStateUseCase.execute(itemId = id, pinState = !pinState) {
+    fun updateClipboardPinState(timestamp: Long, pinState: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        updateClipboardPinStateUseCase.execute(timestamp = timestamp, pinState = !pinState) {
 
         }.collect({
 

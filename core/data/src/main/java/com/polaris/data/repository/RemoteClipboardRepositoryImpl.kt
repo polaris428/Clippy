@@ -83,7 +83,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun updateClipboardItem(clipboardItem:ClipboardItem): Flow<Boolean> {
         return try {
-        database.child(clipboardItem.id.toString())
+        database.child(clipboardItem.timestamp.toString())
                 .setValue(clipboardItem).await()
             flowOf(true)
         } catch (e: Exception) {

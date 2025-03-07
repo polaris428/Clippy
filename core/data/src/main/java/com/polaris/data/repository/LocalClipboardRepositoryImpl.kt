@@ -21,13 +21,13 @@ internal class LocalClipboardRepositoryImpl  @Inject constructor(
        return clipboardDao.getAllClipboardItems()
     }
 
-    override suspend fun delete(itemId: Int):Flow<Boolean> {
+    override suspend fun delete(itemId: Long):Flow<Boolean> {
 
         return   flowOf(clipboardDao.deleteClipboardItem(itemId)>0)
     }
 
-    override suspend fun updatePinStatus(itemId: Int, pinState: Boolean):Flow<Boolean> {
-        val test = flowOf(clipboardDao.updatePinStatus(itemId,pinState)>0)
+    override suspend fun updatePinStatus(timestamp: Long, pinState: Boolean):Flow<Boolean> {
+        val test = flowOf(clipboardDao.updatePinStatus(timestamp,pinState)>0)
         Log.e("polaris428",test.toString())
         return   test
     }

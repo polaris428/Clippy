@@ -115,10 +115,10 @@ fun ClipboardListSeen(clipboardItemList: List<com.polaris.model.ClipboardItem>?,
                 shareText(context, textToShare)
             },
             onPin = {  item ->
-                viewModel.processIntent(ClipboardListIntent.UpdatePinClipboardDeleteIntent(id =item.id, pinState = item.isPinned ))
+                viewModel.processIntent(ClipboardListIntent.UpdatePinClipboardDeleteIntent(timestamp =item.timestamp, pinState = item.isPinned ))
             },
             onDelete = { item ->
-                onDeleteState.value(ClipboardListIntent.postClipboardDeleteIntent(item.id))
+                onDeleteState.value(ClipboardListIntent.postClipboardDeleteIntent(item.timestamp))
 
             },
             onDismissEvent = {
@@ -274,7 +274,6 @@ fun ClipboardView(
 }
 
 val dummyData = com.polaris.model.ClipboardItem(
-    id = -1,
     type = "GitHub",
     url = "https://www.github.com",
     title = "안드로이드 라이브러리 모음",
@@ -350,7 +349,7 @@ fun ClipboardItemView(clipboardItem: com.polaris.model.ClipboardItem, selectedCl
         }
 
         // ✅ isSelected 값이 true일 때만 보이도록 설정
-        AnimatedCheckmarkWithCircle(selectedClipboardItem?.id == clipboardItem.id)
+        AnimatedCheckmarkWithCircle(selectedClipboardItem?.timestamp == clipboardItem.timestamp)
     }
 }
 

@@ -10,7 +10,7 @@ class UpdateClipboardPinStateUseCase @Inject constructor(
     private val clipboardRepository: LocalClipboardRepository
 ){
     suspend fun execute(
-        itemId: Int,
+        timestamp: Long,
         pinState:Boolean,
         onComplete: () -> Unit,
 
@@ -19,7 +19,7 @@ class UpdateClipboardPinStateUseCase @Inject constructor(
 
         return flow {
             onComplete()
-            emitAll(clipboardRepository.updatePinStatus(itemId,pinState))
+            emitAll(clipboardRepository.updatePinStatus(timestamp,pinState))
 
 
         }
