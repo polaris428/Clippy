@@ -15,6 +15,11 @@ object PrefManager {
         context = mContext
         pref = context.getSharedPreferences(KEY_INIT_PREF_MANAGER, Context.MODE_PRIVATE)
     }
+    var userSignInSkip: Boolean
+        get() = pref.getBoolean(PreferenceConstants.USER_SIGN_IN_CHECK, false)
+        set(v) {
+            pref.edit().putBoolean(PreferenceConstants.USER_SIGN_IN_CHECK, v).apply()
+        }
     var userSignInCheck: Boolean
         get() = pref.getBoolean(PreferenceConstants.USER_SIGN_IN_CHECK, false)
         set(v) {

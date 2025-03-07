@@ -1,6 +1,7 @@
 package com.polaris.splash
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSColumn
 import com.polaris.designsystem.ui.theme.Gray40
+import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 
 @Composable
@@ -49,7 +51,7 @@ fun SplashView(){
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    "Clippy",
+                    text = "Clippy",
                     fontSize = 35.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF333333)

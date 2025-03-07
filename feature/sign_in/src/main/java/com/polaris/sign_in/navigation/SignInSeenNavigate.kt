@@ -15,11 +15,12 @@ fun NavController.navigateSignIn() {
 }
 
 fun NavGraphBuilder.signInNavGraph(
-    onSignInClick:()->Unit
+    onSignInClick:()->Unit,
+    onSignIncomplete: ()->Unit={}
 
 ) {
     composable(route = SignInRoute.route) {
-        SignInSeen(onSignInClick)
+        SignInSeen(onSignInClick,onSignIncomplete)
 
     }
 }

@@ -144,4 +144,13 @@ class MainViewModel @Inject constructor(
 
         }
     }
+
+    fun postInsertDummyData(list: List<ClipboardItem>):Job = viewModelScope.launch(Dispatchers.IO){
+        list.forEach {
+            postClipboardInsertUseCase.execute(item = it, onComplete = {}, isLogin = PrefManager.userSignInCheck).collect{
+
+            }
+        }
+
+    }
 }

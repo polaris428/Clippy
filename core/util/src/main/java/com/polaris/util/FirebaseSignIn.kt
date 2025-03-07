@@ -82,6 +82,7 @@ class GoogleSignInHelper(
 
         FirebaseAuth.getInstance().signOut()
         PrefManager.userSignInCheck = false
+        PrefManager.userSignInSkip = false
         PrefManager.userUid = ""
     }
 }
