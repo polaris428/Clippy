@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation (libs.converter.gson)
     implementation (platform(libs.firebase.bom))
     implementation (libs.firebase.auth)
     implementation (libs.play.services.auth)

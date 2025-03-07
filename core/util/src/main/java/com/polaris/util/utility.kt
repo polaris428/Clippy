@@ -1,5 +1,6 @@
 package com.polaris.util
 
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -9,7 +10,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.regex.Pattern
-
+fun Any.toJson(): String {
+    return "\n" + GsonBuilder().setPrettyPrinting().create().toJson(this)
+}
 suspend fun fetchWebTitle(url: String): String {
     return withContext(Dispatchers.IO) { // 네트워크 작업은 IO 스레드에서 실행
         try {

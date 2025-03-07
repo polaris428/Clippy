@@ -1,5 +1,6 @@
 package com.polaris.shared
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.domin.usecase.clipboard.GetClipboardAllUseCase
@@ -14,6 +15,7 @@ import com.polaris.util.fetchWebTitle
 import com.polaris.util.getGoogleFaviconUrl
 import com.polaris.util.getWebTitle
 import com.polaris.util.isUrl
+import com.polaris.util.toJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 
@@ -66,7 +68,6 @@ class MainViewModel @Inject constructor(
 
         getClipboardAllUseCase.execute(isLogin = PrefManager.userSignInCheck,onComplete = {}).collect {
             _clipboardDataList.value = it
-
         }
 
     }
