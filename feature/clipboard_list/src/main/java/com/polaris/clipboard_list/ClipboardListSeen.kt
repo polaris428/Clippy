@@ -70,12 +70,16 @@ import com.polaris.util.convertTimestampToMonthDay
 import kotlinx.coroutines.launch
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.AnimatedCheckmarkWithCircle
+import com.polaris.designsystem.ui.theme.ClipboardItemView
 import com.polaris.designsystem.ui.theme.bottomSheetTextColor
 import com.polaris.util.getTodayStartTimestamp
 import com.polaris.util.getYearMonth
 
 @Composable
-fun ClipboardListSeen(clipboardItemList: List<com.polaris.model.ClipboardItem>?, onEditClick:(item: com.polaris.model.ClipboardItem)->Unit) {
+fun ClipboardListSeen(
+    clipboardItemList: List<ClipboardItem>?,
+    onEditClick: (item: ClipboardItem) -> Unit
+) {
     val viewModel: ClipboardListViewModel = hiltViewModel()
     val isSheetOpen by viewModel.isSheetOpen.collectAsState()
     val selectedClipboardItem by viewModel.selectedClipboardItem.collectAsState()
@@ -86,15 +90,13 @@ fun ClipboardListSeen(clipboardItemList: List<com.polaris.model.ClipboardItem>?,
     val onDismissState = rememberUpdatedState(viewModel::processIntent)
 
 
-
-
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
-        ClipboardView(clipboardItemList,selectedClipboardItem,
+        ClipboardView(clipboardItemList, selectedClipboardItem,
             onLongPress = {
                 onLongPressState.value(ClipboardListIntent.ItemLongPressed(it))
-               //viewModel.processIntent()
+                //viewModel.processIntent()
             }
         )
 
@@ -114,8 +116,13 @@ fun ClipboardListSeen(clipboardItemList: List<com.polaris.model.ClipboardItem>?,
                 val textToShare = item.url ?: item.title
                 shareText(context, textToShare)
             },
-            onPin = {  item ->
-                viewModel.processIntent(ClipboardListIntent.UpdatePinClipboardDeleteIntent(timestamp =item.timestamp, pinState = item.isPinned ))
+            onPin = { item ->
+                viewModel.processIntent(
+                    ClipboardListIntent.UpdatePinClipboardDeleteIntent(
+                        timestamp = item.timestamp,
+                        pinState = item.isPinned
+                    )
+                )
             },
             onDelete = { item ->
                 onDeleteState.value(ClipboardListIntent.postClipboardDeleteIntent(item.timestamp))
@@ -137,19 +144,21 @@ fun ClipboardListSeen(clipboardItemList: List<com.polaris.model.ClipboardItem>?,
 @Composable
 fun CustomBottomSheetView(
     isSheetOpen: Boolean,
-    selectedClipboardItem: com.polaris.model.ClipboardItem,
-    onContent: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onEdit: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onShear: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onPin:(item: com.polaris.model.ClipboardItem) -> Unit ={},
-    onDelete: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onDismissEvent:()->Unit,
+    selectedClipboardItem: ClipboardItem,
+    onContent: (item: ClipboardItem) -> Unit = {},
+    onEdit: (item: ClipboardItem) -> Unit = {},
+    onShear: (item: ClipboardItem) -> Unit = {},
+    onPin: (item: ClipboardItem) -> Unit = {},
+    onDelete: (item: ClipboardItem) -> Unit = {},
+    onDismissEvent: () -> Unit,
     onDismiss: () -> Unit,
 ) {
 
     if (isSheetOpen) {
         Column(
-            modifier = Modifier.fillMaxSize().background(Color.Transparent),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent),
             verticalArrangement = Arrangement.Bottom // ✅ 바텀 시트를 하단 정렬
         ) {
             CustomBottomSheet(selectedClipboardItem = selectedClipboardItem,
@@ -179,17 +188,19 @@ fun CustomBottomSheetView(
 @Preview(showBackground = true)
 @Composable
 fun ClipboardView(
-    clipboardItemList: List<com.polaris.model.ClipboardItem>? = listOf(dummyData),
-    selectedClipboardItem: com.polaris.model.ClipboardItem?= null,
-    onLongPress: (item: com.polaris.model.ClipboardItem) -> Unit = {},
+    clipboardItemList: List<ClipboardItem>? = listOf(dummyData),
+    selectedClipboardItem: ClipboardItem? = null,
+    onLongPress: (item: ClipboardItem) -> Unit = {},
 ) {
     val todayStartTimestamp = getTodayStartTimestamp()
 
     // ✅ Pinned 아이템을 먼저 가져옴
-    val pinnedItems = clipboardItemList?.filter { it.isPinned }?.sortedByDescending { it.timestamp }.orEmpty()
+    val pinnedItems =
+        clipboardItemList?.filter { it.isPinned }?.sortedByDescending { it.timestamp }.orEmpty()
 
     // ✅ 나머지 아이템을 시간순으로 정렬
-    val otherItems = clipboardItemList?.filter { !it.isPinned }?.sortedByDescending { it.timestamp }.orEmpty()
+    val otherItems =
+        clipboardItemList?.filter { !it.isPinned }?.sortedByDescending { it.timestamp }.orEmpty()
 
     val todayItems = otherItems.filter { it.timestamp >= todayStartTimestamp }
     val previousItems = otherItems.filter { it.timestamp < todayStartTimestamp }
@@ -197,7 +208,7 @@ fun ClipboardView(
 
     // 📌 월 단위로 그룹화
     val groupedByMonth = previousItems.groupBy { getYearMonth(it.timestamp) }
-
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -223,7 +234,12 @@ fun ClipboardView(
             ) {
                 pinnedItems.forEach { item ->
 
-                    ClipboardItemView(item,selectedClipboardItem) { onLongPress(item) }
+
+                    ClipboardItemView(
+                        clipboardItem = item,
+                        selectedClipboardItem = selectedClipboardItem,
+                        onClick = { openUrl(context = context, url = item.url) },
+                        onLongPress = { onLongPress(item) })
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -244,7 +260,11 @@ fun ClipboardView(
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 todayItems.forEach { item ->
-                    ClipboardItemView(item,selectedClipboardItem) { onLongPress(item) }
+                    ClipboardItemView(
+                        clipboardItem = item,
+                        selectedClipboardItem = selectedClipboardItem,
+                        onClick = { openUrl(context = context, url = item.url) },
+                        onLongPress = { onLongPress(item) })
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -265,7 +285,11 @@ fun ClipboardView(
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 items.forEach { item ->
-                    ClipboardItemView(item,selectedClipboardItem) { onLongPress(item) }
+                    ClipboardItemView(
+                        clipboardItem = item,
+                        selectedClipboardItem = selectedClipboardItem,
+                        onClick = { openUrl(context = context, url = item.url) },
+                        onLongPress = { onLongPress(item) })
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -273,7 +297,7 @@ fun ClipboardView(
     }
 }
 
-val dummyData = com.polaris.model.ClipboardItem(
+val dummyData = ClipboardItem(
     type = "GitHub",
     url = "https://www.github.com",
     title = "안드로이드 라이브러리 모음",
@@ -284,74 +308,9 @@ val dummyData = com.polaris.model.ClipboardItem(
 @Preview(showBackground = true)
 @Composable
 fun preView() {
-    ClipboardItemView(dummyData, dummyData,onLongPress = {})
+    ClipboardItemView(dummyData, dummyData, onLongPress = {})
 }
 
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ClipboardItemView(clipboardItem: com.polaris.model.ClipboardItem, selectedClipboardItem: com.polaris.model.ClipboardItem?, onLongPress: () -> Unit) {
-    val context = LocalContext.current
-
-
-    Box {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .combinedClickable(
-                    onClick = { openUrl(context, clipboardItem.url) },
-                    onLongClick = {
-
-                        onLongPress() // ✅ 기존 롱클릭 이벤트 실행
-                    },
-                    indication = rememberRipple(
-                        color = Color.Gray, // 리플 색상 설정
-                        bounded = true // Row 크기 내에서만 리플 퍼지게 설정
-                    ),
-                    interactionSource = remember { MutableInteractionSource() }
-                )
-                .padding(top = 14.dp, start = 8.dp)
-        ) {
-            if (!clipboardItem.faviconUrl.isNullOrEmpty()) {
-                displayImage(clipboardItem.faviconUrl!!)
-            }
-
-
-            Column(modifier = Modifier.padding(start = 10.dp)) {
-                Text(
-                    text = clipboardItem.title,
-                    fontSize = 16.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (!clipboardItem.url.isNullOrEmpty()) {
-                        Text(
-                            text = convertTimestampToMonthDay(clipboardItem.timestamp),
-                            color = Gray50,
-                            fontSize = 12.sp
-                        )
-                        Text(
-                            text = " | ", color = Gray50, fontSize = 14.sp
-                        )
-                        Text(
-                            text = clipboardItem.type, color = Gray50, fontSize = 12.sp
-                        )
-                    }
-                }
-                LineView()
-            }
-        }
-
-        // ✅ isSelected 값이 true일 때만 보이도록 설정
-        AnimatedCheckmarkWithCircle(selectedClipboardItem?.timestamp == clipboardItem.timestamp)
-    }
-}
 
 @Composable
 fun Header() {
@@ -388,9 +347,8 @@ fun displayImage(imageUrl: String = "") {
         .data(imageUrl)
         .crossfade(true)  // 부드러운 이미지 전환
         .error(R.drawable.ic_logo)  // 오류 발생 시 기본 이미지
-      //  .placeholder(R.drawable.ic_logo) // 로딩 중 기본 이미지
+        //  .placeholder(R.drawable.ic_logo) // 로딩 중 기본 이미지
         .build()
-
 
 
     val painter = if (LocalInspectionMode.current) {
@@ -428,13 +386,13 @@ fun CustomBottomSheetPreview() {
 
 @Composable
 fun CustomBottomSheet(
-    selectedClipboardItem: com.polaris.model.ClipboardItem,
-    onContent: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onEdit: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onPin: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onShear: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onDelete: (item: com.polaris.model.ClipboardItem) -> Unit = {},
-    onDismissEvent :()-> Unit ={},
+    selectedClipboardItem: ClipboardItem,
+    onContent: (item: ClipboardItem) -> Unit = {},
+    onEdit: (item: ClipboardItem) -> Unit = {},
+    onPin: (item: ClipboardItem) -> Unit = {},
+    onShear: (item: ClipboardItem) -> Unit = {},
+    onDelete: (item: ClipboardItem) -> Unit = {},
+    onDismissEvent: () -> Unit = {},
     onDismiss: () -> Unit,
     isPreview: Boolean = false
 ) {
@@ -444,7 +402,8 @@ fun CustomBottomSheet(
 
     val animOffset = remember { Animatable(if (isPreview) 0f else 500f) } // ✅ 프리뷰에서는 바로 표시
 
-    var pinIcon = if(selectedClipboardItem.isPinned) R.drawable.ic_pin_off else R.drawable.ic_pin_on
+    var pinIcon =
+        if (selectedClipboardItem.isPinned) R.drawable.ic_pin_off else R.drawable.ic_pin_on
 
     LaunchedEffect(Unit) {
         if (!isPreview) { // ✅ 프리뷰가 아닐 때만 애니메이션 실행
@@ -591,7 +550,6 @@ fun openUrl(context: Context, url: String?) {
         context.startActivity(intent)
     }
 }
-
 
 
 @Preview

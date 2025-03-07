@@ -43,3 +43,5 @@ include(":feature:shared")
 include(":feature:sign_in")
 include(":feature:splash")
 include(":core:model")
+
+include(":feature:clipboard_shared_list")

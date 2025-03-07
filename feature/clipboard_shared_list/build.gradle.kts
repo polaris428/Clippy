@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.polaris.designsystem"
+    namespace = "com.polaris.clipboard_shared_list"
     compileSdk = 35
 
     defaultConfig {
@@ -31,11 +31,20 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
     implementation(projects.core.model)
+    implementation(projects.feature.shared)
+    implementation(projects.core.domin)
+    implementation(projects.core.data)
+    implementation(projects.core.designsystem)
+    implementation(libs.androidx.core.ktx)
     implementation(projects.core.util)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -46,10 +55,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    //coil
-    implementation(libs.coil.compose)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

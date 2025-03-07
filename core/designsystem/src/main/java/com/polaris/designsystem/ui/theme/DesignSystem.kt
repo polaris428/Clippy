@@ -5,6 +5,10 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +28,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -44,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
@@ -53,15 +59,24 @@ import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.polaris.designsystem.R
+import com.polaris.model.ClipboardItem
+import com.polaris.util.convertTimestampToMonthDay
 
 
 @Preview(showBackground = true)
@@ -348,4 +363,117 @@ fun CDSColumn(
         content()
 
     }
+}
+
+val dummyData = ClipboardItem(
+    type = "GitHub",
+    url = "https://www.github.com",
+    title = "안드로이드 라이브러리 모음",
+    faviconUrl = "https://github.githubassets.com/favicon.ico",
+    timestamp = System.currentTimeMillis()
+)
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+@Preview()
+fun ClipboardItemView(clipboardItem: ClipboardItem=dummyData, selectedClipboardItem: ClipboardItem?=null, onClick: () -> Unit={},onLongPress: () -> Unit={}) {
+
+    Box {
+        Row(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = { onClick() },
+                    onLongClick = {
+
+                        onLongPress() // ✅ 기존 롱클릭 이벤트 실행
+                    },
+                    indication = rememberRipple(
+                        color = Color.Gray, // 리플 색상 설정
+                        bounded = true // Row 크기 내에서만 리플 퍼지게 설정
+                    ),
+                    interactionSource = remember { MutableInteractionSource() }
+                )
+                .padding(top = 14.dp, start = 8.dp)
+        ) {
+            if (!clipboardItem.faviconUrl.isNullOrEmpty()) {
+                displayImage(clipboardItem.faviconUrl!!)
+            }
+
+
+            Column(modifier = Modifier.padding(start = 10.dp)) {
+                Text(
+                    text = clipboardItem.title,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (!clipboardItem.url.isNullOrEmpty()) {
+                        Text(
+                            text = convertTimestampToMonthDay(clipboardItem.timestamp),
+                            color = Gray50,
+                            fontSize = 12.sp
+                        )
+                        Text(
+                            text = " | ", color = Gray50, fontSize = 14.sp
+                        )
+                        Text(
+                            text = clipboardItem.type, color = Gray50, fontSize = 12.sp
+                        )
+                    }
+                }
+                LineView()
+            }
+        }
+
+        // ✅ isSelected 값이 true일 때만 보이도록 설정
+        AnimatedCheckmarkWithCircle(selectedClipboardItem?.timestamp == clipboardItem.timestamp)
+    }
+}
+
+@Preview
+@Composable
+fun displayImage(imageUrl: String = "") {
+
+    val context = LocalContext.current
+
+    val imageRequest = ImageRequest.Builder(context)
+        .data(imageUrl)
+        .crossfade(true)  // 부드러운 이미지 전환
+        .error(R.drawable.ic_logo)  // 오류 발생 시 기본 이미지
+        //  .placeholder(R.drawable.ic_logo) // 로딩 중 기본 이미지
+        .build()
+
+
+
+    val painter = if (LocalInspectionMode.current) {
+        // 프리뷰 모드에서는 Image와 painterResource 사용
+        painterResource(id = R.drawable.ic_logo)
+    } else {
+        // 실제 모드에서는 rememberAsyncImagePainter 사용
+        rememberAsyncImagePainter(model = imageRequest)
+    }
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+
+        color = Color.White, modifier = Modifier.size(48.dp)
+
+
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .size(24.dp)
+                .clip(RoundedCornerShape(4.dp))
+        )
+    }
+
 }
