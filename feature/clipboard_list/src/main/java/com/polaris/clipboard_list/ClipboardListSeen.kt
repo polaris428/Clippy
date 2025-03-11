@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.polaris.clipboard_folder.SlidePanel
 import com.polaris.model.ClipboardItem
 import com.polaris.designsystem.ui.theme.Gray50
 import com.polaris.designsystem.ui.theme.LineView
@@ -72,6 +73,7 @@ import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.AnimatedCheckmarkWithCircle
 import com.polaris.designsystem.ui.theme.ClipboardItemView
 import com.polaris.designsystem.ui.theme.bottomSheetTextColor
+import com.polaris.util.detectSwipe
 import com.polaris.util.getTodayStartTimestamp
 import com.polaris.util.getYearMonth
 
@@ -89,6 +91,7 @@ fun ClipboardListSeen(
     val onShearState = rememberUpdatedState(viewModel::processIntent)
     val onDismissState = rememberUpdatedState(viewModel::processIntent)
 
+    var isPanelOpen by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -134,6 +137,19 @@ fun ClipboardListSeen(
             onDismiss = {
                 onDismissState.value(ClipboardListIntent.BottomSheetDismissed)
             })
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .detectSwipe(
+                    onSwipeRight = { isPanelOpen = true },  // ✅ 오른쪽 스와이프 → 패널 열기
+                    onSwipeLeft = { isPanelOpen = false }   // ✅ 왼쪽 스와이프 → 패널 닫기
+                )
+        )
+
+        // ✅ 왼쪽에서 등장하는 슬라이드 패널
+        SlidePanel()
+
 
 
     }

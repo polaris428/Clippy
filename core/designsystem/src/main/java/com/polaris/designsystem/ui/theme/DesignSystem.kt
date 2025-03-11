@@ -85,7 +85,7 @@ fun LineView() {
     Column {
         Spacer(modifier = Modifier.height(14.dp))
         HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(), // 1f 제거 (불필요)
+            modifier = Modifier.fillMaxWidth(1f), // 1f 제거 (불필요)
             color = Gray90,
             thickness = 1.dp
         )

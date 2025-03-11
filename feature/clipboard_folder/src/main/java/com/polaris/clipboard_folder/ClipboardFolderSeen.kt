@@ -1,0 +1,285 @@
+package com.polaris.clipboard_folder
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntOffset
+import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import com.polaris.designsystem.R
+import com.polaris.designsystem.ui.theme.CDSColumn
+import com.polaris.designsystem.ui.theme.LineView
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
+
+@Composable
+fun ClipboardFolderSeen() {
+    ClipboardFolderView()
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ClipboardFolderView() {
+    CDSColumn {
+        Header()
+
+    }
+}
+
+@Composable
+fun Header() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_logo),
+            contentDescription = null,
+            modifier = Modifier.size(32.dp),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            "Clippy",
+            fontSize = 35.sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            color = Color(0xFF333333)
+        )
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ClipboardFolderViewPreView() {
+    CDSColumn(modifier = Modifier.background(Color.Transparent)) {
+        Header()
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            folderItem(title = "모든 노트")
+            folderItem(title = "공유 노트")
+            folderItem(title = "개인노트")
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            folderItem(title = "고정됨")
+            folderItem(title = "최근 삭제됨")
+        }
+
+
+    }
+
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+@Preview(showBackground = true)
+fun folderItem(title: String = "모든 노트", onClick: () -> Unit = {}) {
+    Row(
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = {
+                    // onLongPress() // ✅ 기존 롱클릭 이벤트 실행
+                },
+                indication = rememberRipple(
+                    color = Color.Gray, // 리플 색상 설정
+                    bounded = true // Row 크기 내에서만 리플 퍼지게 설정
+                ),
+                interactionSource = remember { MutableInteractionSource() }
+            )
+            .padding(top = 14.dp, start = 12.dp)
+    ) {
+        Image(
+            modifier = Modifier.size(24.dp),
+            painter = painterResource(id = R.drawable.ic_folder),
+            contentDescription = ""
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .weight(1f)
+        ) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            LineView()
+        }
+
+        // 오른쪽 끝에 정렬될 요소들
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "0", style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                modifier = Modifier.size(12.dp),
+                painter = painterResource(id = R.drawable.ic_arrow_right),
+                contentDescription = ""
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+        }
+    }
+}
+
+@Composable
+fun SlidePanel(isOpen: Boolean = false, onDismiss: () -> Unit = {}) {
+    val density = LocalDensity.current
+    val panelWidthPx = with(density) { 300.dp.toPx().roundToInt() } // 패널 너비 px 변환
+    var dragOffset by remember { mutableStateOf(0f) }
+    var isPanelOpen by remember { mutableStateOf(isOpen) }
+
+    // ✅ 실시간 패널 위치 조절 (드래그 반영)
+    val offsetX by remember { derivedStateOf {
+        if (isPanelOpen) dragOffset.coerceAtLeast(0f) else (-panelWidthPx + dragOffset).coerceAtMost(0f)
+    } }
+
+    // ✅ 배경 투명도 애니메이션 적용
+    val backgroundAlpha by animateFloatAsState(
+        targetValue = if (isPanelOpen) 0.5f else 0f,
+        animationSpec = tween(250, easing = FastOutSlowInEasing),
+        label = "backgroundAlpha"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = backgroundAlpha)) // ✅ 배경 어둡게 변환
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        println("Drag Ended, Offset: $dragOffset") // 디버깅 출력
+                        if (abs(dragOffset) > panelWidthPx / 1.5) {
+                            isPanelOpen = dragOffset > 0
+                        }
+                        dragOffset = 0f // ✅ 패널이 열린 상태에서 초기화 방지
+                    },
+                    onHorizontalDrag = { _, dragAmount ->
+                        dragOffset += dragAmount
+                        println("DragOffset: $dragOffset") // 디버깅 출력
+                    }
+                )
+            }
+    ) {
+        SlidePanelContent(
+            modifier = Modifier
+                .offset { IntOffset(offsetX.roundToInt(), 0) } // ✅ 실시간 위치 반영
+                .fillMaxHeight()
+                .fillMaxWidth(0.7f)
+                .background(Color.White, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
+                .padding(16.dp),
+            onDismiss = { isPanelOpen = false }
+        )
+    }
+}
+
+
+/**
+ * ✅ 패널 내부 버튼 UI
+ */
+@Composable
+fun SlidePanelContent(modifier: Modifier, onDismiss: () -> Unit) {
+    Column(
+        modifier = modifier
+    ) {
+        PanelButton("📂 폴더 추가") { /* 폴더 추가 로직 */ }
+        PanelButton("📝 새 문서") { /* 새 문서 작성 로직 */ }
+        PanelButton("📌 고정") { /* 고정 기능 */ }
+    }
+}
+
+/**
+ * ✅ 패널 내 버튼 컴포넌트
+ */
+@Composable
+fun PanelButton(text: String, onClick: () -> Unit) {
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(text)
+    }
+}
+

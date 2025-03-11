@@ -45,3 +45,4 @@ include(":feature:splash")
 include(":core:model")
 
 include(":feature:clipboard_shared_list")
+include(":feature:clipboard_folder")

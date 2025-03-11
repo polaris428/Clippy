@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id ("com.google.gms.google-services")
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.polaris.util"
+    namespace = "com.polaris.clipboard_folder"
     compileSdk = 35
 
     defaultConfig {
@@ -38,14 +37,16 @@ android {
 }
 
 dependencies {
-    implementation (libs.converter.gson)
-    implementation (platform(libs.firebase.bom))
-    implementation (libs.firebase.auth)
-    implementation (libs.play.services.auth)
+    implementation(projects.core.model)
+    implementation(projects.feature.shared)
+    implementation(projects.core.domin)
+    implementation(projects.core.data)
+    implementation(projects.core.designsystem)
+    implementation(libs.androidx.core.ktx)
+    implementation(projects.core.util)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.jsoup)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))

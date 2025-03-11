@@ -42,6 +42,7 @@ dependencies {
     implementation(projects.core.domin)
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
+    implementation(projects.feature.clipboardFolder)
     implementation(libs.androidx.core.ktx)
     implementation(projects.core.util)
     implementation(libs.androidx.appcompat)
