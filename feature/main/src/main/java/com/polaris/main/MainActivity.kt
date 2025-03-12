@@ -81,14 +81,14 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "로그인에 실패했어요, 잠시 후에 다시 시도해주세요", Toast.LENGTH_SHORT).show()
         })
         //googleSignInHelper.googleSignOut()
-        viewModel.processIntent(MainIntent.getAllClipboardListIntent)
+
         setContent {
 
             navController = rememberNavController()
 
 
             NavHost(navController = navController, startDestination = SplashRoute.route) {
-                splashNavGraph(onSplashCompleted = {
+                splashNavGraph(viewModel,onSplashCompleted = {
                     if (!PrefManager.userSignInSkip) {
                         dummyDate.forEach {
                             viewModel.postInsertDummyData(dummyDate)

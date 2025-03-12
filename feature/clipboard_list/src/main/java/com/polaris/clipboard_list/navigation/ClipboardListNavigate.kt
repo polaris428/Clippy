@@ -16,8 +16,8 @@ fun NavController.navigateClipboardList() {
 }
 
 fun NavGraphBuilder.clipboardListNavGraph(
-    clipboardItemList: StateFlow<List<com.polaris.model.ClipboardItem>>,
-    onEditClick:(item: com.polaris.model.ClipboardItem)->Unit
+    clipboardItemList: StateFlow<List<ClipboardItem>>,
+    onEditClick:(item: ClipboardItem)->Unit
 
 ) {
     composable(route = ClipboardList.route) {

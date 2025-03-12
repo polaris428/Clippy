@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,15 +26,21 @@ import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSColumn
 import com.polaris.designsystem.ui.theme.Gray40
+import com.polaris.shared.MainViewModel
+import com.polaris.shared.intent.MainIntent
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashSeen(onSplashCompleted:()->Unit){
-    LaunchedEffect(Unit) {
+fun SplashSeen(viewModel: MainViewModel,onSplashCompleted:()->Unit){
+    val clipboardItem =  viewModel.clipboardItem.collectAsState()
+
+    viewModel.processIntent(MainIntent.getAllClipboardListIntent)
+    LaunchedEffect(clipboardItem.value) {
         delay(2000) // 3초 딜레이
         onSplashCompleted()
     }
+
     SplashView()
 
 }
