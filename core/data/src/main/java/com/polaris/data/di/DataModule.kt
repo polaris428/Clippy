@@ -15,7 +15,7 @@ abstract class DataModule {
 
     @Binds
     internal abstract fun bindLocalClipboardRepository(
-        clipboardRepositoryImpl: LocalClipboardRepositoryImpl
+        clipboardRepositoryImpl: LocalClipboardRepositoryImpl,
     ): LocalClipboardRepository
 
     @Binds

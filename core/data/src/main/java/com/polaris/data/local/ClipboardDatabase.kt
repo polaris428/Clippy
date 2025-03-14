@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.polaris.model.ClipboardFolder
 import com.polaris.model.ClipboardItem
 
 @Database(entities = [ClipboardItem::class], version = 1, exportSchema = false)
 abstract class ClipboardDatabase : RoomDatabase() {
     abstract fun clipboardDao(): ClipboardDao
-
     companion object {
         @Volatile
         private var INSTANCE: ClipboardDatabase? = null
@@ -20,6 +20,28 @@ abstract class ClipboardDatabase : RoomDatabase() {
                     context.applicationContext,
                     ClipboardDatabase::class.java,
                     "clipboard_database"
+                ) .fallbackToDestructiveMigration().build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
+}
+
+@Database(entities = [ClipboardFolder::class], version = 1, exportSchema = false)
+abstract class ClipboardFolderDatabase: RoomDatabase(){
+    abstract fun clipboardFolderDao(): ClipboardFolderDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: ClipboardDatabase? = null
+
+        fun getDatabase(context: Context): ClipboardDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    ClipboardDatabase::class.java,
+                    "clipboard_folders_database"
                 ) .fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance

@@ -1,6 +1,7 @@
 package com.polaris.domin.repository
 
 
+import com.polaris.model.ClipboardFolder
 import com.polaris.model.ClipboardItem
 import kotlinx.coroutines.flow.Flow
 
@@ -12,4 +13,8 @@ interface LocalClipboardRepository {
     suspend fun updatePinStatus(timestamp: Long,pinState:Boolean) :Flow<Boolean>
     suspend fun updateClipboardItem(clipboardItem: ClipboardItem):Flow<Boolean>
     suspend fun clearAll()
+
+
+    suspend fun insertFolder(folder: ClipboardFolder):Flow<Boolean>
+    suspend fun upDateFolder()
 }

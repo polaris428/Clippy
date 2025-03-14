@@ -5,6 +5,9 @@ import androidx.room.Room
 import com.google.firebase.database.FirebaseDatabase
 import com.polaris.data.local.ClipboardDao
 import com.polaris.data.local.ClipboardDatabase
+import com.polaris.data.local.ClipboardFolderDao
+import com.polaris.data.local.ClipboardFolderDatabase
+import com.polaris.model.ClipboardFolder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,11 +32,34 @@ object DatabaseModule {
             .build()
              .also { context.deleteDatabase("clipboard_database") } //개발 테스트용 배포시 삭제 필요
     }
-
     @Provides
     fun provideClipboardDao(database: ClipboardDatabase): ClipboardDao {
         return database.clipboardDao()
     }
+
+
+
+    @Provides
+    @Singleton
+    fun provideClipboardFolderDatabase(@ApplicationContext context: Context): ClipboardFolderDatabase {
+        return Room.databaseBuilder(
+            context,
+            ClipboardFolderDatabase::class.java,
+            "clipboard_folders_database"
+        ).fallbackToDestructiveMigration()
+
+            .fallbackToDestructiveMigration() //개발 테스트용 배포시 삭제 필요
+            .build()
+            .also { context.deleteDatabase("clipboard_folders_database") } //개발 테스트용 배포시 삭제 필요
+    }
+
+    @Provides
+    fun provideClipboardFolderDao(database: ClipboardFolderDatabase): ClipboardFolderDao {
+        return database.clipboardFolderDao()
+    }
+
+
+
     @Provides
     @Singleton
     fun provideFirebaseDatabase(): FirebaseDatabase {
