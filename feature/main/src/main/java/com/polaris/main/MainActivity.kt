@@ -104,8 +104,15 @@ class MainActivity : ComponentActivity() {
                 signInNavGraph(
                     onSignInClick = { googleSignInHelper.startGoogleSignIn() },
                     onSignIncomplete = {
-                        PrefManager.userSignInSkip = true
-                        navController.navigateClipboardList()
+
+                        googleSignInHelper.signInAnonymously(onSuccess = {
+                            PrefManager.userSignInSkip = true
+                            navController.navigateClipboardList()
+                        }, onFailure = {
+                            Toast.makeText(this@MainActivity,"게스트 로그인 실패",Toast.LENGTH_SHORT).show()
+
+                        })
+
                     })
                 clipboardListNavGraph(
                     viewModel.clipboardDataList,

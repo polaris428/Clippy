@@ -45,7 +45,7 @@ fun SplashSeen(viewModel: MainViewModel, splashViewModel: SplashViewModel= hiltV
     }
 
     if (!PrefManager.userSignInSkip) {
-        splashViewModel.processIntent(SplashIntent.initPostFolder())
+        //splashViewModel.processIntent(SplashIntent.initPostFolder())
     }
     SplashView()
 

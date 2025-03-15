@@ -85,4 +85,17 @@ class GoogleSignInHelper(
         PrefManager.userSignInSkip = false
         PrefManager.userUid = ""
     }
+
+    fun signInAnonymously(onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+        FirebaseAuth.getInstance().signInAnonymously()
+            .addOnSuccessListener { authResult ->
+                val userId = authResult.user!!.uid
+                onSuccess(userId)
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception.message ?: "익명 로그인 실패")
+            }
+    }
+
+
 }
