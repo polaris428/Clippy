@@ -46,3 +46,4 @@ include(":core:model")
 
 include(":feature:clipboard_shared_list")
 include(":feature:clipboard_folder")
+include(":core:init_date")

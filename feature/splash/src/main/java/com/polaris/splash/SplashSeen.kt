@@ -22,17 +22,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSColumn
 import com.polaris.designsystem.ui.theme.Gray40
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
+import com.polaris.splash.intent.SplashIntent
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashSeen(viewModel: MainViewModel,onSplashCompleted:()->Unit){
+fun SplashSeen(viewModel: MainViewModel, splashViewModel: SplashViewModel= hiltViewModel(), onSplashCompleted:()->Unit){
+
     val clipboardItem =  viewModel.clipboardItem.collectAsState()
 
     viewModel.processIntent(MainIntent.getAllClipboardListIntent)
@@ -41,6 +44,9 @@ fun SplashSeen(viewModel: MainViewModel,onSplashCompleted:()->Unit){
         onSplashCompleted()
     }
 
+    if (!PrefManager.userSignInSkip) {
+        splashViewModel.processIntent(SplashIntent.initPostFolder())
+    }
     SplashView()
 
 }

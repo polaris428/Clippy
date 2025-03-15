@@ -16,5 +16,6 @@ interface LocalClipboardRepository {
 
 
     suspend fun insertFolder(folder: ClipboardFolder):Flow<Boolean>
+    suspend fun getFolderList():Flow<List<ClipboardFolder>>
     suspend fun upDateFolder()
 }

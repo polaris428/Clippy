@@ -1,36 +1,35 @@
-package com.polaris.domin.usecase.clipboard
+package com.polaris.domin.usecase.clipboard.clipboard
 
 
 
 import com.polaris.domin.repository.LocalClipboardRepository
 import com.polaris.domin.repository.RemoteClipboardRepository
 import com.polaris.model.ClipboardItem
-
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-
-
 import javax.inject.Inject
 
-class GetClipboardAllUseCase @Inject constructor(
-    private val localClipboardRepository: LocalClipboardRepository,
-    private val remoteClipboardRepository: RemoteClipboardRepository
-) {
+class PostClipboardInsertUseCase @Inject constructor(
+   private val localClipboardRepository: LocalClipboardRepository,
+    private val clipboardRepository: RemoteClipboardRepository
+){
     suspend fun execute(
-        isLogin:Boolean,
+        item: ClipboardItem,
         onComplete: () -> Unit,
-        ): Flow<List<ClipboardItem>> {
+        isLogin:Boolean
+        ):Flow<Boolean> {
 
 
         return flow {
             onComplete()
             if (isLogin){
-                emitAll(remoteClipboardRepository.getAll())
+                emitAll( clipboardRepository.insert(item))
             }else{
-                emitAll(localClipboardRepository.getAll())
-
+                emitAll(localClipboardRepository.insert(item))
             }
+
+
 
 
         }

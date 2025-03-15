@@ -20,7 +20,7 @@ fun NavGraphBuilder.splashNavGraph(
 
 ) {
     composable(route = SplashRoute.route) {
-        SplashSeen(viewModel,onSplashCompleted)
+        SplashSeen(viewModel,onSplashCompleted =  onSplashCompleted)
 
     }
 }

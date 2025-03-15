@@ -1,4 +1,4 @@
-package com.polaris.domin.usecase.clipboard
+package com.polaris.domin.usecase.clipboard.clipboard
 
 import android.util.Log
 import com.polaris.domin.repository.LocalClipboardRepository

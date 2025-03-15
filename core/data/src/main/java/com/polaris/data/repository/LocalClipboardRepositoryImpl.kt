@@ -50,6 +50,10 @@ internal class LocalClipboardRepositoryImpl @Inject constructor(
         return flowOf(true)
     }
 
+    override suspend fun getFolderList(): Flow<List<ClipboardFolder>> {
+        return flowOf(clipboardFolderDao.getAllFolders())
+    }
+
     override suspend fun upDateFolder() {
         //  TODO("Not yet implemented")
     }

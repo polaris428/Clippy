@@ -92,7 +92,6 @@ class MainActivity : ComponentActivity() {
                     if (!PrefManager.userSignInSkip) {
                         dummyDate.forEach {
                             viewModel.postInsertDummyData(dummyDate)
-                            viewModel.postClipboardInsert()
                         }
                         navController.navigateClipboardList()
                     } else {

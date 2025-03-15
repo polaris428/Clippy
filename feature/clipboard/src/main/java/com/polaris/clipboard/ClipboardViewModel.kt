@@ -11,8 +11,7 @@ import com.polaris.util.isUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import com.polaris.model.ClipboardItem
-import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
+import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardInsertUseCase
 import com.polaris.util.PrefManager
 import com.polaris.util.extractUrl
 import com.polaris.util.getWebTitle

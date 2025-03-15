@@ -8,6 +8,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.polaris.model.ClipboardItem
 import com.polaris.domin.repository.RemoteClipboardRepository
+import com.polaris.model.ClipboardFolder
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -19,14 +20,16 @@ import javax.inject.Inject
 internal class RemoteClipboardRepositoryImpl @Inject constructor(
     private val firebaseDatabase: FirebaseDatabase
 ) : RemoteClipboardRepository {
-    private val database: DatabaseReference
+    private val clipboardDatabase: DatabaseReference
         get() = firebaseDatabase.getReference(PrefManager.userUid).child("clipboard")
 
+    private val folderDatabase: DatabaseReference
+        get() = firebaseDatabase.getReference(PrefManager.userUid).child("folder")
 
     override suspend fun postDataMigration(itemList: List<ClipboardItem>): Flow<Boolean> {
         return try {
             itemList.reversed().forEach { item ->
-                database.push().setValue(item).await() // 개별적으로 push
+                clipboardDatabase.push().setValue(item).await() // 개별적으로 push
             }
             flowOf(true)
         } catch (e: Exception) {
@@ -36,7 +39,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun insert(item: ClipboardItem): Flow<Boolean> {
         return try {
-            database.push().setValue(item).await()
+            clipboardDatabase.push().setValue(item).await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)
@@ -56,14 +59,14 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
                 close(error.toException())
             }
         }
-        database.addValueEventListener(listener)
-        awaitClose { database.removeEventListener(listener) } // 스트림 종료 시 리스너 제거
+        clipboardDatabase.addValueEventListener(listener)
+        awaitClose { clipboardDatabase.removeEventListener(listener) } // 스트림 종료 시 리스너 제거
     }
 
 
     override suspend fun delete(itemId: Int): Flow<Boolean> {
         return try {
-            database.child(itemId.toString()).removeValue().await()
+            clipboardDatabase.child(itemId.toString()).removeValue().await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)
@@ -73,7 +76,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun updatePinStatus(itemId: Int, pinState: Boolean): Flow<Boolean> {
         return try {
-            database.child(itemId.toString()).child("pinned")
+            clipboardDatabase.child(itemId.toString()).child("pinned")
                 .setValue(pinState).await()
             flowOf(true)
         } catch (e: Exception) {
@@ -83,7 +86,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun updateClipboardItem(clipboardItem:ClipboardItem): Flow<Boolean> {
         return try {
-        database.child(clipboardItem.timestamp.toString())
+            clipboardDatabase.child(clipboardItem.timestamp.toString())
                 .setValue(clipboardItem).await()
             flowOf(true)
         } catch (e: Exception) {
@@ -94,10 +97,28 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun clearAll(): Flow<Boolean> {
         return try {
-            database.removeValue().await()
+            clipboardDatabase.removeValue().await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)
         }
+    }
+
+    override suspend fun insertFolder(folder: ClipboardFolder): Flow<Boolean> {
+        return try {
+            folderDatabase.push().setValue(folder).await()
+            flowOf(true)
+        } catch (e: Exception) {
+            flowOf(false)
+        }
+
+    }
+
+    override suspend fun getFolderList(): Flow<List<ClipboardFolder>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun upDateFolder() {
+        TODO("Not yet implemented")
     }
 }

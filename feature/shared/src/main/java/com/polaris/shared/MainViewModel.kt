@@ -1,12 +1,11 @@
 package com.polaris.shared
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polaris.domin.usecase.clipboard.GetClipboardAllUseCase
-import com.polaris.domin.usecase.clipboard.PostClipboardInsertUseCase
-import com.polaris.domin.usecase.clipboard.PostDataMigrationUseCase
-import com.polaris.domin.usecase.clipboard.UpdateClipboardUseCase
+import com.polaris.domin.usecase.clipboard.clipboard.GetClipboardAllUseCase
+import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardInsertUseCase
+import com.polaris.domin.usecase.clipboard.clipboard.PostDataMigrationUseCase
+import com.polaris.domin.usecase.clipboard.clipboard.UpdateClipboardUseCase
 import com.polaris.model.ClipboardItem
 import com.polaris.shared.intent.MainIntent
 import com.polaris.util.PrefManager
@@ -15,7 +14,6 @@ import com.polaris.util.fetchWebTitle
 import com.polaris.util.getGoogleFaviconUrl
 import com.polaris.util.getWebTitle
 import com.polaris.util.isUrl
-import com.polaris.util.toJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 
@@ -34,7 +32,7 @@ class MainViewModel @Inject constructor(
     private val postClipboardMigrationUseCase: PostDataMigrationUseCase,
 
 
-) : ViewModel() {
+    ) : ViewModel() {
 
 
     private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())

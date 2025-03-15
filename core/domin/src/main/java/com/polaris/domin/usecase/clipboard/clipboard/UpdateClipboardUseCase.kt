@@ -1,17 +1,18 @@
-package com.polaris.domin.usecase.clipboard
+package com.polaris.domin.usecase.clipboard.clipboard
+
 
 import com.polaris.domin.repository.LocalClipboardRepository
+import com.polaris.model.ClipboardItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class UpdateClipboardPinStateUseCase @Inject constructor(
+class UpdateClipboardUseCase  @Inject constructor(
     private val clipboardRepository: LocalClipboardRepository
 ){
     suspend fun execute(
-        timestamp: Long,
-        pinState:Boolean,
+        clipboardItem: ClipboardItem,
         onComplete: () -> Unit,
 
         ): Flow<Boolean> {
@@ -19,7 +20,7 @@ class UpdateClipboardPinStateUseCase @Inject constructor(
 
         return flow {
             onComplete()
-            emitAll(clipboardRepository.updatePinStatus(timestamp,pinState))
+            emitAll(clipboardRepository.updateClipboardItem(clipboardItem))
 
 
         }
