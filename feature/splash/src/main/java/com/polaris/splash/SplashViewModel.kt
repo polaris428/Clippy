@@ -27,7 +27,7 @@ class SplashViewModel @Inject constructor(val postFolderUseCase: PostFolderUseCa
 
     fun initPostFolder(list: List<ClipboardFolder>) = viewModelScope.launch {
         list.forEach {
-            postFolderUseCase.execute(PrefManager.userSignInCheck, it, onComplete = {}).catch { }
+            postFolderUseCase.execute(PrefManager.userSignInCheck, it).catch { }
         }
 
     }

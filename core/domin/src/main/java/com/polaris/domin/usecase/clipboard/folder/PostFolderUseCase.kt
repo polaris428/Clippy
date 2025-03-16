@@ -16,13 +16,11 @@ class PostFolderUseCase @Inject constructor(
     suspend fun execute(
         isLogin: Boolean,
         folder: ClipboardFolder,
-        onComplete: () -> Unit,
 
         ): Flow<Boolean> {
 
 
         return flow {
-            onComplete()
             if (isLogin){
                 emitAll(remoteClipboardRepository.insertFolder(folder))
             }else{

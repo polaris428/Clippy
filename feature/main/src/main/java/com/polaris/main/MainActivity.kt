@@ -16,6 +16,7 @@ import com.polaris.clipboard_list.navigation.navigateClipboardList
 import com.polaris.model.ClipboardItem
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
+import com.polaris.sign_in.intent.SignInIntent
 import com.polaris.sign_in.navigation.navigateSignIn
 import com.polaris.sign_in.navigation.signInNavGraph
 import com.polaris.splash.navigation.SplashRoute
@@ -88,7 +89,7 @@ class MainActivity : ComponentActivity() {
 
 
             NavHost(navController = navController, startDestination = SplashRoute.route) {
-                splashNavGraph(viewModel,onSplashCompleted = {
+                splashNavGraph(viewModel, onSplashCompleted = {
                     if (!PrefManager.userSignInSkip) {
                         dummyDate.forEach {
                             viewModel.postInsertDummyData(dummyDate)
@@ -103,20 +104,26 @@ class MainActivity : ComponentActivity() {
                 )
                 signInNavGraph(
                     onSignInClick = { googleSignInHelper.startGoogleSignIn() },
-                    onSignIncomplete = {
-
-                        googleSignInHelper.signInAnonymously(onSuccess = {
-                            PrefManager.userSignInSkip = true
-                            navController.navigateClipboardList()
+                    onSignInAnonymouslyClick = { viewModel ->
+                        googleSignInHelper.signInAnonymously(
+                            onSuccess = {
+                                viewModel.processIntent(SignInIntent.postInitFolderIntent)
                         }, onFailure = {
-                            Toast.makeText(this@MainActivity,"게스트 로그인 실패",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, "게스트 로그인 실패", Toast.LENGTH_SHORT)
+                                .show()
 
                         })
+
+                    },
+                    onSignIncomplete = {
+                        PrefManager.userSignInSkip = true
+                        navController.navigateClipboardList()
+
 
                     })
                 clipboardListNavGraph(
                     viewModel.clipboardDataList,
-                    onEditClick = { item: com.polaris.model.ClipboardItem ->
+                    onEditClick = { item: ClipboardItem ->
                         viewModel.updateClipboardItem(item)
                         navController.navigateClipboardEdit()
 

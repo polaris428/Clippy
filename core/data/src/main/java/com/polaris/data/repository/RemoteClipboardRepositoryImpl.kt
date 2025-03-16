@@ -26,6 +26,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
     private val folderDatabase: DatabaseReference
         get() = firebaseDatabase.getReference(PrefManager.userUid).child("folder")
 
+
     override suspend fun postDataMigration(itemList: List<ClipboardItem>): Flow<Boolean> {
         return try {
             itemList.reversed().forEach { item ->
@@ -106,6 +107,8 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun insertFolder(folder: ClipboardFolder): Flow<Boolean> {
         return try {
+            val folderId = FirebaseDatabase.getInstance().getReference("folders").push().key!!
+            folder.id = folderId
             folderDatabase.push().setValue(folder).await()
             flowOf(true)
         } catch (e: Exception) {
@@ -119,6 +122,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
     }
 
     override suspend fun upDateFolder() {
-        TODO("Not yet implemented")
+
+
     }
 }

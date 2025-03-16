@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,21 +22,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSColumn
-import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.Gray40
-import com.polaris.util.PrefManager
+import com.polaris.sign_in.viewModel.SignInViewModel
 
 @Composable
-fun SignInSeen(onSignInClick: () -> Unit,onSignIncomplete: ()->Unit) {
-    SignInView(onSignInClick,onSignIncomplete)
+fun SignInSeen(onSignInClick: () -> Unit,onSignInAnonymouslyClick:(viewModel:SignInViewModel)->Unit,onSignIncomplete: ()->Unit) {
+    val viewModel : SignInViewModel = hiltViewModel()
+
+    SignInView(viewModel,onSignInClick,onSignInAnonymouslyClick,onSignIncomplete)
 }
 
 @Composable
 @Preview(showBackground = true)
-fun SignInView(onSignInClick: () -> Unit = {},onSignIncomplete: ()->Unit={}) {
+fun SignInView(viewModel: SignInViewModel= hiltViewModel(), onSignInClick: () -> Unit = {}, onSignInAnonymouslyClick:(SignInViewModel)-> Unit ={}, onSignIncomplete: ()->Unit={}) {
+
     CDSColumn(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(Modifier.weight(1f)) {
             Column(
@@ -72,6 +73,7 @@ fun SignInView(onSignInClick: () -> Unit = {},onSignIncomplete: ()->Unit={}) {
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null // 클릭 효과 제거
             ) {
+                onSignInAnonymouslyClick(viewModel)
                 onSignIncomplete()
             },
             text = "로그인 없이 계속하기",

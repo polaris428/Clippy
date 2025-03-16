@@ -36,6 +36,7 @@ android {
 dependencies {
     implementation (libs.androidx.room.runtime)
     implementation(libs.firebase.database)
+    implementation(libs.androidx.adapters)
     kapt (libs.androidx.room.compiler)
     //hilt
     implementation("androidx.room:room-ktx:2.6.1")
