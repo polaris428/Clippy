@@ -3,11 +3,10 @@ package com.polaris.data.di
 import android.content.Context
 import androidx.room.Room
 import com.google.firebase.database.FirebaseDatabase
-import com.polaris.data.local.ClipboardDao
-import com.polaris.data.local.ClipboardDatabase
-import com.polaris.data.local.ClipboardFolderDao
-import com.polaris.data.local.ClipboardFolderDatabase
-import com.polaris.model.ClipboardFolder
+import com.polaris.database.dao.ClipboardDao
+import com.polaris.database.ClipboardDatabase
+import com.polaris.database.dao.ClipboardFolderDao
+import com.polaris.database.ClipboardFolderDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,10 +20,10 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideClipboardDatabase(@ApplicationContext context: Context): ClipboardDatabase {
+    fun provideClipboardDatabase(@ApplicationContext context: Context): com.polaris.database.ClipboardDatabase {
         return Room.databaseBuilder(
             context,
-            ClipboardDatabase::class.java,
+            com.polaris.database.ClipboardDatabase::class.java,
             "clipboard_database"
         ).fallbackToDestructiveMigration()
 
@@ -33,7 +32,7 @@ object DatabaseModule {
              .also { context.deleteDatabase("clipboard_database") } //개발 테스트용 배포시 삭제 필요
     }
     @Provides
-    fun provideClipboardDao(database: ClipboardDatabase): ClipboardDao {
+    fun provideClipboardDao(database: com.polaris.database.ClipboardDatabase): com.polaris.database.dao.ClipboardDao {
         return database.clipboardDao()
     }
 
@@ -41,10 +40,10 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideClipboardFolderDatabase(@ApplicationContext context: Context): ClipboardFolderDatabase {
+    fun provideClipboardFolderDatabase(@ApplicationContext context: Context): com.polaris.database.ClipboardFolderDatabase {
         return Room.databaseBuilder(
             context,
-            ClipboardFolderDatabase::class.java,
+            com.polaris.database.ClipboardFolderDatabase::class.java,
             "clipboard_folders_database"
         ).fallbackToDestructiveMigration()
 
@@ -54,7 +53,7 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideClipboardFolderDao(database: ClipboardFolderDatabase): ClipboardFolderDao {
+    fun provideClipboardFolderDao(database: com.polaris.database.ClipboardFolderDatabase): com.polaris.database.dao.ClipboardFolderDao {
         return database.clipboardFolderDao()
     }
 

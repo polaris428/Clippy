@@ -6,9 +6,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.polaris.model.ClipboardItem
 import com.polaris.domin.repository.RemoteClipboardRepository
-import com.polaris.model.ClipboardFolder
+import com.polaris.model.dto.ClipboardFolderDTO
+import com.polaris.model.dto.ClipboardItemDTO
+import com.polaris.model.response.ClipboardItemResponse
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +28,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         get() = firebaseDatabase.getReference(PrefManager.userUid).child("folder")
 
 
-    override suspend fun postDataMigration(itemList: List<ClipboardItem>): Flow<Boolean> {
+    override suspend fun postDataMigration(itemList: List<ClipboardItemDTO>): Flow<Boolean> {
         return try {
             itemList.reversed().forEach { item ->
                 clipboardDatabase.push().setValue(item).await() // 개별적으로 push
@@ -38,7 +39,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insert(item: ClipboardItem): Flow<Boolean> {
+    override suspend fun insert(item: ClipboardItemDTO): Flow<Boolean> {
         return try {
             clipboardDatabase.push().setValue(item).await()
             flowOf(true)
@@ -48,11 +49,11 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getAll(): Flow<List<ClipboardItem>> = callbackFlow {
+    override suspend fun getAll(): Flow<List<ClipboardItemResponse>> = callbackFlow {
 
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val items = snapshot.children.mapNotNull { it.getValue(ClipboardItem::class.java) }
+                val items = snapshot.children.mapNotNull { it.getValue(ClipboardItemResponse::class.java) }
                 trySend(items).isSuccess
             }
 
@@ -85,7 +86,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateClipboardItem(clipboardItem:ClipboardItem): Flow<Boolean> {
+    override suspend fun updateClipboardItem(clipboardItem:ClipboardItemDTO): Flow<Boolean> {
         return try {
             clipboardDatabase.child(clipboardItem.timestamp.toString())
                 .setValue(clipboardItem).await()
@@ -105,7 +106,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertFolder(folder: ClipboardFolder): Flow<Boolean> {
+    override suspend fun insertFolder(folder: ClipboardFolderDTO): Flow<Boolean> {
         return try {
             val folderId = FirebaseDatabase.getInstance().getReference("folders").push().key!!
             folder.id = folderId
@@ -117,7 +118,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getFolderList(): Flow<List<ClipboardFolder>> {
+    override suspend fun getFolderList(): Flow<List<ClipboardFolderDTO>> {
         TODO("Not yet implemented")
     }
 

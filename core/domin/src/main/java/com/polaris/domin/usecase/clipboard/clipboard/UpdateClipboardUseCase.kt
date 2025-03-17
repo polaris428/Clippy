@@ -2,7 +2,9 @@ package com.polaris.domin.usecase.clipboard.clipboard
 
 
 import com.polaris.domin.repository.LocalClipboardRepository
-import com.polaris.model.ClipboardItem
+import com.polaris.database.model.toEntity
+import com.polaris.model.dto.ClipboardItemDTO
+import com.polaris.model.model.ClipboardItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -20,7 +22,7 @@ class UpdateClipboardUseCase  @Inject constructor(
 
         return flow {
             onComplete()
-            emitAll(clipboardRepository.updateClipboardItem(clipboardItem))
+            emitAll(clipboardRepository.updateClipboardItem(clipboardItem.toEntity()))
 
 
         }

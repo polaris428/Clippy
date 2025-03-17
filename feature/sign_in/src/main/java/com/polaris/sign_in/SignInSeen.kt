@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,18 +28,44 @@ import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSColumn
 import com.polaris.designsystem.ui.theme.Gray40
+import com.polaris.sign_in.intent.SignInIntent
 import com.polaris.sign_in.viewModel.SignInViewModel
+import com.polaris.util.GoogleSignInHelper
 
 @Composable
-fun SignInSeen(onSignInClick: () -> Unit,onSignInAnonymouslyClick:(viewModel:SignInViewModel)->Unit,onSignIncomplete: ()->Unit) {
-    val viewModel : SignInViewModel = hiltViewModel()
+fun SignInSeen(
+    onSignInClick: () -> Unit,
+    googleSignInHelper: GoogleSignInHelper,
+    onSignIncomplete: () -> Unit
+) {
+    val viewModel: SignInViewModel = hiltViewModel()
+    val coroutineScope = rememberCoroutineScope()
+    SignInView(viewModel, onSignInClick, onSignInAnonymouslyClick = {
+        googleSignInHelper.signInAnonymously(onSuccess = {
+            //viewModel.sendIntent(SignInIntent.PostUserInfoIntent())
+        }, onFailure = {
 
-    SignInView(viewModel,onSignInClick,onSignInAnonymouslyClick,onSignIncomplete)
+        })
+    }, onSignIncomplete)
+
+
+
+
+
+
+
 }
+
+
 
 @Composable
 @Preview(showBackground = true)
-fun SignInView(viewModel: SignInViewModel= hiltViewModel(), onSignInClick: () -> Unit = {}, onSignInAnonymouslyClick:(SignInViewModel)-> Unit ={}, onSignIncomplete: ()->Unit={}) {
+fun SignInView(
+    viewModel: SignInViewModel = hiltViewModel(),
+    onSignInClick: () -> Unit = {},
+    onSignInAnonymouslyClick: (SignInViewModel) -> Unit = {},
+    onSignIncomplete: () -> Unit = {}
+) {
 
     CDSColumn(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(Modifier.weight(1f)) {

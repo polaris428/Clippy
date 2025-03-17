@@ -1,7 +1,8 @@
 package com.polaris.clipboard_save_animation.intent
 
-import com.polaris.model.ClipboardItem
+import com.polaris.model.model.ClipboardItem
+
 
 sealed class SaveAnimationSeenIntent {
-    data class postClipboarInsertIntent (val clipboardItem: com.polaris.model.ClipboardItem): SaveAnimationSeenIntent()
+    data class postClipboarInsertIntent (val clipboardItem: ClipboardItem): SaveAnimationSeenIntent()
 }

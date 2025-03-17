@@ -1,4 +1,4 @@
-package com.polaris.model
+package com.polaris.database
 
 import org.junit.Test
 

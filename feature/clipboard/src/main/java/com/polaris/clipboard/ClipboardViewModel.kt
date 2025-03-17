@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardInsertUseCase
+import com.polaris.model.model.ClipboardItem
 import com.polaris.util.PrefManager
 import com.polaris.util.extractUrl
 import com.polaris.util.getWebTitle
@@ -29,8 +30,8 @@ class ClipboardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ClipboardUiState>(ClipboardUiState.Initialize)
     val uiState: StateFlow<ClipboardUiState> = _uiState
 
-    private val _clipboardItem = MutableStateFlow<com.polaris.model.ClipboardItem>(com.polaris.model.ClipboardItem())
-    val clipboardItem : StateFlow<com.polaris.model.ClipboardItem> = _clipboardItem
+    private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
+    val clipboardItem : StateFlow<ClipboardItem> = _clipboardItem
 
 
     private val _sharedText = MutableStateFlow<String>("")
@@ -59,14 +60,14 @@ class ClipboardViewModel @Inject constructor(
             }
             Log.e("polaris0428",type)
             Log.e("polaris0428",title)
-            com.polaris.model.ClipboardItem(
+            ClipboardItem(
                 type = type,
                 url = urlPreprocessing,
                 title = title ?: "",
                 faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
             )
         } else {
-            com.polaris.model.ClipboardItem(
+            ClipboardItem(
                 type = "text",
                 url = null,
                 title = url,

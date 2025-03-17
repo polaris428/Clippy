@@ -3,7 +3,8 @@ package com.polaris.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.domin.usecase.clipboard.folder.PostFolderUseCase
-import com.polaris.model.ClipboardFolder
+import com.polaris.model.model.ClipboardFolder
+
 import com.polaris.shared.intent.MainIntent
 import com.polaris.splash.intent.SplashIntent
 import com.polaris.util.PrefManager

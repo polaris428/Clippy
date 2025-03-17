@@ -13,7 +13,8 @@ import com.polaris.clipboard_edit.navigation.clipboardEdit
 import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
 import com.polaris.clipboard_list.navigation.clipboardListNavGraph
 import com.polaris.clipboard_list.navigation.navigateClipboardList
-import com.polaris.model.ClipboardItem
+import com.polaris.model.dto.UserDTO
+import com.polaris.model.model.ClipboardItem
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
 import com.polaris.sign_in.intent.SignInIntent
@@ -24,6 +25,7 @@ import com.polaris.splash.navigation.splashNavGraph
 import com.polaris.util.GoogleSignInHelper
 import com.polaris.util.PrefManager
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.UUID
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -104,17 +106,7 @@ class MainActivity : ComponentActivity() {
                 )
                 signInNavGraph(
                     onSignInClick = { googleSignInHelper.startGoogleSignIn() },
-                    onSignInAnonymouslyClick = { viewModel ->
-                        googleSignInHelper.signInAnonymously(
-                            onSuccess = {
-                                viewModel.processIntent(SignInIntent.postInitFolderIntent)
-                        }, onFailure = {
-                            Toast.makeText(this@MainActivity, "게스트 로그인 실패", Toast.LENGTH_SHORT)
-                                .show()
-
-                        })
-
-                    },
+                    googleSignInHelper=googleSignInHelper,
                     onSignIncomplete = {
                         PrefManager.userSignInSkip = true
                         navController.navigateClipboardList()
@@ -153,6 +145,12 @@ class MainActivity : ComponentActivity() {
         navController.navigateClipboardList()
 
     }
+
+    fun generateGuestId(): String {
+        val uniqueNumber = UUID.randomUUID().hashCode() and Int.MAX_VALUE  // 양수로 변환
+        return "guest$uniqueNumber"
+    }
+
 
 }
 

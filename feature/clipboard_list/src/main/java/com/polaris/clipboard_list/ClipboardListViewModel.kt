@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardDeleteUseCase
 import com.polaris.domin.usecase.clipboard.clipboard.UpdateClipboardPinStateUseCase
+import com.polaris.model.model.ClipboardItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,13 +23,14 @@ class ClipboardListViewModel @Inject constructor(
     val isSheetOpen: StateFlow<Boolean> = _isSheetOpen
 
     // 선택된 ClipboardItem (기본값 dummyData)
-    private val _selectedClipboardItem = MutableStateFlow<com.polaris.model.ClipboardItem>(com.polaris.model.ClipboardItem())
-    val selectedClipboardItem: StateFlow<com.polaris.model.ClipboardItem> = _selectedClipboardItem
+    private val _selectedClipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem()
+    )
+    val selectedClipboardItem: StateFlow<ClipboardItem> = _selectedClipboardItem
 
     /**
      * 특정 아이템 롱클릭 시 바텀 시트를 열고 선택한 아이템 저장
      */
-    fun onItemLongPressed(item: com.polaris.model.ClipboardItem) {
+    fun onItemLongPressed(item: ClipboardItem) {
         _selectedClipboardItem.value = item
         _isSheetOpen.value = true
     }

@@ -1,15 +1,16 @@
-package com.polaris.data.local
+package com.polaris.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.polaris.model.ClipboardFolder
-import com.polaris.model.ClipboardItem
+import com.polaris.database.model.ClipboardFolderEntity
+import com.polaris.database.model.ClipboardItemEntity
 
-@Database(entities = [ClipboardItem::class], version = 1, exportSchema = false)
+
+@Database(entities = [ClipboardItemEntity::class], version = 1, exportSchema = false)
 abstract class ClipboardDatabase : RoomDatabase() {
-    abstract fun clipboardDao(): ClipboardDao
+    abstract fun clipboardDao(): com.polaris.database.dao.ClipboardDao
     companion object {
         @Volatile
         private var INSTANCE: ClipboardDatabase? = null
@@ -28,9 +29,9 @@ abstract class ClipboardDatabase : RoomDatabase() {
     }
 }
 
-@Database(entities = [ClipboardFolder::class], version = 1, exportSchema = false)
+@Database(entities = [ClipboardFolderEntity::class], version = 1, exportSchema = false)
 abstract class ClipboardFolderDatabase: RoomDatabase(){
-    abstract fun clipboardFolderDao(): ClipboardFolderDao
+    abstract fun clipboardFolderDao(): com.polaris.database.dao.ClipboardFolderDao
 
     companion object {
         @Volatile

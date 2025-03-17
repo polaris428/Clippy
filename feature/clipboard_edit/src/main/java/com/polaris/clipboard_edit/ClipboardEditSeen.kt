@@ -22,8 +22,9 @@ import androidx.compose.ui.unit.dp
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSTextField
+import com.polaris.model.model.ClipboardItem
 import com.polaris.shared.MainViewModel
-import com.polaris.model.ClipboardItem
+
 @Composable
 fun ClipboardEditSeen(viewModel: MainViewModel, onSaveClick: (type: String, title: String) -> Unit = { _, _ -> }) {
     ClipboardEditView(
@@ -35,7 +36,7 @@ fun ClipboardEditSeen(viewModel: MainViewModel, onSaveClick: (type: String, titl
 @Composable
 @Preview(showBackground = true)
 fun ClipboardEditView(
-    clipboardItem: ClipboardItem = ClipboardItem(),
+    clipboardItem: ClipboardItem =ClipboardItem(),
     onSaveClick: (type: String, title: String) -> Unit = { _, _ -> }
 ) {
     var title by remember(clipboardItem) { mutableStateOf(clipboardItem.title) }

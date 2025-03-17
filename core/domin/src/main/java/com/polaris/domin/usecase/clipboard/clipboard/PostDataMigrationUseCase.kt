@@ -1,7 +1,9 @@
 package com.polaris.domin.usecase.clipboard.clipboard
 
 import com.polaris.domin.repository.RemoteClipboardRepository
-import com.polaris.model.ClipboardItem
+import com.polaris.model.dto.ClipboardItemDTO
+import com.polaris.model.dto.toDTO
+import com.polaris.model.model.ClipboardItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -19,7 +21,7 @@ class PostDataMigrationUseCase @Inject constructor(
 
         return flow {
             onComplete()
-            emitAll(clipboardRepository.postDataMigration(item))
+            emitAll(clipboardRepository.postDataMigration(item.map { it.toDTO() }))
 
 
         }

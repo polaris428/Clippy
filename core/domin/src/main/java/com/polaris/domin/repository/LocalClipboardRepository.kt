@@ -1,21 +1,26 @@
 package com.polaris.domin.repository
 
 
-import com.polaris.model.ClipboardFolder
-import com.polaris.model.ClipboardItem
+
+import com.polaris.database.model.ClipboardFolderEntity
+import com.polaris.database.model.ClipboardItemEntity
+import com.polaris.model.dto.ClipboardFolderDTO
+import com.polaris.model.dto.ClipboardItemDTO
+import com.polaris.model.response.ClipboardFolderResponse
+import com.polaris.model.response.ClipboardItemResponse
 import kotlinx.coroutines.flow.Flow
 
 interface LocalClipboardRepository {
-    suspend fun insert(item: ClipboardItem) : Flow<Boolean>
-    suspend fun getAll(): Flow<List<ClipboardItem>>
+    suspend fun insert(item: ClipboardItemEntity) : Flow<Boolean>
+    suspend fun getAll(): Flow<List<ClipboardItemResponse>>
 
     suspend fun delete(timestamp: Long) :Flow<Boolean>
     suspend fun updatePinStatus(timestamp: Long,pinState:Boolean) :Flow<Boolean>
-    suspend fun updateClipboardItem(clipboardItem: ClipboardItem):Flow<Boolean>
+    suspend fun updateClipboardItem(clipboardItem: ClipboardItemEntity):Flow<Boolean>
     suspend fun clearAll()
 
 
-    suspend fun insertFolder(folder: ClipboardFolder):Flow<Boolean>
-    suspend fun getFolderList():Flow<List<ClipboardFolder>>
+    suspend fun insertFolder(folder: ClipboardFolderEntity):Flow<Boolean>
+    suspend fun getFolderList():Flow<List<ClipboardFolderResponse>>
     suspend fun upDateFolder()
 }

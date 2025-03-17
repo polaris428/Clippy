@@ -1,20 +1,20 @@
-package com.polaris.data.local
+package com.polaris.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.polaris.model.ClipboardItem
+import com.polaris.database.model.ClipboardItemEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ClipboardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-     fun insertClipboardItem(item: ClipboardItem)
+     fun insertClipboardItem(item: ClipboardItemEntity)
 
     @Query("SELECT * FROM clipboard_history ORDER BY timestamp DESC")
-     fun getAllClipboardItems(): Flow<List<ClipboardItem>>
+     fun getAllClipboardItems(): Flow<List<ClipboardItemEntity>>
 
     @Query("DELETE FROM clipboard_history WHERE timestamp = :timestamp")
      fun deleteClipboardItem(timestamp: Long) :Int
@@ -23,7 +23,7 @@ interface ClipboardDao {
     suspend fun updatePinStatus(timestamp: Long, isPinned: Boolean) :Int
 
     @Update
-    suspend fun updateClipboardItem(item: ClipboardItem): Int
+    suspend fun updateClipboardItem(item: ClipboardItemEntity): Int
 
 
 

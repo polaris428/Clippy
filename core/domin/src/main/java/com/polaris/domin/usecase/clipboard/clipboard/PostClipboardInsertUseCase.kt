@@ -2,9 +2,12 @@ package com.polaris.domin.usecase.clipboard.clipboard
 
 
 
+import com.polaris.database.model.toEntity
 import com.polaris.domin.repository.LocalClipboardRepository
 import com.polaris.domin.repository.RemoteClipboardRepository
-import com.polaris.model.ClipboardItem
+import com.polaris.model.dto.ClipboardItemDTO
+import com.polaris.model.dto.toDTO
+import com.polaris.model.model.ClipboardItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -24,9 +27,9 @@ class PostClipboardInsertUseCase @Inject constructor(
         return flow {
             onComplete()
             if (isLogin){
-                emitAll( clipboardRepository.insert(item))
+                emitAll( clipboardRepository.insert(item.toDTO()))
             }else{
-                emitAll(localClipboardRepository.insert(item))
+                emitAll(localClipboardRepository.insert(item.toEntity()))
             }
 
 

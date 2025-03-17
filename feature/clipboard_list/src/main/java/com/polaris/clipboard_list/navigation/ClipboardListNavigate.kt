@@ -5,7 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.polaris.clipboard_list.ClipboardListSeen
-import com.polaris.model.ClipboardItem
+import com.polaris.model.model.ClipboardItem
 import kotlinx.coroutines.flow.StateFlow
 
 fun NavController.navigateClipboardList() {

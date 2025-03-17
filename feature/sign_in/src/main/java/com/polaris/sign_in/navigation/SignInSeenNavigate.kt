@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.polaris.sign_in.SignInSeen
 import com.polaris.sign_in.viewModel.SignInViewModel
+import com.polaris.util.GoogleSignInHelper
 
 
 fun NavController.navigateSignIn() {
@@ -16,12 +17,12 @@ fun NavController.navigateSignIn() {
 
 fun NavGraphBuilder.signInNavGraph(
     onSignInClick:()->Unit,
-    onSignInAnonymouslyClick:(viewModel:SignInViewModel)->Unit,
+    googleSignInHelper:GoogleSignInHelper,
     onSignIncomplete: ()->Unit={}
 
 ) {
     composable(route = SignInRoute.route) {
-        SignInSeen(onSignInClick,onSignInAnonymouslyClick,onSignIncomplete)
+        SignInSeen(onSignInClick,googleSignInHelper,onSignIncomplete)
 
     }
 }

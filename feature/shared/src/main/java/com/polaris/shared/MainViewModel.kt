@@ -6,7 +6,7 @@ import com.polaris.domin.usecase.clipboard.clipboard.GetClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardInsertUseCase
 import com.polaris.domin.usecase.clipboard.clipboard.PostDataMigrationUseCase
 import com.polaris.domin.usecase.clipboard.clipboard.UpdateClipboardUseCase
-import com.polaris.model.ClipboardItem
+import com.polaris.model.model.ClipboardItem
 import com.polaris.shared.intent.MainIntent
 import com.polaris.util.PrefManager
 import com.polaris.util.extractUrl
@@ -96,7 +96,7 @@ class MainViewModel @Inject constructor(
                 fetchWebTitle(urlPreprocessing)
             }
 
-            ClipboardItem(
+           ClipboardItem(
                 type = type,
                 url = urlPreprocessing,
                 title = title ?: "",

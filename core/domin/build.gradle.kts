@@ -34,7 +34,8 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.model)
+    api(projects.core.database)
+    api(projects.core.model)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

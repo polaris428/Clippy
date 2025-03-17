@@ -1,6 +1,6 @@
 package com.polaris.shared.intent
 
-import com.polaris.model.ClipboardItem
+import com.polaris.model.model.ClipboardItem
 
 
 sealed class MainIntent {

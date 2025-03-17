@@ -10,12 +10,9 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
@@ -56,7 +52,6 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,15 +59,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.polaris.clipboard_folder.SlidePanel
-import com.polaris.model.ClipboardItem
-import com.polaris.designsystem.ui.theme.Gray50
-import com.polaris.designsystem.ui.theme.LineView
-import com.polaris.util.convertTimestampToMonthDay
 import kotlinx.coroutines.launch
 import com.polaris.designsystem.R
-import com.polaris.designsystem.ui.theme.AnimatedCheckmarkWithCircle
 import com.polaris.designsystem.ui.theme.ClipboardItemView
 import com.polaris.designsystem.ui.theme.bottomSheetTextColor
+import com.polaris.model.model.ClipboardItem
 import com.polaris.util.detectSwipe
 import com.polaris.util.getTodayStartTimestamp
 import com.polaris.util.getYearMonth
@@ -402,7 +393,7 @@ fun CustomBottomSheetPreview() {
 
 @Composable
 fun CustomBottomSheet(
-    selectedClipboardItem: ClipboardItem,
+    selectedClipboardItem:ClipboardItem,
     onContent: (item: ClipboardItem) -> Unit = {},
     onEdit: (item: ClipboardItem) -> Unit = {},
     onPin: (item: ClipboardItem) -> Unit = {},
