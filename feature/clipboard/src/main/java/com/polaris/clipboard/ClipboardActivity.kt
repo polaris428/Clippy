@@ -80,6 +80,7 @@ import com.polaris.designsystem.ui.theme.ClippyTheme
 import com.polaris.designsystem.ui.theme.textColorGray
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
+import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
@@ -131,7 +132,7 @@ class ClipboardActivity : AppCompatActivity() {
         val clip = ClipData.newPlainText("Shared Text", viewModel.clipboardItem.value.url)
         clipboard.setPrimaryClip(clip)
 
-        viewModel.processIntent(MainIntent.postClipboarInsertIntent)
+        viewModel.processIntent(MainIntent.postClipboarInsertIntent(PrefManager.folderIdList[0]))
         Toast.makeText(this@ClipboardActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
         navController.navigateClipboardSaveAnimation()
     }

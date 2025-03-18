@@ -18,6 +18,7 @@ class PostClipboardInsertUseCase @Inject constructor(
     private val clipboardRepository: RemoteClipboardRepository
 ){
     suspend fun execute(
+        folderId:String,
         item: ClipboardItem,
         onComplete: () -> Unit,
         isLogin:Boolean
@@ -27,7 +28,7 @@ class PostClipboardInsertUseCase @Inject constructor(
         return flow {
             onComplete()
             if (isLogin){
-                emitAll( clipboardRepository.insert(item.toDTO()))
+                emitAll( clipboardRepository.insert(folderId,item.toDTO()))
             }else{
                 emitAll(localClipboardRepository.insert(item.toEntity()))
             }

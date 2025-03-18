@@ -48,7 +48,7 @@ class MainViewModel @Inject constructor(
             }
 
             is MainIntent.postClipboarInsertIntent -> {
-                postClipboardInsert()
+                postClipboardInsert(PrefManager.folderIdList[0])
             }
 
             is MainIntent.updateClipboarIntent -> {
@@ -70,10 +70,11 @@ class MainViewModel @Inject constructor(
 
     }
 
-    fun postClipboardInsert(): Job = viewModelScope.launch(Dispatchers.IO) {
+    fun postClipboardInsert(id:String): Job = viewModelScope.launch(Dispatchers.IO) {
 
 
         postClipboardInsertUseCase.execute(
+            folderId = id,
             item = clipboardItem.value,
             isLogin = PrefManager.userSignInCheck,
             onComplete = {
@@ -143,12 +144,5 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun postInsertDummyData(list: List<ClipboardItem>):Job = viewModelScope.launch(Dispatchers.IO){
-        list.forEach {
-            postClipboardInsertUseCase.execute(item = it, onComplete = {}, isLogin = PrefManager.userSignInCheck).collect{
 
-            }
-        }
-
-    }
 }

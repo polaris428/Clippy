@@ -78,11 +78,12 @@ class ClipboardViewModel @Inject constructor(
         _clipboardItem.emit(clipboardItem) // value 대신 emit 사용
     }
 
-    fun postClipboardInsert(url: String): Job = viewModelScope.launch(Dispatchers.IO) {
+    fun postClipboardInsert(id: String): Job = viewModelScope.launch(Dispatchers.IO) {
 
 
 
         postClipboardInsertUseCase.execute(
+            folderId = id,
             item = clipboardItem.value,
             isLogin = PrefManager.userSignInCheck,
             onComplete = {

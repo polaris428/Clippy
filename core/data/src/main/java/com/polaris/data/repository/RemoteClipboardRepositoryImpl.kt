@@ -9,8 +9,6 @@ import com.google.firebase.database.ValueEventListener
 import com.polaris.domin.repository.RemoteClipboardRepository
 import com.polaris.model.dto.ClipboardFolderDTO
 import com.polaris.model.dto.ClipboardItemDTO
-import com.polaris.model.model.ClipboardFolder
-import com.polaris.model.model.toDTO
 import com.polaris.model.response.ClipboardFolderResponse
 import com.polaris.model.response.ClipboardItemResponse
 import com.polaris.util.PrefManager
@@ -24,17 +22,17 @@ import javax.inject.Inject
 internal class RemoteClipboardRepositoryImpl @Inject constructor(
     private val firebaseDatabase: FirebaseDatabase
 ) : RemoteClipboardRepository {
-    private val clipboardDatabase: DatabaseReference
-        get() = firebaseDatabase.getReference(PrefManager.userUid).child("clipboard")
+
 
     private val folderDatabase: DatabaseReference
         get() = firebaseDatabase.getReference("folder")
 
-
+    private val userDatabase: DatabaseReference
+        get() = firebaseDatabase.getReference("user")
     override suspend fun postDataMigration(itemList: List<ClipboardItemDTO>): Flow<Boolean> {
         return try {
             itemList.reversed().forEach { item ->
-                clipboardDatabase.push().setValue(item).await() // 개별적으로 push
+             //   clipboardDatabase.push().setValue(item).await() // 개별적으로 push
             }
             flowOf(true)
         } catch (e: Exception) {
@@ -42,9 +40,9 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insert(item: ClipboardItemDTO): Flow<Boolean> {
+    override suspend fun insert(folderId:String,item: ClipboardItemDTO): Flow<Boolean> {
         return try {
-            clipboardDatabase.push().setValue(item).await()
+            folderDatabase.child(folderId).child("clipboard_dateList").push().setValue(item).await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)
@@ -64,14 +62,14 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
                 close(error.toException())
             }
         }
-        clipboardDatabase.addValueEventListener(listener)
-        awaitClose { clipboardDatabase.removeEventListener(listener) } // 스트림 종료 시 리스너 제거
+        folderDatabase.addValueEventListener(listener)
+        awaitClose { folderDatabase.removeEventListener(listener) } // 스트림 종료 시 리스너 제거
     }
 
 
     override suspend fun delete(itemId: Int): Flow<Boolean> {
         return try {
-            clipboardDatabase.child(itemId.toString()).removeValue().await()
+           // clipboardDatabase.child(itemId.toString()).removeValue().await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)
@@ -81,7 +79,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun updatePinStatus(itemId: Int, pinState: Boolean): Flow<Boolean> {
         return try {
-            clipboardDatabase.child(itemId.toString()).child("pinned")
+            folderDatabase.child(itemId.toString()).child("pinned")
                 .setValue(pinState).await()
             flowOf(true)
         } catch (e: Exception) {
@@ -91,7 +89,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun updateClipboardItem(clipboardItem:ClipboardItemDTO): Flow<Boolean> {
         return try {
-            clipboardDatabase.child(clipboardItem.timestamp.toString())
+            folderDatabase.child(clipboardItem.timestamp.toString())
                 .setValue(clipboardItem).await()
             flowOf(true)
         } catch (e: Exception) {
@@ -102,7 +100,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun clearAll(): Flow<Boolean> {
         return try {
-            clipboardDatabase.removeValue().await()
+            folderDatabase.removeValue().await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)
@@ -113,7 +111,9 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         return try {
             val folderId = FirebaseDatabase.getInstance().getReference("folders").push().key!!
             folder.id = folderId
-            folderDatabase.push().setValue(folder).await()
+            folderDatabase.child(folderId).setValue(folder).await()
+            userDatabase.child(PrefManager.userUid).child("folder_list").push().setValue(folderId)
+            PrefManager.folderIdList += listOf(folderId)
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)

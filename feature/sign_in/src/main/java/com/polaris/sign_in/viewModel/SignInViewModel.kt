@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.polaris.designsystem.ui.theme.dummyData
+import com.polaris.designsystem.ui.theme.dummyDateList
 import com.polaris.domin.usecase.clipboard.folder.PostFolderUseCase
 import com.polaris.domin.usecase.clipboard.user.GetCheckIfUserExistsUseCase
 import com.polaris.domin.usecase.clipboard.user.PostUserInfoUseCase
@@ -69,7 +71,7 @@ class SignInViewModel @Inject constructor(
 
 
     fun postBaseFolder() = viewModelScope.launch {
-        val initFolder = ClipboardFolder(owner = PrefManager.userUid, name = "기본 폴더")
+        val initFolder = ClipboardFolder(owner = PrefManager.userUid, name = "기본 폴더", clipboardDateList = dummyDateList)
 
         postFolderUseCase.execute( initFolder).collect {
             if (it){

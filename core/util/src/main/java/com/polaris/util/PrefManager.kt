@@ -3,6 +3,8 @@ package com.polaris.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 @SuppressLint("StaticFieldLeak")
 object PrefManager {
@@ -37,4 +39,17 @@ object PrefManager {
             pref.edit().putString(PreferenceConstants.USER_NAME, v).apply()
         }
 
+    var folderIdList: List<String>
+        get() {
+            val json = pref.getString("FOLDER_ID", null)
+            return try {
+                Gson().fromJson(json, object : TypeToken<List<String>>() {}.type) ?: emptyList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+        }
+        set(value) {
+            val json = Gson().toJson(value)
+            pref.edit().putString("FOLDER_ID", json).apply()
+        }
 }

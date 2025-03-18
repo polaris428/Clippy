@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RemoteClipboardRepository {
     suspend fun postDataMigration(itemList: List<ClipboardItemDTO>):Flow<Boolean>
-    suspend fun insert(item: ClipboardItemDTO) : Flow<Boolean>
+    suspend fun insert(folderId:String,item: ClipboardItemDTO) : Flow<Boolean>
     suspend fun getAll(): Flow<List<ClipboardItemResponse>>
 
     suspend fun delete(itemId: Int) : Flow<Boolean>
