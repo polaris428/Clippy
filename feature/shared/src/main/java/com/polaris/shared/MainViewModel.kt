@@ -82,10 +82,7 @@ class MainViewModel @Inject constructor(
         postClipboardInsertUseCase.execute(
             folderId = id,
             item = clipboardItem.value,
-            isLogin = PrefManager.userSignInCheck,
-            onComplete = {
-
-            }).collect {
+           ).collect {
 
         }
 

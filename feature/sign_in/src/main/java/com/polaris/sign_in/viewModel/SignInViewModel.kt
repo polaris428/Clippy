@@ -4,10 +4,13 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.polaris.designsystem.ui.theme.dummyData
 import com.polaris.designsystem.ui.theme.dummyDateList
+import com.polaris.domin.usecase.clipboard.clipboard.GetClipboardFolderUseCase
+import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardInsertUseCase
 import com.polaris.domin.usecase.clipboard.folder.PostFolderUseCase
 import com.polaris.domin.usecase.clipboard.user.GetCheckIfUserExistsUseCase
 import com.polaris.domin.usecase.clipboard.user.PostUserInfoUseCase
@@ -30,7 +33,9 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val postFolderUseCase: PostFolderUseCase,
     private val postUserInfoUseCase: PostUserInfoUseCase,
-    private val getCheckIfUserExistsUseCase: GetCheckIfUserExistsUseCase
+    private val getCheckIfUserExistsUseCase: GetCheckIfUserExistsUseCase,
+    private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
+    private val getClipboardFolderUseCase: GetClipboardFolderUseCase
 ) :
     ViewModel() {
 
@@ -63,6 +68,8 @@ class SignInViewModel @Inject constructor(
                     is SignInIntent.PostUserInfoIntent -> postUserInfo(intent.user)
                     is SignInIntent.GetCheckIfUserExists -> getCheckIfUserExists(intent.uid)
                     is SignInIntent.PostInitFolderIntent -> postBaseFolder()
+                    is SignInIntent.PostInitClipboardData -> initClipboardDate(intent.folderId)
+                    is SignInIntent.GetClipboardData -> getClipboardFolder()
 
                 }
             }
@@ -71,12 +78,12 @@ class SignInViewModel @Inject constructor(
 
 
     fun postBaseFolder() = viewModelScope.launch {
-        val initFolder = ClipboardFolder(owner = PrefManager.userUid, name = "기본 폴더", clipboardDateList = dummyDateList)
+        val initFolder = ClipboardFolder(owner = PrefManager.userUid, name = "기본 폴더")
 
         postFolderUseCase.execute( initFolder).collect {
             if (it){
+                sendIntent(SignInIntent.PostInitClipboardData(PrefManager.folderIdList[0]))
 
-                updateState(SignInState.Complete)
             }else{
                 updateState(SignInState.Error(""))
             }
@@ -120,6 +127,21 @@ class SignInViewModel @Inject constructor(
             }
         } catch (e: Exception) {
           //  Log.e("GoogleSignIn", "Google 로그인 실패", e)
+        }
+    }
+
+    fun initClipboardDate(folderId:String) =viewModelScope.launch{
+        dummyDateList.forEach {
+            postClipboardInsertUseCase.execute(folderId,it).collect{
+                getClipboardFolder()
+            }
+        }
+
+    }
+
+    fun getClipboardFolder() = viewModelScope.launch {
+        getClipboardFolderUseCase.execute(PrefManager.folderIdList[0]).collect{
+            updateState(SignInState.Complete(it))
         }
     }
 

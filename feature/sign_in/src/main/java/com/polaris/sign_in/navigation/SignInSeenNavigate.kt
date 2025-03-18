@@ -4,6 +4,7 @@ package com.polaris.sign_in.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.polaris.model.model.ClipboardFolder
 import com.polaris.sign_in.SignInSeen
 import com.polaris.sign_in.viewModel.SignInViewModel
 import com.polaris.util.GoogleSignInHelper
@@ -17,7 +18,7 @@ fun NavController.navigateSignIn() {
 
 fun NavGraphBuilder.signInNavGraph(
     googleSignInHelper:GoogleSignInHelper,
-    onSignIncomplete: ()->Unit={}
+    onSignIncomplete: (ClipboardFolder)->Unit={}
 
 ) {
     composable(route = SignInRoute.route) {

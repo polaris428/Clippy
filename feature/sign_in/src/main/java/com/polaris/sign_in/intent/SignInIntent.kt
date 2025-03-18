@@ -7,5 +7,6 @@ sealed class SignInIntent {
     object PostInitFolderIntent:SignInIntent()
     data class GetCheckIfUserExists(val uid:String) :SignInIntent()
     data class PostUserInfoIntent(val user: User):SignInIntent()
-
+    data class PostInitClipboardData(val folderId:String):SignInIntent()
+    object GetClipboardData:SignInIntent()
 }

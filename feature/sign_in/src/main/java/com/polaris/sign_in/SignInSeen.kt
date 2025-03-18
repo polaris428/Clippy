@@ -63,7 +63,7 @@ import com.polaris.model.model.ClipboardFolder
 @Composable
 fun SignInSeen(
     googleSignInHelper: GoogleSignInHelper,
-    onSignIncomplete: () -> Unit
+    onSignIncomplete: (ClipboardFolder) -> Unit
 ) {
     val viewModel: SignInViewModel = hiltViewModel()
     val state = viewModel.uiState.collectAsState()
@@ -127,7 +127,8 @@ fun SignInSeen(
 
         }
         is SignInState.Complete ->{
-            onSignIncomplete()
+
+            onSignIncomplete((state.value as SignInState.Complete).clipboardFolder)
             viewModel.updateState(SignInState.Initialize)
         }
     }

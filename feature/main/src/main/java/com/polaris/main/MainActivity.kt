@@ -21,6 +21,7 @@ import com.polaris.sign_in.intent.SignInIntent
 import com.polaris.sign_in.navigation.navigateSignIn
 import com.polaris.sign_in.navigation.signInNavGraph
 import com.polaris.splash.navigation.SplashRoute
+import com.polaris.splash.navigation.navigateSplash
 import com.polaris.splash.navigation.splashNavGraph
 import com.polaris.util.GoogleSignInHelper
 import com.polaris.util.PrefManager
@@ -69,7 +70,7 @@ class MainActivity : ComponentActivity() {
                     googleSignInHelper = googleSignInHelper,
                     onSignIncomplete = {
                         PrefManager.userSignInSkip = true
-                        navController.navigateClipboardList()
+                        navController.navigateSplash()
 
 
                     })
