@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandHorizontally
@@ -19,6 +20,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -51,6 +53,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +67,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -206,15 +210,18 @@ fun folderItem(title: String = "모든 노트", onClick: () -> Unit = {}) {
 fun SlidePanel(isOpen: Boolean = false, onDismiss: () -> Unit = {}) {
     val density = LocalDensity.current
     val panelWidthPx = with(density) { 300.dp.toPx().roundToInt() } // 패널 너비 px 변환
-    var dragOffset by remember { mutableStateOf(0f) }
     var isPanelOpen by remember { mutableStateOf(isOpen) }
+    var rawDragOffset by remember { mutableStateOf(if (isPanelOpen) 0f else -panelWidthPx.toFloat()) }
+    val velocityTracker = remember { VelocityTracker() }
+    var isDragging by remember { mutableStateOf(false) } // 드래그 중 여부 체크
 
-    // ✅ 실시간 패널 위치 조절 (드래그 반영)
-    val offsetX by remember { derivedStateOf {
-        if (isPanelOpen) dragOffset.coerceAtLeast(0f) else (-panelWidthPx + dragOffset).coerceAtMost(0f)
-    } }
+    // ✅ 드래그 중에는 즉시 반영, 드래그 종료 후 애니메이션 적용
+    val animatedOffsetX by animateFloatAsState(
+        targetValue = if (isDragging) rawDragOffset else rawDragOffset,
+        animationSpec = if (isDragging) snap() else tween(250, easing = FastOutSlowInEasing),
+        label = "animatedOffsetX"
+    )
 
-    // ✅ 배경 투명도 애니메이션 적용
     val backgroundAlpha by animateFloatAsState(
         targetValue = if (isPanelOpen) 0.5f else 0f,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
@@ -224,26 +231,45 @@ fun SlidePanel(isOpen: Boolean = false, onDismiss: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = backgroundAlpha)) // ✅ 배경 어둡게 변환
+            .background(Color.Black.copy(alpha = backgroundAlpha))
+            .clickable(
+                enabled = isPanelOpen, // ✅ 패널이 열려 있을 때만 닫힘 이벤트 적용
+                onClick = {
+                    isPanelOpen = false
+                    rawDragOffset = -panelWidthPx.toFloat() // ✅ 패널 닫기
+                }
+            )
+
             .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragEnd = {
-                        println("Drag Ended, Offset: $dragOffset") // 디버깅 출력
-                        if (abs(dragOffset) > panelWidthPx / 1.5) {
-                            isPanelOpen = dragOffset > 0
-                        }
-                        dragOffset = 0f // ✅ 패널이 열린 상태에서 초기화 방지
+                detectDragGestures(
+                    onDragStart = {
+                        velocityTracker.resetTracking()
+                        isDragging = true // ✅ 드래그 시작 시 즉시 반영
                     },
-                    onHorizontalDrag = { _, dragAmount ->
-                        dragOffset += dragAmount
-                        println("DragOffset: $dragOffset") // 디버깅 출력
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        rawDragOffset = (rawDragOffset + dragAmount.x).coerceIn(-panelWidthPx.toFloat(), 0f)
+                        velocityTracker.addPosition(change.uptimeMillis, change.position)
+                    },
+                    onDragEnd = {
+                        isDragging = false // ✅ 드래그 종료 후 애니메이션 적용
+                        val velocity = velocityTracker.calculateVelocity().x
+                        val threshold = panelWidthPx / 2
+
+                        rawDragOffset = if (velocity > 1000 || rawDragOffset > -threshold) {
+                            isPanelOpen = true
+                            0f
+                        } else {
+                            isPanelOpen = false
+                            -panelWidthPx.toFloat()
+                        }
                     }
                 )
             }
     ) {
         SlidePanelContent(
             modifier = Modifier
-                .offset { IntOffset(offsetX.roundToInt(), 0) } // ✅ 실시간 위치 반영
+                .offset { IntOffset(animatedOffsetX.roundToInt(), 0) } // ✅ 드래그 중 즉시 반응 + 드래그 종료 후 애니메이션 적용
                 .fillMaxHeight()
                 .fillMaxWidth(0.7f)
                 .background(Color.White, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
@@ -282,4 +308,5 @@ fun PanelButton(text: String, onClick: () -> Unit) {
         Text(text)
     }
 }
+
 

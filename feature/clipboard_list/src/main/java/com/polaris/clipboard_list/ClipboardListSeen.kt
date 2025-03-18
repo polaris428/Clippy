@@ -133,14 +133,6 @@ fun ClipboardListSeen(
                     onDismissState.value(ClipboardListIntent.BottomSheetDismissed)
                 })
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .detectSwipe(
-                        onSwipeRight = { isPanelOpen = true },  // ✅ 오른쪽 스와이프 → 패널 열기
-                        onSwipeLeft = { isPanelOpen = false }   // ✅ 왼쪽 스와이프 → 패널 닫기
-                    )
-            )
 
             // ✅ 왼쪽에서 등장하는 슬라이드 패널
             SlidePanel()
