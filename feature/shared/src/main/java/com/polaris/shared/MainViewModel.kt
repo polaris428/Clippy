@@ -44,7 +44,7 @@ class MainViewModel @Inject constructor(
     fun processIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.getAllClipboardListIntent -> {
-                getAllClipboardList()
+                //getAllClipboardList()
             }
 
             is MainIntent.postClipboarInsertIntent -> {

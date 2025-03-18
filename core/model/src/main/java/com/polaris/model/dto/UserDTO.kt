@@ -1,3 +1,3 @@
 package com.polaris.model.dto
 
-data class UserDTO(val name:String, val createdAt: Long )
+data class UserDTO(val id:String, val folderList: ArrayList<String>  )

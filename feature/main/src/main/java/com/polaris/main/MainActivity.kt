@@ -71,13 +71,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         googleSignInHelper = GoogleSignInHelper(activity = this, onSignInSuccess = { task ->
-            Log.d("polaris0428", "성공")
             PrefManager.userSignInCheck = true
             PrefManager.userUid = task.result.user!!.uid
-            if (PrefManager.userUid != "") {
-
-                viewModel.postClipboardMigrationUseCase(viewModel.clipboardDataList.value)
-            }
+            viewModel.postClipboardMigrationUseCase(viewModel.clipboardDataList.value)
 
 
         }, onSignInFailure = { exception ->
@@ -92,7 +88,7 @@ class MainActivity : ComponentActivity() {
 
             NavHost(navController = navController, startDestination = SplashRoute.route) {
                 splashNavGraph(viewModel, onSplashCompleted = {
-                    if (!PrefManager.userSignInSkip) {
+                    if (PrefManager.userSignInSkip) {
                         dummyDate.forEach {
                             viewModel.postInsertDummyData(dummyDate)
                         }
@@ -105,7 +101,6 @@ class MainActivity : ComponentActivity() {
 
                 )
                 signInNavGraph(
-                    onSignInClick = { googleSignInHelper.startGoogleSignIn() },
                     googleSignInHelper=googleSignInHelper,
                     onSignIncomplete = {
                         PrefManager.userSignInSkip = true
@@ -146,10 +141,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    fun generateGuestId(): String {
-        val uniqueNumber = UUID.randomUUID().hashCode() and Int.MAX_VALUE  // 양수로 변환
-        return "guest$uniqueNumber"
-    }
+
 
 
 }

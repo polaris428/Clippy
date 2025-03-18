@@ -87,9 +87,11 @@ class GoogleSignInHelper(
     }
 
     fun signInAnonymously(onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+
         FirebaseAuth.getInstance().signInAnonymously()
             .addOnSuccessListener { authResult ->
                 val userId = authResult.user!!.uid
+                PrefManager.userUid=userId
                 onSuccess(userId)
             }
             .addOnFailureListener { exception ->

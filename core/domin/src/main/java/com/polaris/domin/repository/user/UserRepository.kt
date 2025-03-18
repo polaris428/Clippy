@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun postUserInfo(userDTO: UserDTO):Flow<Boolean>
+    suspend fun getCheckIfUserExists(uid: String): Boolean
 }

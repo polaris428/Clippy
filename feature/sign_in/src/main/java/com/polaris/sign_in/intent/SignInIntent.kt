@@ -1,8 +1,11 @@
 package com.polaris.sign_in.intent
 
 import com.polaris.model.dto.UserDTO
+import com.polaris.model.model.User
 
 sealed class SignInIntent {
     object PostInitFolderIntent:SignInIntent()
-    data class PostUserInfoIntent(val userDTO: UserDTO):SignInIntent()
+    data class GetCheckIfUserExists(val uid:String) :SignInIntent()
+    data class PostUserInfoIntent(val user: User):SignInIntent()
+
 }
