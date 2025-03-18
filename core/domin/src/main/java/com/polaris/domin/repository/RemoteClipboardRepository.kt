@@ -13,7 +13,7 @@ interface RemoteClipboardRepository {
     suspend fun postDataMigration(itemList: List<ClipboardItemDTO>):Flow<Boolean>
     suspend fun insert(folderId:String,item: ClipboardItemDTO) : Flow<Boolean>
     suspend fun getAll(): Flow<List<ClipboardItemResponse>>
-
+    suspend fun getClipboardFolder(id:String): Flow<ClipboardFolderResponse>
     suspend fun delete(itemId: Int) : Flow<Boolean>
     suspend fun updatePinStatus(itemId: Int,pinState:Boolean) : Flow<Boolean>
     suspend fun updateClipboardItem(clipboardItem: ClipboardItemDTO): Flow<Boolean>

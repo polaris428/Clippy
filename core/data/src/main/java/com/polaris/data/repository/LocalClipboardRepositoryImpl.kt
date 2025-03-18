@@ -24,10 +24,7 @@ internal class LocalClipboardRepositoryImpl @Inject constructor(
         return flowOf(true)
     }
 
-    override suspend fun getAll(): Flow<List<ClipboardItemResponse>> {
-        return clipboardDao.getAllClipboardItems()
-            .map { entities -> entities.map { it.toResponse() } }
-    }
+
 
     override suspend fun delete(itemId: Long): Flow<Boolean> {
 
@@ -55,10 +52,7 @@ internal class LocalClipboardRepositoryImpl @Inject constructor(
         return flowOf(true)
     }
 
-    override suspend fun getFolderList(): Flow<List<ClipboardFolderResponse>> {
-        ClipboardFolderEntity().toResponse()
-        return flowOf(clipboardFolderDao.getAllFolders().map { it.toResponse() })
-    }
+
 
     override suspend fun upDateFolder() {
         //  TODO("Not yet implemented")

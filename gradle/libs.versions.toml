@@ -43,6 +43,7 @@ playServicesAuth = "21.3.0"
 firebaseDatabase = "21.0.0"
 converterGson = "2.9.0"
 adapters = "3.2.0-alpha11"
+firebaseCrashlyticsBuildtools = "3.0.3"
 [libraries]
 
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
@@ -93,6 +94,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 androidx-adapters = { group = "androidx.databinding", name = "adapters", version.ref = "adapters" }
+firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

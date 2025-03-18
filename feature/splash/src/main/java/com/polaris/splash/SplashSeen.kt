@@ -1,5 +1,6 @@
 package com.polaris.splash
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +38,11 @@ import kotlinx.coroutines.delay
 fun SplashSeen(viewModel: MainViewModel, splashViewModel: SplashViewModel= hiltViewModel(), onSplashCompleted:()->Unit){
 
     val clipboardItem =  viewModel.clipboardItem.collectAsState()
+    Log.e("polaris040428_size",PrefManager.folderIdList.size.toString())
+    if (PrefManager.folderIdList.isNotEmpty()){
+        viewModel.processIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList[0]))
+    }
 
-    viewModel.processIntent(MainIntent.getAllClipboardListIntent)
     LaunchedEffect(clipboardItem.value) {
         delay(2000) // 3초 딜레이
         onSplashCompleted()

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalClipboardRepository {
     suspend fun insert(item: ClipboardItemEntity) : Flow<Boolean>
-    suspend fun getAll(): Flow<List<ClipboardItemResponse>>
+
 
     suspend fun delete(timestamp: Long) :Flow<Boolean>
     suspend fun updatePinStatus(timestamp: Long,pinState:Boolean) :Flow<Boolean>
@@ -21,6 +21,6 @@ interface LocalClipboardRepository {
 
 
     suspend fun insertFolder(folder: ClipboardFolderEntity):Flow<Boolean>
-    suspend fun getFolderList():Flow<List<ClipboardFolderResponse>>
+
     suspend fun upDateFolder()
 }

@@ -1,11 +1,14 @@
 package com.polaris.shared
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.domin.usecase.clipboard.clipboard.GetClipboardAllUseCase
+import com.polaris.domin.usecase.clipboard.clipboard.GetClipboardFolderUseCase
 import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardInsertUseCase
 import com.polaris.domin.usecase.clipboard.clipboard.PostDataMigrationUseCase
 import com.polaris.domin.usecase.clipboard.clipboard.UpdateClipboardUseCase
+import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
 import com.polaris.shared.intent.MainIntent
 import com.polaris.util.PrefManager
@@ -14,6 +17,7 @@ import com.polaris.util.fetchWebTitle
 import com.polaris.util.getGoogleFaviconUrl
 import com.polaris.util.getWebTitle
 import com.polaris.util.isUrl
+import com.polaris.util.toJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 
@@ -26,7 +30,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val getClipboardAllUseCase: GetClipboardAllUseCase,
+    private val getClipboardFolderUseCase: GetClipboardFolderUseCase,
+
     private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
     private val updateClipboardUseCase: UpdateClipboardUseCase,
     private val postClipboardMigrationUseCase: PostDataMigrationUseCase,
@@ -38,13 +43,13 @@ class MainViewModel @Inject constructor(
     private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
     val clipboardItem: StateFlow<ClipboardItem> = _clipboardItem
 
-    private val _clipboardDataList = MutableStateFlow<List<ClipboardItem>>(emptyList())
-    val clipboardDataList: StateFlow<List<ClipboardItem>> = _clipboardDataList
+    private val _clipboardDataList = MutableStateFlow<ClipboardFolder>(ClipboardFolder())
+    val clipboardDataList: StateFlow<ClipboardFolder> = _clipboardDataList
 
     fun processIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.getAllClipboardListIntent -> {
-                //getAllClipboardList()
+                getClipboardFolder(intent.folderId)
             }
 
             is MainIntent.postClipboarInsertIntent -> {
@@ -62,9 +67,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getAllClipboardList(): Job = viewModelScope.launch {
+    fun getClipboardFolder(folderId: String): Job = viewModelScope.launch {
 
-        getClipboardAllUseCase.execute(isLogin = PrefManager.userSignInCheck,onComplete = {}).collect {
+        getClipboardFolderUseCase.execute(folderId).collect {
+            Log.e("polaris040428",it.toJson())
             _clipboardDataList.value = it
         }
 
@@ -132,7 +138,7 @@ class MainViewModel @Inject constructor(
         updateClipboardUseCase.execute(clipboardItem = clipboardItem.value, onComplete = {})
             .collect {
 
-                processIntent(MainIntent.getAllClipboardListIntent)
+                processIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList[0]))
             }
 
 

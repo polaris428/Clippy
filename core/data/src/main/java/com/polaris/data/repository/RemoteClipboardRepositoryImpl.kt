@@ -66,6 +66,22 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         awaitClose { folderDatabase.removeEventListener(listener) } // 스트림 종료 시 리스너 제거
     }
 
+    override suspend fun getClipboardFolder(id: String): Flow<ClipboardFolderResponse> = callbackFlow {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.getValue(ClipboardFolderResponse::class.java)?.let { item ->
+                    trySend(item).isSuccess
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
+        }
+        folderDatabase.child(id).addValueEventListener(listener)
+        awaitClose { folderDatabase.removeEventListener(listener) }
+    }
+
 
     override suspend fun delete(itemId: Int): Flow<Boolean> {
         return try {

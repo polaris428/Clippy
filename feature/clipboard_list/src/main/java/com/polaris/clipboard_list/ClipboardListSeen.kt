@@ -64,6 +64,7 @@ import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSColumn
 import com.polaris.designsystem.ui.theme.ClipboardItemView
 import com.polaris.designsystem.ui.theme.bottomSheetTextColor
+import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
 import com.polaris.util.detectSwipe
 import com.polaris.util.getTodayStartTimestamp
@@ -71,7 +72,7 @@ import com.polaris.util.getYearMonth
 
 @Composable
 fun ClipboardListSeen(
-    clipboardItemList: List<ClipboardItem>?,
+    clipboardItemList: ClipboardFolder?,
     onEditClick: (item: ClipboardItem) -> Unit
 ) {
     val viewModel: ClipboardListViewModel = hiltViewModel()
@@ -86,11 +87,11 @@ fun ClipboardListSeen(
     var isPanelOpen by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    if (clipboardItemList.isNullOrEmpty()) {
+    if (clipboardItemList==null) {
         EmptyListView()
     } else {
         Box(modifier = Modifier.fillMaxSize()) {
-            ClipboardView(clipboardItemList, selectedClipboardItem,
+            ClipboardView(clipboardItemList.clipboardDateList, selectedClipboardItem,
                 onLongPress = {
                     onLongPressState.value(ClipboardListIntent.ItemLongPressed(it))
                     //viewModel.processIntent()

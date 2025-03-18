@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         googleSignInHelper = GoogleSignInHelper(activity = this, onSignInSuccess = { task ->
             PrefManager.userSignInCheck = true
             PrefManager.userUid = task.result.user!!.uid
-            viewModel.postClipboardMigrationUseCase(viewModel.clipboardDataList.value)
+          //  viewModel.postClipboardMigrationUseCase(viewModel.clipboardDataList.value)
 
 
         }, onSignInFailure = { exception ->
