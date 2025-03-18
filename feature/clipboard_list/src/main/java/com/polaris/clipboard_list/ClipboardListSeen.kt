@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
@@ -13,6 +14,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,8 +48,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +74,7 @@ import com.polaris.model.model.ClipboardItem
 import com.polaris.util.detectSwipe
 import com.polaris.util.getTodayStartTimestamp
 import com.polaris.util.getYearMonth
+import kotlin.math.roundToInt
 
 @Composable
 fun ClipboardListSeen(
@@ -87,10 +93,55 @@ fun ClipboardListSeen(
     var isPanelOpen by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    if (clipboardItemList==null) {
+    if (clipboardItemList == null) {
         EmptyListView()
     } else {
-        Box(modifier = Modifier.fillMaxSize()) {
+        val density = LocalDensity.current
+        val panelWidthPx = with(density) { 300.dp.toPx().roundToInt() } // 패널 너비 px 변환
+        var isPanelOpen by remember { mutableStateOf(false) }
+        var rawDragOffset by remember { mutableStateOf(if (isPanelOpen) 0f else -panelWidthPx.toFloat()) }
+        val velocityTracker = remember { VelocityTracker() }
+        var isDragging by remember { mutableStateOf(false) } // 드래그 중 여부 체크
+
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                enabled = isPanelOpen, // ✅ 패널이 열려 있을 때만 닫힘 이벤트 적용
+                onClick = {
+                    isPanelOpen = false
+                    rawDragOffset = -panelWidthPx.toFloat() // ✅ 패널 닫기
+                }
+            )
+
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = {
+                        velocityTracker.resetTracking()
+                        isDragging = true // ✅ 드래그 시작 시 즉시 반영
+                        Log.d("ㄹㄴㅁㄹㅇㅁ", "ㅁㄴㅇㄻㄴㄻㄴㅇㄹㅇㄹ")
+                    },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        rawDragOffset =
+                            (rawDragOffset + dragAmount.x).coerceIn(-panelWidthPx.toFloat(), 0f)
+                        velocityTracker.addPosition(change.uptimeMillis, change.position)
+
+                    },
+                    onDragEnd = {
+                        isDragging = false // ✅ 드래그 종료 후 애니메이션 적용
+                        val velocity = velocityTracker.calculateVelocity().x
+                        val threshold = panelWidthPx / 2
+
+                        rawDragOffset = if (velocity > 1000 || rawDragOffset > -threshold) {
+                            isPanelOpen = true
+                            0f
+                        } else {
+                            isPanelOpen = false
+                            -panelWidthPx.toFloat()
+                        }
+                    }
+                )
+            }) {
             ClipboardView(clipboardItemList.clipboardDateList, selectedClipboardItem,
                 onLongPress = {
                     onLongPressState.value(ClipboardListIntent.ItemLongPressed(it))
@@ -135,7 +186,13 @@ fun ClipboardListSeen(
 
 
             // ✅ 왼쪽에서 등장하는 슬라이드 패널
-            SlidePanel()
+            SlidePanel(
+                density = density,
+                panelWidthPx = panelWidthPx,
+                isPanelOpen = isPanelOpen,
+                rawDragOffset = rawDragOffset,
+                isDragging = isDragging
+            )
 
 
         }
@@ -147,7 +204,10 @@ fun ClipboardListSeen(
 @Composable
 @Preview(showBackground = true)
 fun EmptyListView() {
-    CDSColumn(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    CDSColumn(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Header()
 
         Text("추가된 클립이 없어요")
