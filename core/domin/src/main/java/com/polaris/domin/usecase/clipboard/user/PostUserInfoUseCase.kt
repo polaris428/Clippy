@@ -5,6 +5,7 @@ import com.polaris.model.dto.UserDTO
 import com.polaris.model.model.User
 import com.polaris.model.model.toDTO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -18,7 +19,8 @@ class PostUserInfoUseCase  @Inject constructor(
 
 
         return flow {
-            userRepository.postUserInfo(user.toDTO())
+
+            emitAll(userRepository.postUserInfo(user.toDTO()))
 
 
         }

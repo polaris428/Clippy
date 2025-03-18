@@ -58,6 +58,7 @@ import com.google.firebase.BuildConfig
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.polaris.model.model.ClipboardFolder
 
 @Composable
 fun SignInSeen(
@@ -109,13 +110,25 @@ fun SignInSeen(
 
         }
 
-        is SignInState.Success -> {
-            onSignIncomplete()
+        is SignInState.SignInSuccess -> {
+            viewModel.sendIntent(
+                SignInIntent.PostUserInfoIntent(
+                    user = User(
+                        id = PrefManager.userUid,
+                        folderList = arrayListOf()
+                    )
+                )
+            )
+
         }
 
         is SignInState.Error -> {
             Toast.makeText(LocalContext.current, "오류가 발생했어요", Toast.LENGTH_SHORT).show()
 
+        }
+        is SignInState.Complete ->{
+            onSignIncomplete()
+            viewModel.updateState(SignInState.Initialize)
         }
     }
     SignInView(
@@ -128,20 +141,14 @@ fun SignInSeen(
                     )
                 }
                 .addOnFailureListener {
+                    //TODO: UI 에러처리 필요
                     println("Google One Tap 로그인 실패: ${it.message}")
                 }
         },
         onSignInAnonymouslyClick = {
             googleSignInHelper.signInAnonymously(
                 onSuccess = {
-                    viewModel.sendIntent(
-                        SignInIntent.PostUserInfoIntent(
-                            user = User(
-                                id = it,
-                                folderList = arrayListOf()
-                            )
-                        )
-                    )
+                    viewModel.updateState(SignInState.SignInSuccess)
                 }, onFailure = {
 
                 })

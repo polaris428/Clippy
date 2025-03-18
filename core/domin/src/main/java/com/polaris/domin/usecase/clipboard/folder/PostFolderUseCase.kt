@@ -17,19 +17,14 @@ class PostFolderUseCase @Inject constructor(
     private val remoteClipboardRepository: RemoteClipboardRepository
 ){
     suspend fun execute(
-        isLogin: Boolean,
         folder: ClipboardFolder,
 
         ): Flow<Boolean> {
 
 
         return flow {
-            if (isLogin){
-                emitAll(remoteClipboardRepository.insertFolder(folder.toDTO()))
-            }else{
-                emitAll(localClipboardRepository.insertFolder(folder.toEntity()))
 
-            }
+            emitAll(remoteClipboardRepository.insertFolder(folder.toDTO()))
 
 
         }

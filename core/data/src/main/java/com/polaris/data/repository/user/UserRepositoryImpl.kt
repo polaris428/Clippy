@@ -20,6 +20,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun postUserInfo(userDTO: UserDTO): Flow<Boolean> {
         return try {
+
             userDatabase.child(PrefManager.userUid).push().setValue(userDTO).await()
             flowOf(true)
         } catch (e: Exception) {

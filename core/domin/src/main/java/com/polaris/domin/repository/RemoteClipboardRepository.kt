@@ -4,6 +4,8 @@ package com.polaris.domin.repository
 
 import com.polaris.model.dto.ClipboardFolderDTO
 import com.polaris.model.dto.ClipboardItemDTO
+import com.polaris.model.model.ClipboardFolder
+import com.polaris.model.response.ClipboardFolderResponse
 import com.polaris.model.response.ClipboardItemResponse
 import kotlinx.coroutines.flow.Flow
 
@@ -18,6 +20,6 @@ interface RemoteClipboardRepository {
     suspend fun clearAll():Flow<Boolean>
 
     suspend fun insertFolder(folder: ClipboardFolderDTO):Flow<Boolean>
-    suspend fun getFolderList():Flow<List<ClipboardFolderDTO>>
+    suspend fun getFolderList():Flow<List<ClipboardFolderResponse>>
     suspend fun upDateFolder()
 }

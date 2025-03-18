@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
                 splashNavGraph(viewModel, onSplashCompleted = {
                     if (PrefManager.userSignInSkip) {
                         dummyDate.forEach {
-                            viewModel.postInsertDummyData(dummyDate)
+                          //  viewModel.postInsertDummyData(dummyDate)
                         }
                         navController.navigateClipboardList()
                     } else {
@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
 
                 )
                 signInNavGraph(
-                    googleSignInHelper=googleSignInHelper,
+                    googleSignInHelper = googleSignInHelper,
                     onSignIncomplete = {
                         PrefManager.userSignInSkip = true
                         navController.navigateClipboardList()
@@ -140,8 +140,6 @@ class MainActivity : ComponentActivity() {
         navController.navigateClipboardList()
 
     }
-
-
 
 
 }

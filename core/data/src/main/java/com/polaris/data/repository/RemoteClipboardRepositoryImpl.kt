@@ -9,6 +9,9 @@ import com.google.firebase.database.ValueEventListener
 import com.polaris.domin.repository.RemoteClipboardRepository
 import com.polaris.model.dto.ClipboardFolderDTO
 import com.polaris.model.dto.ClipboardItemDTO
+import com.polaris.model.model.ClipboardFolder
+import com.polaris.model.model.toDTO
+import com.polaris.model.response.ClipboardFolderResponse
 import com.polaris.model.response.ClipboardItemResponse
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.channels.awaitClose
@@ -25,7 +28,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         get() = firebaseDatabase.getReference(PrefManager.userUid).child("clipboard")
 
     private val folderDatabase: DatabaseReference
-        get() = firebaseDatabase.getReference(PrefManager.userUid).child("folder")
+        get() = firebaseDatabase.getReference("folder")
 
 
     override suspend fun postDataMigration(itemList: List<ClipboardItemDTO>): Flow<Boolean> {
@@ -118,7 +121,7 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getFolderList(): Flow<List<ClipboardFolderDTO>> {
+    override suspend fun getFolderList(): Flow<List<ClipboardFolderResponse>> {
         TODO("Not yet implemented")
     }
 

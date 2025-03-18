@@ -61,6 +61,7 @@ import coil.request.ImageRequest
 import com.polaris.clipboard_folder.SlidePanel
 import kotlinx.coroutines.launch
 import com.polaris.designsystem.R
+import com.polaris.designsystem.ui.theme.CDSColumn
 import com.polaris.designsystem.ui.theme.ClipboardItemView
 import com.polaris.designsystem.ui.theme.bottomSheetTextColor
 import com.polaris.model.model.ClipboardItem
@@ -85,67 +86,79 @@ fun ClipboardListSeen(
     var isPanelOpen by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    if (clipboardItemList.isNullOrEmpty()) {
+        EmptyListView()
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            ClipboardView(clipboardItemList, selectedClipboardItem,
+                onLongPress = {
+                    onLongPressState.value(ClipboardListIntent.ItemLongPressed(it))
+                    //viewModel.processIntent()
+                }
+            )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        ClipboardView(clipboardItemList, selectedClipboardItem,
-            onLongPress = {
-                onLongPressState.value(ClipboardListIntent.ItemLongPressed(it))
-                //viewModel.processIntent()
-            }
-        )
+            CustomBottomSheetView(
+                isSheetOpen = isSheetOpen,
+                selectedClipboardItem = selectedClipboardItem,
+                onContent = { item ->
+                    val textToCopy = item.url ?: item.title
+                    copyToClipboard(context, textToCopy)
 
-        CustomBottomSheetView(
-            isSheetOpen = isSheetOpen,
-            selectedClipboardItem = selectedClipboardItem,
-            onContent = { item ->
-                val textToCopy = item.url ?: item.title
-                copyToClipboard(context, textToCopy)
+                },
+                onEdit = { item ->
+                    onEditClick(item)
+                },
+                onShear = { item ->
 
-            },
-            onEdit = { item ->
-                onEditClick(item)
-            },
-            onShear = { item ->
-
-                val textToShare = item.url ?: item.title
-                shareText(context, textToShare)
-            },
-            onPin = { item ->
-                viewModel.processIntent(
-                    ClipboardListIntent.UpdatePinClipboardDeleteIntent(
-                        timestamp = item.timestamp,
-                        pinState = item.isPinned
+                    val textToShare = item.url ?: item.title
+                    shareText(context, textToShare)
+                },
+                onPin = { item ->
+                    viewModel.processIntent(
+                        ClipboardListIntent.UpdatePinClipboardDeleteIntent(
+                            timestamp = item.timestamp,
+                            pinState = item.isPinned
+                        )
                     )
-                )
-            },
-            onDelete = { item ->
-                onDeleteState.value(ClipboardListIntent.postClipboardDeleteIntent(item.timestamp))
+                },
+                onDelete = { item ->
+                    onDeleteState.value(ClipboardListIntent.postClipboardDeleteIntent(item.timestamp))
 
-            },
-            onDismissEvent = {
-                viewModel.clearSelectedClipboard()
-            },
-            onDismiss = {
-                onDismissState.value(ClipboardListIntent.BottomSheetDismissed)
-            })
+                },
+                onDismissEvent = {
+                    viewModel.clearSelectedClipboard()
+                },
+                onDismiss = {
+                    onDismissState.value(ClipboardListIntent.BottomSheetDismissed)
+                })
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .detectSwipe(
-                    onSwipeRight = { isPanelOpen = true },  // ✅ 오른쪽 스와이프 → 패널 열기
-                    onSwipeLeft = { isPanelOpen = false }   // ✅ 왼쪽 스와이프 → 패널 닫기
-                )
-        )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .detectSwipe(
+                        onSwipeRight = { isPanelOpen = true },  // ✅ 오른쪽 스와이프 → 패널 열기
+                        onSwipeLeft = { isPanelOpen = false }   // ✅ 왼쪽 스와이프 → 패널 닫기
+                    )
+            )
 
-        // ✅ 왼쪽에서 등장하는 슬라이드 패널
-        SlidePanel()
-
+            // ✅ 왼쪽에서 등장하는 슬라이드 패널
+            SlidePanel()
 
 
+        }
     }
 
 
+}
+
+@Composable
+@Preview(showBackground = true)
+fun EmptyListView() {
+    CDSColumn(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Header()
+
+        Text("추가된 클립이 없어요")
+    }
 }
 
 @Composable
@@ -393,7 +406,7 @@ fun CustomBottomSheetPreview() {
 
 @Composable
 fun CustomBottomSheet(
-    selectedClipboardItem:ClipboardItem,
+    selectedClipboardItem: ClipboardItem,
     onContent: (item: ClipboardItem) -> Unit = {},
     onEdit: (item: ClipboardItem) -> Unit = {},
     onPin: (item: ClipboardItem) -> Unit = {},

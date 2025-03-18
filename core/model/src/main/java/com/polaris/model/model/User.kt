@@ -2,7 +2,7 @@ package com.polaris.model.model
 
 import com.polaris.model.dto.UserDTO
 
-data class User(val id:String, val folderList: ArrayList<String> )
+data class User(val id:String, val folderList: ArrayList<ClipboardFolder> )
 
 fun User.toDTO():UserDTO{
     return UserDTO(id=id,  folderList= folderList )

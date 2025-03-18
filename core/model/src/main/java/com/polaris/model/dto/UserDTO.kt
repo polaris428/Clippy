@@ -1,3 +1,5 @@
 package com.polaris.model.dto
 
-data class UserDTO(val id:String, val folderList: ArrayList<String>  )
+import com.polaris.model.model.ClipboardFolder
+
+data class UserDTO(val id:String, val folderList: ArrayList<ClipboardFolder>  )

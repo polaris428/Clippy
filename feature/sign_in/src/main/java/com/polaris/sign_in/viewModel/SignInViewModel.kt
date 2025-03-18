@@ -46,12 +46,12 @@ class SignInViewModel @Inject constructor(
     }
     fun updateState(signInState: SignInState) {
         viewModelScope.launch {
-            _uiState.emit(signInState)  // 🔥 `emit()` 사용
+            _uiState.emit(signInState)
         }
     }
     fun sendIntent(intent: SignInIntent) {
         viewModelScope.launch {
-            _intent.emit(intent)  // 🔥 `emit()` 사용
+            _intent.emit(intent)
         }
     }
     private fun handleIntent() {
@@ -69,10 +69,15 @@ class SignInViewModel @Inject constructor(
 
 
     fun postBaseFolder() = viewModelScope.launch {
+        val initFolder = ClipboardFolder(owner = PrefManager.userUid, name = "기본 폴더")
 
-        val initFolder = ClipboardFolder(owner = PrefManager.userUid)
+        postFolderUseCase.execute( initFolder).collect {
+            if (it){
 
-        postFolderUseCase.execute(PrefManager.userSignInCheck, initFolder).collect {
+                updateState(SignInState.Complete)
+            }else{
+                updateState(SignInState.Error(""))
+            }
 
         }
 
@@ -81,10 +86,15 @@ class SignInViewModel @Inject constructor(
     fun postUserInfo(user: User) = viewModelScope.launch {
 
         postUserInfoUseCase.execute(user).collect {
+            if (it){
+                sendIntent(SignInIntent.PostInitFolderIntent)
+            }else{
+                updateState(SignInState.Error(""))
+            }
 
         }
     }
-
+    //TODO : 마이그레이션
     fun getCheckIfUserExists(uid:String) = viewModelScope.launch {
         getCheckIfUserExistsUseCase.execute(uid).collect{
 
@@ -99,8 +109,8 @@ class SignInViewModel @Inject constructor(
                 auth.signInWithCredential(credential)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Log.e("FirebaseAuth", "로그인 성공")
-                           // _user.value = auth.currentUser
+                            updateState(signInState = SignInState.SignInSuccess)
+
                         } else {
                            Log.e("FirebaseAuth", "로그인 실패", task.exception)
                         }
