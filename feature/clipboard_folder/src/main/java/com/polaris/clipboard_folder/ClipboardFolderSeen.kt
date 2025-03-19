@@ -88,20 +88,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-//val dummeyList = listOf<>()
-@Composable
-fun ClipboardFolderSeen() {
-    ClipboardFolderView()
-}
 
-@Composable
-@Preview(showBackground = true)
-fun ClipboardFolderView() {
-    CDSColumn {
-        Header()
-
-    }
-}
 
 @Composable
 fun Header() {
@@ -130,42 +117,49 @@ fun Header() {
 @Composable
 @Preview(showBackground = true)
 fun ClipboardFolderViewPreView() {
-    CDSColumn(modifier = Modifier.background(Color.Transparent)) {
-        Header()
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            folderItem(title = "모든 노트")
-            folderItem(title = "공유 노트")
-            folderItem(title = "개인노트")
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            folderItem(title = "고정됨")
-            folderItem(title = "최근 삭제됨")
-        }
+    Box {
+        Column() {
+            Header()
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                folderItem(clipboardFolder = ClipboardFolder(name = "모든 노트"))
+                folderItem(clipboardFolder = ClipboardFolder(name = "공유 노트"))
+                folderItem(clipboardFolder = ClipboardFolder(name = "개인 노트"))
+
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                folderItem(clipboardFolder = ClipboardFolder(name = "고정됨"))
+                folderItem(clipboardFolder = ClipboardFolder(name = "최근 삭제됨"))
+            }
 
 
+        }
     }
+
 
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview(showBackground = true)
-fun folderItem(title: String = "모든 노트", onClick: () -> Unit = {}) {
+fun folderItem(
+    clipboardFolder: ClipboardFolder = ClipboardFolder(),
+    onClick: (String) -> Unit = {}
+) {
     Row(
         modifier = Modifier
             .background(Color.White)
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onClick() },
+                onClick = { onClick(clipboardFolder.id) },
                 onLongClick = {
                     // onLongPress() // ✅ 기존 롱클릭 이벤트 실행
                 },
@@ -188,7 +182,7 @@ fun folderItem(title: String = "모든 노트", onClick: () -> Unit = {}) {
                 .padding(start = 10.dp)
                 .weight(1f)
         ) {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(clipboardFolder.name, style = MaterialTheme.typography.bodyLarge)
             LineView()
         }
 
@@ -211,7 +205,15 @@ fun folderItem(title: String = "모든 노트", onClick: () -> Unit = {}) {
 }
 
 @Composable
-fun SlidePanel(folderList: List<ClipboardFolder>,onClick: (String) -> Unit,isPanelOpen: Boolean = false,rawDragOffset: Float = 0f , isDragging: Boolean = false) {
+fun SlidePanel(
+    folderList: List<ClipboardFolder>,
+    onClick: (String) -> Unit,
+    isPanelOpen: Boolean = false,
+    rawDragOffset: Float = 0f,
+    isDragging: Boolean = false,
+
+    panelClose:()->Unit ={}
+) {
 
 
     // ✅ 드래그 중에는 즉시 반영, 드래그 종료 후 애니메이션 적용
@@ -231,21 +233,45 @@ fun SlidePanel(folderList: List<ClipboardFolder>,onClick: (String) -> Unit,isPan
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = backgroundAlpha))
+            .clickable(
+                enabled = isPanelOpen,
+                onClick = {
+                    panelClose()
+
+                },
+                indication = null, // ✅ 클릭 이펙트 제거
+                interactionSource = remember { MutableInteractionSource() } // ✅ 불필요한 효과 방지
+            )
 
 
 
     ) {
-        SlidePanelContent(
-            folderList = folderList,
-            modifier = Modifier
-                .offset { IntOffset(animatedOffsetX.roundToInt(), 0) } // ✅ 드래그 중 즉시 반응 + 드래그 종료 후 애니메이션 적용
-                .fillMaxHeight()
-                .fillMaxWidth(0.7f)
-                .background(Color.White, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
-                .padding(16.dp),
-            onClick =onClick
-        )
+
+        Column(modifier = Modifier.background(Color.Transparent)) {
+
+            SlidePanelContent(
+                folderList = folderList,
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            animatedOffsetX.roundToInt(),
+                            0
+                        )
+                    } // ✅ 드래그 중 즉시 반응 + 드래그 종료 후 애니메이션 적용
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.7f)
+                    .background(
+                        Color.White,
+                        shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+                    )
+                    .padding(16.dp),
+                onClick = onClick
+            )
+
+
+        }
     }
+
 }
 
 
@@ -253,15 +279,31 @@ fun SlidePanel(folderList: List<ClipboardFolder>,onClick: (String) -> Unit,isPan
  * ✅ 패널 내부 버튼 UI
  */
 @Composable
-fun SlidePanelContent(folderList: List<ClipboardFolder>,modifier: Modifier, onClick: (String) -> Unit) {
+fun SlidePanelContent(
+    folderList: List<ClipboardFolder>,
+    modifier: Modifier,
+    onClick: (String) -> Unit
+) {
+    Column(  modifier = modifier) {
+        Header()
+        LazyColumn(
 
-    LazyColumn(
-        modifier =modifier
-    ) {
+        ) {
 
-        items(folderList) { item ->
-            PanelButton(item,onClick)
+            items(folderList) { item ->
+                folderItem(item, onClick)
+            }
         }
+        Spacer(modifier = Modifier.height(24.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            folderItem(clipboardFolder = ClipboardFolder(id = "0", name = "고정됨"))
+            folderItem(clipboardFolder = ClipboardFolder(id = "-1", name = "최근 삭제됨"))
+        }
+
     }
 
 }
@@ -270,9 +312,9 @@ fun SlidePanelContent(folderList: List<ClipboardFolder>,modifier: Modifier, onCl
  * ✅ 패널 내 버튼 컴포넌트
  */
 @Composable
-fun PanelButton(clipboardFolder:ClipboardFolder, onClick: (String) -> Unit) {
+fun PanelButton(clipboardFolder: ClipboardFolder, onClick: (String) -> Unit) {
     TextButton(
-        onClick = {onClick(clipboardFolder.id)},
+        onClick = { onClick(clipboardFolder.id) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)

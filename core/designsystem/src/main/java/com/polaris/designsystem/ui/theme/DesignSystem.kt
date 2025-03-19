@@ -358,6 +358,7 @@ fun CDSColumn(
 
     }
 }
+
 var dummyDateList = listOf(
     ClipboardItem(
         type = "구글",
@@ -399,10 +400,17 @@ val dummyData = ClipboardItem(
     faviconUrl = "https://github.githubassets.com/favicon.ico",
     timestamp = System.currentTimeMillis()
 )
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview()
-fun ClipboardItemView(clipboardItem :ClipboardItem =dummyData, selectedClipboardItem: ClipboardItem?=null, onClick: () -> Unit={}, onLongPress: () -> Unit={}) {
+fun ClipboardItemView(
+    clipboardItem: ClipboardItem = dummyData,
+    clickable:Boolean=false,
+    selectedClipboardItem: ClipboardItem? = null,
+    onClick: () -> Unit = {},
+    onLongPress: () -> Unit = {}
+) {
 
     Box {
         Row(
@@ -410,6 +418,7 @@ fun ClipboardItemView(clipboardItem :ClipboardItem =dummyData, selectedClipboard
                 .background(Color.White)
                 .fillMaxWidth()
                 .combinedClickable(
+                    enabled = clickable,
                     onClick = { onClick() },
                     onLongClick = {
 
@@ -476,7 +485,6 @@ fun displayImage(imageUrl: String = "") {
         .error(R.drawable.ic_logo)  // 오류 발생 시 기본 이미지
         //  .placeholder(R.drawable.ic_logo) // 로딩 중 기본 이미지
         .build()
-
 
 
     val painter = if (LocalInspectionMode.current) {

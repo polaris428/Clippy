@@ -15,6 +15,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -106,13 +107,7 @@ fun ClipboardListSeen(
 
         Box(modifier = Modifier
             .fillMaxSize()
-            .clickable(
-                enabled = isPanelOpen, // ✅ 패널이 열려 있을 때만 닫힘 이벤트 적용
-                onClick = {
-                    isPanelOpen = false
-                    rawDragOffset = -panelWidthPx.toFloat() // ✅ 패널 닫기
-                }
-            )
+
 
             .pointerInput(Unit) {
                 detectDragGestures(
@@ -144,8 +139,14 @@ fun ClipboardListSeen(
             }) {
             ClipboardView(clipboardFolder[index].clipboardDateList, selectedClipboardItem,
                 onLongPress = {
-                    onLongPressState.value(ClipboardListIntent.ItemLongPressed(it))
+                    if (!isPanelOpen)
+                        onLongPressState.value(ClipboardListIntent.ItemLongPressed(it))
                     //viewModel.processIntent()
+                },
+                onClick = {
+
+                    if (!isPanelOpen)
+                        openUrl(context,it)
                 }
             )
 
@@ -191,7 +192,12 @@ fun ClipboardListSeen(
                 folderList = clipboardFolder,
                 isPanelOpen = isPanelOpen,
                 rawDragOffset = rawDragOffset,
-                isDragging = isDragging
+                isDragging = isDragging,
+                panelClose = {
+                    isPanelOpen = false
+                    rawDragOffset = -panelWidthPx.toFloat()
+
+                }
             )
 
 
@@ -263,6 +269,8 @@ fun CustomBottomSheetView(
 fun ClipboardView(
     clipboardItemList: List<ClipboardItem>? = listOf(dummyData),
     selectedClipboardItem: ClipboardItem? = null,
+    clickable:Boolean=true,
+    onClick: (url:String) -> Unit ={},
     onLongPress: (item: ClipboardItem) -> Unit = {},
 ) {
     val todayStartTimestamp = getTodayStartTimestamp()
@@ -311,6 +319,7 @@ fun ClipboardView(
                     ClipboardItemView(
                         clipboardItem = item,
                         selectedClipboardItem = selectedClipboardItem,
+                        clickable= clickable,
                         onClick = { openUrl(context = context, url = item.url) },
                         onLongPress = { onLongPress(item) })
                 }
@@ -336,7 +345,11 @@ fun ClipboardView(
                     ClipboardItemView(
                         clipboardItem = item,
                         selectedClipboardItem = selectedClipboardItem,
-                        onClick = { openUrl(context = context, url = item.url) },
+                        onClick = {
+                            onClick(item.url!!)
+                          //  openUrl(context = context, url = item.url)
+
+                                  },
                         onLongPress = { onLongPress(item) })
                 }
             }
@@ -381,7 +394,7 @@ val dummyData = ClipboardItem(
 @Preview(showBackground = true)
 @Composable
 fun preView() {
-    ClipboardItemView(dummyData, dummyData, onLongPress = {})
+    ClipboardItemView(clipboardItem = dummyData, selectedClipboardItem = dummyData, onLongPress = {})
 }
 
 
