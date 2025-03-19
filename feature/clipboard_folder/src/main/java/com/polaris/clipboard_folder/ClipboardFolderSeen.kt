@@ -223,27 +223,11 @@ fun SlidePanel(
         label = "animatedOffsetX"
     )
 
-    val backgroundAlpha by animateFloatAsState(
-        targetValue = if (isPanelOpen) 0.5f else 0f,
-        animationSpec = tween(250, easing = FastOutSlowInEasing),
-        label = "backgroundAlpha"
-    )
+
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = backgroundAlpha))
-            .clickable(
-                enabled = isPanelOpen,
-                onClick = {
-                    panelClose()
-
-                },
-                indication = null, // ✅ 클릭 이펙트 제거
-                interactionSource = remember { MutableInteractionSource() } // ✅ 불필요한 효과 방지
-            )
-
-
+            .fillMaxHeight()
 
     ) {
 

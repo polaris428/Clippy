@@ -406,7 +406,7 @@ val dummyData = ClipboardItem(
 @Preview()
 fun ClipboardItemView(
     clipboardItem: ClipboardItem = dummyData,
-    clickable:Boolean=false,
+    clickable:Boolean=true,
     selectedClipboardItem: ClipboardItem? = null,
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {}
