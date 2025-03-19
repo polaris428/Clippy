@@ -80,6 +80,8 @@ class MainActivity : ComponentActivity() {
                         viewModel.updateClipboardItem(item)
                         navController.navigateClipboardEdit()
 
+                    }, onAddFolderClick = {
+
                     })
 
                 clipboardEdit(mainViewModel = viewModel, onSaveClick = { type, title ->

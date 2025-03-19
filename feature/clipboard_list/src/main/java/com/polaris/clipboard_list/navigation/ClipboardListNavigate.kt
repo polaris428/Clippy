@@ -18,12 +18,12 @@ fun NavController.navigateClipboardList() {
 
 fun NavGraphBuilder.clipboardListNavGraph(
     clipboardItemList: StateFlow<List<ClipboardFolder>>,
-    onEditClick:(item: ClipboardItem)->Unit
-
+    onEditClick:(item: ClipboardItem)->Unit,
+    onAddFolderClick :()->Unit
 ) {
     composable(route = ClipboardList.route) {
 
-        ClipboardListSeen(clipboardItemList.collectAsState().value, onEditClick = onEditClick)
+        ClipboardListSeen(clipboardItemList.collectAsState().value, onEditClick = onEditClick,onAddFolderClick =onAddFolderClick)
     }
 }
 object ClipboardList {

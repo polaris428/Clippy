@@ -207,7 +207,8 @@ fun folderItem(
 @Composable
 fun SlidePanel(
     folderList: List<ClipboardFolder>,
-    onClick: (String) -> Unit,
+    onItemClick: (String) -> Unit,
+    onAddFolderClick: () -> Unit,
     isPanelOpen: Boolean = false,
     rawDragOffset: Float = 0f,
     isDragging: Boolean = false,
@@ -249,7 +250,7 @@ fun SlidePanel(
                         shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
                     )
                     .padding(16.dp),
-                onClick = onClick
+                onItemClick = onItemClick
             )
 
 
@@ -266,19 +267,24 @@ fun SlidePanel(
 fun SlidePanelContent(
     folderList: List<ClipboardFolder>,
     modifier: Modifier,
-    onClick: (String) -> Unit
+    onItemClick: (String) -> Unit
 ) {
-    Column(  modifier = modifier) {
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
         Header()
+
         LazyColumn(
-
+            modifier = Modifier // LazyColumn은 가변 크기
+                .fillMaxWidth()
         ) {
-
             items(folderList) { item ->
-                folderItem(item, onClick)
+                folderItem(item, onItemClick)
             }
         }
+
         Spacer(modifier = Modifier.height(24.dp))
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -288,9 +294,20 @@ fun SlidePanelContent(
             folderItem(clipboardFolder = ClipboardFolder(id = "-1", name = "최근 삭제됨"))
         }
 
-    }
+        // 📌 여기에 Spacer(weight=1f)를 추가하여 아래 여백을 만듦!
+        Spacer(modifier = Modifier.weight(1f))
 
+        Text(
+            "폴더 추가하기",
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {  }
+                .padding(16.dp)
+                .align(Alignment.CenterHorizontally) // 중앙 정렬
+        )
+    }
 }
+
 
 /**
  * ✅ 패널 내 버튼 컴포넌트

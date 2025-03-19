@@ -22,11 +22,11 @@
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/clipboard" />
             <option value="$PROJECT_DIR$/feature/clipboard_edit" />
-            <option value="$PROJECT_DIR$/feature/clipboard_folder" />
             <option value="$PROJECT_DIR$/feature/clipboard_list" />
             <option value="$PROJECT_DIR$/feature/clipboard_save_animation" />
             <option value="$PROJECT_DIR$/feature/clipboard_shared_list" />
             <option value="$PROJECT_DIR$/feature/main" />
+            <option value="$PROJECT_DIR$/feature/main_slide_panel" />
             <option value="$PROJECT_DIR$/feature/shared" />
             <option value="$PROJECT_DIR$/feature/sign_in" />
             <option value="$PROJECT_DIR$/feature/splash" />

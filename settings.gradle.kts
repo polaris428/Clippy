@@ -45,6 +45,6 @@ include(":feature:splash")
 include(":core:model")
 
 include(":feature:clipboard_shared_list")
-include(":feature:clipboard_folder")
+include(":feature:main_slide_panel")
 include(":core:init_date")
 include(":core:database")

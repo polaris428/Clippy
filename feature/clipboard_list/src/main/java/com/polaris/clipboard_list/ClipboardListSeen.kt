@@ -81,7 +81,8 @@ import kotlin.math.roundToInt
 @Composable
 fun ClipboardListSeen(
     clipboardFolder: List<ClipboardFolder>?,
-    onEditClick: (item: ClipboardItem) -> Unit
+    onEditClick: (item: ClipboardItem) -> Unit,
+    onAddFolderClick:()->Unit
 ) {
     val viewModel: ClipboardListViewModel = hiltViewModel()
     val isSheetOpen by viewModel.isSheetOpen.collectAsState()
@@ -207,7 +208,8 @@ fun ClipboardListSeen(
             }
             // ✅ 왼쪽에서 등장하는 슬라이드 패널
             SlidePanel(
-                onClick = { viewModel.indexUpdate(index) },
+                onItemClick = { viewModel.indexUpdate(index) },
+                onAddFolderClick= { onAddFolderClick() },
                 folderList = clipboardFolder,
                 isPanelOpen = isPanelOpen,
                 rawDragOffset = rawDragOffset,

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.polaris.clipboard_folder"
+    namespace = "com.polaris.main_slide_panel"
     compileSdk = 35
 
     defaultConfig {
