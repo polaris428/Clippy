@@ -49,19 +49,18 @@ fun ClipboardEditView(
 
             .padding(20.dp)
     ) {
-        Row(Modifier.weight(1f)) {
-            Column(Modifier.weight(1f)) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp),
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                CDSTextField(label = "사이트 설명", value = type, onValueChange = { type = it })
-                Spacer(modifier = Modifier.height(8.dp))
-                CDSTextField(label = "사이트 제목", value = title, onValueChange = { title = it })
-            }
+        Column(Modifier.weight(1f)) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_logo),
+                contentDescription = null,
+                modifier = Modifier.size(40.dp),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            CDSTextField(label = "사이트 설명", value = type, onValueChange = { type = it })
+            Spacer(modifier = Modifier.height(8.dp))
+            CDSTextField(label = "사이트 제목", value = title, onValueChange = { title = it })
         }
+        Spacer(modifier = Modifier.weight(1f))
         CDSButton(buttonText = "저장하기", onClick = { onSaveClick(type, title) })
     }
 }
