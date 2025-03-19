@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val getClipboardFolderUseCase: GetClipboardFolderUseCase,
+    private val getClipboardALlFolderUseCase: GetClipboardAllUseCase,
 
     private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
     private val updateClipboardUseCase: UpdateClipboardUseCase,
@@ -43,13 +43,14 @@ class MainViewModel @Inject constructor(
     private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
     val clipboardItem: StateFlow<ClipboardItem> = _clipboardItem
 
-    private val _clipboardDataList = MutableStateFlow<ClipboardFolder>(ClipboardFolder())
-    val clipboardDataList: StateFlow<ClipboardFolder> = _clipboardDataList
+    private val _clipboardDataList = MutableStateFlow<List<ClipboardFolder>>(listOf())
+    val clipboardDataList: StateFlow<List<ClipboardFolder>> = _clipboardDataList
+
 
     fun processIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.getAllClipboardListIntent -> {
-                getClipboardFolder(intent.folderId)
+                getClipboardFolder(intent.folderIdList)
             }
 
             is MainIntent.postClipboarInsertIntent -> {
@@ -67,10 +68,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getClipboardFolder(folderId: String): Job = viewModelScope.launch {
+    fun getClipboardFolder(folderId: List<String>): Job = viewModelScope.launch {
 
-        getClipboardFolderUseCase.execute(folderId).collect {
-            Log.e("polaris040428",it.toJson())
+        getClipboardALlFolderUseCase.execute(folderId).collect {
             _clipboardDataList.value = it
         }
 
@@ -135,7 +135,7 @@ class MainViewModel @Inject constructor(
         updateClipboardUseCase.execute(clipboardItem = clipboardItem.value, onComplete = {})
             .collect {
 
-                processIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList[0]))
+                processIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList))
             }
 
 

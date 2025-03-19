@@ -78,7 +78,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ClipboardListSeen(
-    clipboardItemList: ClipboardFolder?,
+    clipboardFolder: List<ClipboardFolder>?,
     onEditClick: (item: ClipboardItem) -> Unit
 ) {
     val viewModel: ClipboardListViewModel = hiltViewModel()
@@ -91,9 +91,9 @@ fun ClipboardListSeen(
     val onDismissState = rememberUpdatedState(viewModel::processIntent)
 
     var isPanelOpen by remember { mutableStateOf(false) }
-
+    val index by viewModel.index.collectAsState()
     val context = LocalContext.current
-    if (clipboardItemList == null) {
+    if (clipboardFolder == null) {
         EmptyListView()
     } else {
         val density = LocalDensity.current
@@ -102,6 +102,7 @@ fun ClipboardListSeen(
         var rawDragOffset by remember { mutableStateOf(if (isPanelOpen) 0f else -panelWidthPx.toFloat()) }
         val velocityTracker = remember { VelocityTracker() }
         var isDragging by remember { mutableStateOf(false) } // 드래그 중 여부 체크
+
 
         Box(modifier = Modifier
             .fillMaxSize()
@@ -118,7 +119,6 @@ fun ClipboardListSeen(
                     onDragStart = {
                         velocityTracker.resetTracking()
                         isDragging = true // ✅ 드래그 시작 시 즉시 반영
-                        Log.d("ㄹㄴㅁㄹㅇㅁ", "ㅁㄴㅇㄻㄴㄻㄴㅇㄹㅇㄹ")
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()
@@ -142,7 +142,7 @@ fun ClipboardListSeen(
                     }
                 )
             }) {
-            ClipboardView(clipboardItemList.clipboardDateList, selectedClipboardItem,
+            ClipboardView(clipboardFolder[index].clipboardDateList, selectedClipboardItem,
                 onLongPress = {
                     onLongPressState.value(ClipboardListIntent.ItemLongPressed(it))
                     //viewModel.processIntent()
@@ -187,8 +187,8 @@ fun ClipboardListSeen(
 
             // ✅ 왼쪽에서 등장하는 슬라이드 패널
             SlidePanel(
-                density = density,
-                panelWidthPx = panelWidthPx,
+                onClick = { viewModel.indexUpdate(index) },
+                folderList = clipboardFolder,
                 isPanelOpen = isPanelOpen,
                 rawDragOffset = rawDragOffset,
                 isDragging = isDragging

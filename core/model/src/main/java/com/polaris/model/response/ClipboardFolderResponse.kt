@@ -13,5 +13,5 @@ data class ClipboardFolderResponse(
 )
 
 fun ClipboardFolderResponse.toModel():ClipboardFolder{
-    return ClipboardFolder(clipboardDateList =  clipboard_dateList.values.toList(),id=id,)
+    return ClipboardFolder(clipboardDateList =  clipboard_dateList.values.toList(),id=id, name = name, owner = owner)
 }

@@ -3,6 +3,7 @@ package com.polaris.domin.usecase.clipboard.clipboard
 
 import com.polaris.domin.repository.LocalClipboardRepository
 import com.polaris.domin.repository.RemoteClipboardRepository
+import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
 import com.polaris.model.response.ClipboardItemResponse
 import com.polaris.model.response.toModel
@@ -20,16 +21,13 @@ class GetClipboardAllUseCase @Inject constructor(
     private val remoteClipboardRepository: RemoteClipboardRepository
 ) {
     suspend fun execute(
-        isLogin: Boolean,
-        onComplete: () -> Unit,
-    ): Flow<List<ClipboardItem>> {
+        idList: List<String>,
+    ): Flow<List<ClipboardFolder>> {
 
 
         return flow {
-            onComplete()
-            emitAll(
-                remoteClipboardRepository.getAll()
-                    .map { entities -> entities.map { it.toModel() } })
+
+            emitAll(remoteClipboardRepository.getAll(idList).map { entities -> entities.map { it.toModel() } })
 
         }
     }

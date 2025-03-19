@@ -38,9 +38,9 @@ import kotlinx.coroutines.delay
 fun SplashSeen(viewModel: MainViewModel, splashViewModel: SplashViewModel= hiltViewModel(), onSplashCompleted:()->Unit){
 
     val clipboardItem =  viewModel.clipboardItem.collectAsState()
-    Log.e("polaris040428_size",PrefManager.folderIdList.size.toString())
+
     if (PrefManager.folderIdList.isNotEmpty()){
-        viewModel.processIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList[0]))
+        viewModel.processIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList))
     }
 
     LaunchedEffect(clipboardItem.value) {

@@ -1,5 +1,6 @@
 package com.polaris.clipboard_folder
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -80,6 +81,8 @@ import androidx.compose.ui.window.Dialog
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSColumn
 import com.polaris.designsystem.ui.theme.LineView
+import com.polaris.model.model.ClipboardFolder
+import com.polaris.util.toJson
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.max
@@ -208,12 +211,7 @@ fun folderItem(title: String = "모든 노트", onClick: () -> Unit = {}) {
 }
 
 @Composable
-fun SlidePanel(density: Density,
-               panelWidthPx: Int = with(density) { 300.dp.toPx().roundToInt() },
-               isPanelOpen: Boolean = false,
-               rawDragOffset: Float = if (isPanelOpen) 0f else -panelWidthPx.toFloat(),
-
-               isDragging: Boolean = false) {
+fun SlidePanel(folderList: List<ClipboardFolder>,onClick: (String) -> Unit,isPanelOpen: Boolean = false,rawDragOffset: Float = 0f , isDragging: Boolean = false) {
 
 
     // ✅ 드래그 중에는 즉시 반영, 드래그 종료 후 애니메이션 적용
@@ -238,14 +236,14 @@ fun SlidePanel(density: Density,
 
     ) {
         SlidePanelContent(
+            folderList = folderList,
             modifier = Modifier
                 .offset { IntOffset(animatedOffsetX.roundToInt(), 0) } // ✅ 드래그 중 즉시 반응 + 드래그 종료 후 애니메이션 적용
                 .fillMaxHeight()
                 .fillMaxWidth(0.7f)
                 .background(Color.White, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
                 .padding(16.dp),
-            onDismiss = {// isPanelOpen = false
-                 }
+            onClick =onClick
         )
     }
 }
@@ -255,28 +253,31 @@ fun SlidePanel(density: Density,
  * ✅ 패널 내부 버튼 UI
  */
 @Composable
-fun SlidePanelContent(modifier: Modifier, onDismiss: () -> Unit) {
-    Column(
-        modifier = modifier
+fun SlidePanelContent(folderList: List<ClipboardFolder>,modifier: Modifier, onClick: (String) -> Unit) {
+
+    LazyColumn(
+        modifier =modifier
     ) {
-        PanelButton("📂 폴더 추가") { /* 폴더 추가 로직 */ }
-        PanelButton("📝 새 문서") { /* 새 문서 작성 로직 */ }
-        PanelButton("📌 고정") { /* 고정 기능 */ }
+
+        items(folderList) { item ->
+            PanelButton(item,onClick)
+        }
     }
+
 }
 
 /**
  * ✅ 패널 내 버튼 컴포넌트
  */
 @Composable
-fun PanelButton(text: String, onClick: () -> Unit) {
+fun PanelButton(clipboardFolder:ClipboardFolder, onClick: (String) -> Unit) {
     TextButton(
-        onClick = onClick,
+        onClick = {onClick(clipboardFolder.id)},
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
-        Text(text)
+        Text(clipboardFolder.name)
     }
 }
 

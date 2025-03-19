@@ -18,10 +18,10 @@ class PostClipboardDeleteUseCase@Inject constructor(
 
 
         return flow {
-            Log.e("polaris0428","흐으으음")
+
             onComplete()
             emitAll(clipboardRepository.delete(timestamp))
-            Log.e("polaris0428","흐으으음1")
+
 
         }
     }

@@ -1,6 +1,7 @@
 package com.polaris.data.repository
 
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -12,11 +13,14 @@ import com.polaris.model.dto.ClipboardItemDTO
 import com.polaris.model.response.ClipboardFolderResponse
 import com.polaris.model.response.ClipboardItemResponse
 import com.polaris.util.PrefManager
+import com.polaris.util.toJson
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.tasks.await
+import java.util.Collections
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 internal class RemoteClipboardRepositoryImpl @Inject constructor(
@@ -50,20 +54,48 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getAll(): Flow<List<ClipboardItemResponse>> = callbackFlow {
+    override suspend fun getAll(ids: List<String>): Flow<List<ClipboardFolderResponse>> = callbackFlow {
+        if (ids.isEmpty()) {
+            trySend(emptyList()).isSuccess
+            close()
+            return@callbackFlow
+        }
 
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val items = snapshot.children.mapNotNull { it.getValue(ClipboardItemResponse::class.java) }
-                trySend(items).isSuccess
+        val resultList = Collections.synchronizedList(mutableListOf<ClipboardFolderResponse>())
+        val listeners = mutableListOf<ValueEventListener>()
+        val remainingCount = AtomicInteger(ids.size) // AtomicInteger로 동기화 처리
+
+        for (id in ids) {
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.getValue(ClipboardFolderResponse::class.java)?.let { item ->
+                        resultList.add(item) // 동기화 리스트 사용
+                    }
+
+                    if (remainingCount.decrementAndGet() == 0) {
+                        trySend(resultList.toList()).isSuccess
+                        close() // 모든 데이터가 로드되었으면 한 번만 방출 후 종료
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // 특정 요청이 실패해도 진행 가능하도록 처리 (완전 실패로 간주하지 않음)
+                    if (remainingCount.decrementAndGet() == 0) {
+                        trySend(resultList.toList()).isSuccess
+                        close()
+                    }
+                }
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+            folderDatabase.child(id).addListenerForSingleValueEvent(listener)
+            listeners.add(listener)
+        }
+
+        awaitClose {
+            for (listener in listeners) {
+                folderDatabase.removeEventListener(listener)
             }
         }
-        folderDatabase.addValueEventListener(listener)
-        awaitClose { folderDatabase.removeEventListener(listener) } // 스트림 종료 시 리스너 제거
     }
 
     override suspend fun getClipboardFolder(id: String): Flow<ClipboardFolderResponse> = callbackFlow {

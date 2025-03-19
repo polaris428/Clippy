@@ -23,9 +23,16 @@ class ClipboardListViewModel @Inject constructor(
     val isSheetOpen: StateFlow<Boolean> = _isSheetOpen
 
     // 선택된 ClipboardItem (기본값 dummyData)
-    private val _selectedClipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem()
-    )
+    private val _selectedClipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
     val selectedClipboardItem: StateFlow<ClipboardItem> = _selectedClipboardItem
+
+    private val _index = MutableStateFlow<Int>(0)
+    val index: StateFlow<Int> = _index
+
+
+    fun  indexUpdate(index:Int){
+        _index.value= index
+    }
 
     /**
      * 특정 아이템 롱클릭 시 바텀 시트를 열고 선택한 아이템 저장

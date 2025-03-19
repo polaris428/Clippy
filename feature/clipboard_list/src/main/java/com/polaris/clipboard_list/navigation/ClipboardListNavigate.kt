@@ -17,7 +17,7 @@ fun NavController.navigateClipboardList() {
 }
 
 fun NavGraphBuilder.clipboardListNavGraph(
-    clipboardItemList: StateFlow<ClipboardFolder>,
+    clipboardItemList: StateFlow<List<ClipboardFolder>>,
     onEditClick:(item: ClipboardItem)->Unit
 
 ) {
