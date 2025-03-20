@@ -82,7 +82,8 @@ import kotlin.math.roundToInt
 fun ClipboardListSeen(
     clipboardFolder: List<ClipboardFolder>?,
     onEditClick: (item: ClipboardItem) -> Unit,
-    onAddFolderClick:()->Unit
+    onAddFolderClick:()->Unit,
+    onJoinFolderClick:()->Unit
 ) {
     val viewModel: ClipboardListViewModel = hiltViewModel()
     val isSheetOpen by viewModel.isSheetOpen.collectAsState()
@@ -211,9 +212,9 @@ fun ClipboardListSeen(
                 onItemClick = { viewModel.indexUpdate(index) },
                 onAddFolderClick= { onAddFolderClick() },
                 folderList = clipboardFolder,
-                isPanelOpen = isPanelOpen,
                 rawDragOffset = rawDragOffset,
                 isDragging = isDragging,
+                onJoinFolderClick = onJoinFolderClick
 
                 )
 

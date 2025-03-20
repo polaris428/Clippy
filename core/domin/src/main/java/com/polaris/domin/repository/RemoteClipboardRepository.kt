@@ -21,5 +21,7 @@ interface RemoteClipboardRepository {
 
     suspend fun insertFolder(folder: ClipboardFolderDTO):Flow<Boolean>
     suspend fun getFolderList():Flow<List<ClipboardFolderResponse>>
+    suspend fun joinFolder(folderId:String): Flow<Boolean>
     suspend fun upDateFolder()
+
 }

@@ -8,5 +8,5 @@ data class ClipboardFolderDTO(
     var name: String ,
     var owner: String ,
     var isShare:Boolean,
-    var clipboard_dateList: List<ClipboardItemDTO>
+    var clipboard_dateList: List<ClipboardItemDTO>?
 )

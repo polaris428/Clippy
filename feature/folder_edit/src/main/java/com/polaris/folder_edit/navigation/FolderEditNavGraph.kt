@@ -25,5 +25,5 @@ fun NavGraphBuilder.folderEditNavGraph(
     }
 }
 object ClipboardList {
-    const val route = "folder_ddit"
+    const val route = "folder_edit"
 }

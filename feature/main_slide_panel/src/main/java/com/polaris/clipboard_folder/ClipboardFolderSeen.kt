@@ -114,44 +114,13 @@ fun Header() {
     }
 }
 
-@Composable
-@Preview(showBackground = true)
-fun ClipboardFolderViewPreView() {
-    Box {
-        Column() {
-            Header()
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                folderItem(clipboardFolder = ClipboardFolder(name = "모든 노트"))
-                folderItem(clipboardFolder = ClipboardFolder(name = "공유 노트"))
-                folderItem(clipboardFolder = ClipboardFolder(name = "개인 노트"))
 
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                folderItem(clipboardFolder = ClipboardFolder(name = "고정됨"))
-                folderItem(clipboardFolder = ClipboardFolder(name = "최근 삭제됨"))
-            }
-
-
-        }
-    }
-
-
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview(showBackground = true)
 fun folderItem(
-    clipboardFolder: ClipboardFolder = ClipboardFolder(),
+    clipboardFolder: ClipboardFolder = ClipboardFolder(name = "기본 폴더"),
     onClick: (String) -> Unit = {}
 ) {
     Row(
@@ -169,7 +138,7 @@ fun folderItem(
                 ),
                 interactionSource = remember { MutableInteractionSource() }
             )
-            .padding(top = 14.dp, start = 12.dp)
+
     ) {
         Image(
             modifier = Modifier.size(24.dp),
@@ -209,11 +178,10 @@ fun SlidePanel(
     folderList: List<ClipboardFolder>,
     onItemClick: (String) -> Unit,
     onAddFolderClick: () -> Unit,
-    isPanelOpen: Boolean = false,
+    onJoinFolderClick: () -> Unit,
     rawDragOffset: Float = 0f,
     isDragging: Boolean = false,
 
-    panelClose:()->Unit ={}
 ) {
 
 
@@ -251,7 +219,8 @@ fun SlidePanel(
                     )
                     .padding(16.dp),
                 onItemClick = onItemClick,
-                onAddFolderClick=onAddFolderClick
+                onAddFolderClick=onAddFolderClick,
+                onJoinFolderClick= onJoinFolderClick
 
             )
 
@@ -266,14 +235,16 @@ fun SlidePanel(
  * ✅ 패널 내부 버튼 UI
  */
 @Composable
+@Preview(showBackground = true)
 fun SlidePanelContent(
-    folderList: List<ClipboardFolder>,
-    modifier: Modifier,
-    onItemClick: (String) -> Unit,
-    onAddFolderClick:()->Unit
+    folderList: List<ClipboardFolder> = listOf(),
+    modifier: Modifier= Modifier,
+    onItemClick: (String) -> Unit={},
+    onAddFolderClick:()->Unit={},
+    onJoinFolderClick:()->Unit={}
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize() .padding(top = 14.dp, start = 12.dp)
     ) {
         Header()
 
@@ -299,15 +270,27 @@ fun SlidePanelContent(
 
         // 📌 여기에 Spacer(weight=1f)를 추가하여 아래 여백을 만듦!
         Spacer(modifier = Modifier.weight(1f))
+        Column {
+            Text(
+                "폴더 참가하기",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onJoinFolderClick() }
 
-        Text(
-            "폴더 추가하기",
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onAddFolderClick() }
-                .padding(16.dp)
-                .align(Alignment.CenterHorizontally) // 중앙 정렬
-        )
+
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                "폴더 추가하기",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onAddFolderClick() }
+
+
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
     }
 }
 

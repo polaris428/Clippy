@@ -15,6 +15,8 @@ import com.polaris.clipboard_list.navigation.clipboardListNavGraph
 import com.polaris.clipboard_list.navigation.navigateClipboardList
 import com.polaris.folder_edit.navigation.folderEditNavGraph
 import com.polaris.folder_edit.navigation.navigateFolderEdit
+import com.polaris.folder_join.navigation.folderJoinNavGraph
+import com.polaris.folder_join.navigation.navigateFolderJoin
 import com.polaris.model.dto.UserDTO
 import com.polaris.model.model.ClipboardItem
 import com.polaris.shared.MainViewModel
@@ -45,7 +47,7 @@ class MainActivity : ComponentActivity() {
         googleSignInHelper = GoogleSignInHelper(activity = this, onSignInSuccess = { task ->
             PrefManager.userSignInCheck = true
             PrefManager.userUid = task.result.user!!.uid
-          //  viewModel.postClipboardMigrationUseCase(viewModel.clipboardDataList.value)
+            //  viewModel.postClipboardMigrationUseCase(viewModel.clipboardDataList.value)
 
 
         }, onSignInFailure = { exception ->
@@ -86,6 +88,9 @@ class MainActivity : ComponentActivity() {
 
                     }, onAddFolderClick = {
                         navController.navigateFolderEdit()
+                    },
+                    onJoinFolderClick = {
+                        navController.navigateFolderJoin()
                     })
 
                 clipboardEdit(mainViewModel = viewModel, onSaveClick = { type, title ->
@@ -94,10 +99,11 @@ class MainActivity : ComponentActivity() {
                 })
 
                 folderEditNavGraph(onPostFolderSuccess = {
-                    navController.navigateClipboardList()
+                    navController.popBackStack()
                 }, onPostFolderFile = {
                     navController.navigateClipboardList()
                 })
+                folderJoinNavGraph(onPostFolderSuccess = {}, onPostFolderFile = {})
 
 
             }

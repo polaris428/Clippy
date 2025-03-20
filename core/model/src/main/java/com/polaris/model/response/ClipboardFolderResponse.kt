@@ -8,6 +8,7 @@ data class ClipboardFolderResponse(
     var timestamp: Long = 0L,
     var name: String = "",
     var owner: String = "",
+    var share:Boolean = false,
     var clipboard_dateList: Map<String, ClipboardItem> = emptyMap()
 
 )
