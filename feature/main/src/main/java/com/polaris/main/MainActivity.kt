@@ -13,6 +13,8 @@ import com.polaris.clipboard_edit.navigation.clipboardEdit
 import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
 import com.polaris.clipboard_list.navigation.clipboardListNavGraph
 import com.polaris.clipboard_list.navigation.navigateClipboardList
+import com.polaris.folder_edit.navigation.folderEditNavGraph
+import com.polaris.folder_edit.navigation.navigateFolderEdit
 import com.polaris.model.dto.UserDTO
 import com.polaris.model.model.ClipboardItem
 import com.polaris.shared.MainViewModel
@@ -32,10 +34,12 @@ import java.util.UUID
 class MainActivity : ComponentActivity() {
     private lateinit var googleSignInHelper: GoogleSignInHelper
     private val viewModel: MainViewModel by viewModels()
+
     lateinit var navController: NavHostController
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         googleSignInHelper = GoogleSignInHelper(activity = this, onSignInSuccess = { task ->
@@ -81,13 +85,20 @@ class MainActivity : ComponentActivity() {
                         navController.navigateClipboardEdit()
 
                     }, onAddFolderClick = {
-
+                        navController.navigateFolderEdit()
                     })
 
                 clipboardEdit(mainViewModel = viewModel, onSaveClick = { type, title ->
                     updateClipDate(type, title)
                     saveClipboard()
                 })
+
+                folderEditNavGraph(onPostFolderSuccess = {
+                    navController.navigateClipboardList()
+                }, onPostFolderFile = {
+                    navController.navigateClipboardList()
+                })
+
 
             }
 

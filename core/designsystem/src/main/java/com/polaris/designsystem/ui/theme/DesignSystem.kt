@@ -35,6 +35,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -227,7 +230,7 @@ fun CDSTextField(
     onFocusChange: (Boolean) -> Unit = {}
 ) {
     Box(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth().offset(x = -7.dp,y=0.dp)
     ) {
         TextField(
             value = value,
@@ -510,5 +513,41 @@ fun displayImage(imageUrl: String = "") {
                 .clip(RoundedCornerShape(4.dp))
         )
     }
+
+}
+
+@Composable
+fun CDSSwitch(
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    switchColors: SwitchColors = SwitchDefaults.colors(
+        checkedThumbColor = Color.White,
+        checkedTrackColor = PrimaryColor,
+        uncheckedThumbColor = Color.Gray,
+        uncheckedTrackColor = Color(0xFFE0E0E0),
+        disabledCheckedThumbColor = Color.DarkGray,
+        disabledCheckedTrackColor = Color.Gray,
+        disabledUncheckedThumbColor = Color.LightGray,
+        disabledUncheckedTrackColor = Color.DarkGray,
+        checkedBorderColor = Color.Transparent,
+        uncheckedBorderColor = Color.Transparent
+    )
+) {
+    Switch(
+        checked = isChecked,
+        onCheckedChange = onCheckedChange,
+        modifier = modifier,
+        enabled = enabled,
+        colors = switchColors
+    )
+}
+@Composable
+@Preview()
+fun preViewSwitch(){
+    Column {
+        CDSSwitch(true, onCheckedChange = {})
+        CDSSwitch(false, onCheckedChange = {})    }
 
 }

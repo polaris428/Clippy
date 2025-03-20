@@ -7,5 +7,6 @@ data class ClipboardFolderDTO(
     var timestamp: Long = System.currentTimeMillis(),
     var name: String ,
     var owner: String ,
-    var clipboard_dateList: List<ClipboardItemDTO> = arrayListOf()
+    var isShare:Boolean,
+    var clipboard_dateList: List<ClipboardItemDTO>
 )

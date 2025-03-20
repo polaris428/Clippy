@@ -250,7 +250,9 @@ fun SlidePanel(
                         shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
                     )
                     .padding(16.dp),
-                onItemClick = onItemClick
+                onItemClick = onItemClick,
+                onAddFolderClick=onAddFolderClick
+
             )
 
 
@@ -267,7 +269,8 @@ fun SlidePanel(
 fun SlidePanelContent(
     folderList: List<ClipboardFolder>,
     modifier: Modifier,
-    onItemClick: (String) -> Unit
+    onItemClick: (String) -> Unit,
+    onAddFolderClick:()->Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -301,7 +304,7 @@ fun SlidePanelContent(
             "폴더 추가하기",
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {  }
+                .clickable { onAddFolderClick() }
                 .padding(16.dp)
                 .align(Alignment.CenterHorizontally) // 중앙 정렬
         )

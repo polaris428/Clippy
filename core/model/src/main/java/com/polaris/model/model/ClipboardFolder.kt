@@ -8,9 +8,11 @@ data class ClipboardFolder(
     val timestamp: Long = System.currentTimeMillis(),
     val name: String="",
     val owner: String="",
-    var clipboardDateList: List<ClipboardItem> = arrayListOf()
+    var isShare:Boolean= false,
+    var clipboardDateList: List<ClipboardItem> = arrayListOf(),
+
 )
 
 fun ClipboardFolder.toDTO():ClipboardFolderDTO{
-    return ClipboardFolderDTO(id = id,timestamp=timestamp,name =name,owner= owner,clipboard_dateList=clipboardDateList.map { it.toDTO() })
+    return ClipboardFolderDTO(id = id,timestamp=timestamp,name =name,owner= owner,isShare=isShare,clipboard_dateList=clipboardDateList.map { it.toDTO() })
 }
