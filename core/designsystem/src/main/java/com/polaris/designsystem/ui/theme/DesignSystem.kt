@@ -78,9 +78,9 @@ import com.polaris.util.convertTimestampToMonthDay
 
 @Preview(showBackground = true)
 @Composable
-fun LineView() {
-    Column {
-        Spacer(modifier = Modifier.height(14.dp))
+fun LineView(modifier: Modifier = Modifier) {
+    Column(modifier) {
+
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(1f), // 1f 제거 (불필요)
             color = Gray90,
@@ -230,7 +230,9 @@ fun CDSTextField(
     onFocusChange: (Boolean) -> Unit = {}
 ) {
     Box(
-        modifier = modifier.fillMaxWidth().offset(x = -7.dp,y=0.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .offset(x = -7.dp, y = 0.dp)
     ) {
         TextField(
             value = value,
@@ -409,67 +411,72 @@ val dummyData = ClipboardItem(
 @Preview()
 fun ClipboardItemView(
     clipboardItem: ClipboardItem = dummyData,
-    clickable:Boolean=true,
+    clickable: Boolean = true,
     selectedClipboardItem: ClipboardItem? = null,
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {}
 ) {
 
     Box {
-        Row(
-            modifier = Modifier
-                .background(Color.White)
-                .fillMaxWidth()
-                .combinedClickable(
-                    enabled = clickable,
-                    onClick = { onClick() },
-                    onLongClick = {
+        Column(modifier = Modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .combinedClickable(
+                enabled = clickable,
+                onClick = { onClick() },
+                onLongClick = {
 
-                        onLongPress() // ✅ 기존 롱클릭 이벤트 실행
-                    },
-                    indication = rememberRipple(
-                        color = Color.Gray, // 리플 색상 설정
-                        bounded = true // Row 크기 내에서만 리플 퍼지게 설정
-                    ),
-                    interactionSource = remember { MutableInteractionSource() }
-                )
-                .padding(top = 14.dp, start = 8.dp)
-        ) {
-            if (!clipboardItem.faviconUrl.isNullOrEmpty()) {
-                displayImage(clipboardItem.faviconUrl!!)
-            }
+                    onLongPress() // ✅ 기존 롱클릭 이벤트 실행
+                },
+                indication = rememberRipple(
+                    color = Color.Gray, // 리플 색상 설정
+                    bounded = true // Row 크기 내에서만 리플 퍼지게 설정
+                ),
+                interactionSource = remember { MutableInteractionSource() }
+            )
+            .padding(top = 14.dp, start = 8.dp)) {
+            Row(
 
-
-            Column(modifier = Modifier.padding(start = 10.dp)) {
-                Text(
-                    text = clipboardItem.title,
-                    fontSize = 16.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (!clipboardItem.url.isNullOrEmpty()) {
-                        Text(
-                            text = convertTimestampToMonthDay(clipboardItem.timestamp),
-                            color = Gray50,
-                            fontSize = 12.sp
-                        )
-                        Text(
-                            text = " | ", color = Gray50, fontSize = 14.sp
-                        )
-                        Text(
-                            text = clipboardItem.type, color = Gray50, fontSize = 12.sp
-                        )
-                    }
+            ) {
+                if (!clipboardItem.faviconUrl.isNullOrEmpty()) {
+                    displayImage(clipboardItem.faviconUrl!!)
                 }
-                LineView()
+
+
+                Column(modifier = Modifier.padding(start = 10.dp)) {
+                    Text(
+                        text = clipboardItem.title,
+                        fontSize = 16.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (!clipboardItem.url.isNullOrEmpty()) {
+                            Text(
+                                text = convertTimestampToMonthDay(clipboardItem.timestamp),
+                                color = Gray50,
+                                fontSize = 12.sp
+                            )
+                            Text(
+                                text = " | ", color = Gray50, fontSize = 14.sp
+                            )
+                            Text(
+                                text = clipboardItem.type, color = Gray50, fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                }
             }
+            Spacer(modifier = Modifier.height(14.dp))
+            LineView(modifier = Modifier.padding(start = 48.dp))
         }
+
 
         // ✅ isSelected 값이 true일 때만 보이도록 설정
         AnimatedCheckmarkWithCircle(selectedClipboardItem?.timestamp == clipboardItem.timestamp)
@@ -543,11 +550,13 @@ fun CDSSwitch(
         colors = switchColors
     )
 }
+
 @Composable
 @Preview()
-fun preViewSwitch(){
+fun preViewSwitch() {
     Column {
         CDSSwitch(true, onCheckedChange = {})
-        CDSSwitch(false, onCheckedChange = {})    }
+        CDSSwitch(false, onCheckedChange = {})
+    }
 
 }

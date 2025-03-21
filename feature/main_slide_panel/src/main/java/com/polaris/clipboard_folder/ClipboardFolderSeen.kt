@@ -125,8 +125,9 @@ fun folderItem(
 ) {
     Row(
         modifier = Modifier
-            .background(Color.White)
             .fillMaxWidth()
+            .padding(top = 10.dp)
+            .background(Color.White)
             .combinedClickable(
                 onClick = { onClick(clipboardFolder.id) },
                 onLongClick = {
@@ -152,7 +153,9 @@ fun folderItem(
                 .weight(1f)
         ) {
             Text(clipboardFolder.name, style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.height(10.dp))
             LineView()
+
         }
 
         // 오른쪽 끝에 정렬될 요소들
