@@ -80,7 +80,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ClipboardListSeen(
-    clipboardFolder: List<ClipboardFolder>?,
+    clipboardFolder: List<ClipboardFolder>?=null,
     onEditClick: (item: ClipboardItem) -> Unit,
     onAddFolderClick:()->Unit,
     onJoinFolderClick:()->Unit
@@ -97,7 +97,8 @@ fun ClipboardListSeen(
     var isPanelOpen by remember { mutableStateOf(false) }
     val index by viewModel.index.collectAsState()
     val context = LocalContext.current
-    if (clipboardFolder == null) {
+    Log.e("poalris040428",clipboardFolder.toString())
+    if (clipboardFolder.isNullOrEmpty()  ) {
         EmptyListView()
     } else {
         val density = LocalDensity.current

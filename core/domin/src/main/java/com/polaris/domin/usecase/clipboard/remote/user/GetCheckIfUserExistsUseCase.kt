@@ -1,4 +1,4 @@
-package com.polaris.domin.usecase.clipboard.user
+package com.polaris.domin.usecase.clipboard.remote.user
 
 import com.polaris.domin.repository.user.UserRepository
 import com.polaris.model.model.User

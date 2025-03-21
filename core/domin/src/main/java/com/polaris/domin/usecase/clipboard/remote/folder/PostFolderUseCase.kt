@@ -1,4 +1,4 @@
-package com.polaris.domin.usecase.clipboard.folder
+package com.polaris.domin.usecase.clipboard.remote.folder
 
 import com.polaris.database.model.toEntity
 import com.polaris.domin.repository.LocalClipboardRepository

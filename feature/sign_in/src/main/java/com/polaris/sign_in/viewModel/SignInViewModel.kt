@@ -9,11 +9,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.polaris.designsystem.ui.theme.dummyData
 import com.polaris.designsystem.ui.theme.dummyDateList
-import com.polaris.domin.usecase.clipboard.clipboard.GetClipboardFolderUseCase
-import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardInsertUseCase
-import com.polaris.domin.usecase.clipboard.folder.PostFolderUseCase
-import com.polaris.domin.usecase.clipboard.user.GetCheckIfUserExistsUseCase
-import com.polaris.domin.usecase.clipboard.user.PostUserInfoUseCase
+import com.polaris.domin.usecase.clipboard.remote.clipboard.GetClipboardFolderUseCase
+import com.polaris.domin.usecase.clipboard.remote.clipboard.PostClipboardInsertUseCase
+import com.polaris.domin.usecase.clipboard.remote.folder.PostFolderUseCase
+import com.polaris.domin.usecase.clipboard.remote.user.GetCheckIfUserExistsUseCase
+import com.polaris.domin.usecase.clipboard.remote.user.PostUserInfoUseCase
 import com.polaris.model.dto.UserDTO
 import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.User

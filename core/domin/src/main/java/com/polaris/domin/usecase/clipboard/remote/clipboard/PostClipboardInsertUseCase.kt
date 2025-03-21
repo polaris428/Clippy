@@ -1,4 +1,4 @@
-package com.polaris.domin.usecase.clipboard.clipboard
+package com.polaris.domin.usecase.clipboard.remote.clipboard
 
 
 

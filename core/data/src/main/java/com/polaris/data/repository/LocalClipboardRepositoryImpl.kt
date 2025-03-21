@@ -24,6 +24,10 @@ internal class LocalClipboardRepositoryImpl @Inject constructor(
         return flowOf(true)
     }
 
+    override suspend fun getAll(): Flow<List<ClipboardFolderEntity>> {
+       return flowOf( clipboardFolderDao.getAllFolders())
+
+    }
 
 
     override suspend fun delete(itemId: Long): Flow<Boolean> {
@@ -47,8 +51,13 @@ internal class LocalClipboardRepositoryImpl @Inject constructor(
         // clipboardDao.clearClipboardHistory()
     }
 
-    override suspend fun insertFolder(folder: ClipboardFolderEntity): Flow<Boolean> {
-        clipboardFolderDao.insertFolder(folder)
+    override suspend fun insertFolder(folder: List<ClipboardFolderEntity>): Flow<Boolean> {
+        clipboardFolderDao.insertFolders(folder)
+        return flowOf(true)
+    }
+
+    override suspend fun updateFolder(folder: List<ClipboardFolderEntity>): Flow<Boolean> {
+        clipboardFolderDao.updateFolders(folder)
         return flowOf(true)
     }
 

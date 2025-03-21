@@ -1,6 +1,5 @@
 package com.polaris.clipboard
 
-import android.app.Activity
 import kotlinx.coroutines.*
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -8,12 +7,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatActivity.CLIPBOARD_SERVICE
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
@@ -23,7 +20,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -54,21 +49,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.polaris.clipboard.intent.ClipboardIntent
-import com.polaris.clipboard.state.ClipboardUiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.polaris.clipboard.intent.ClipboardSaveIntent
 import com.polaris.clipboard.navigation.ClipboardRoute
 import com.polaris.clipboard.navigation.clipboardNavGraph
+import com.polaris.clipboard.state.ClipboardSaveState
 import com.polaris.clipboard_edit.navigation.clipboardEdit
 import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
 import com.polaris.clipboard_save_animation.navigation.clipboardSaveAnimation
@@ -78,45 +67,71 @@ import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.CDSTransparentButton
 import com.polaris.designsystem.ui.theme.ClippyTheme
 import com.polaris.designsystem.ui.theme.textColorGray
+import com.polaris.model.model.ClipboardItem
+import com.polaris.model.model.User
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
-class ClipboardActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by viewModels()
+class ClipboardSaveActivity : AppCompatActivity() {
+    private val viewModel: ClipboardSaveViewModel by viewModels()
     lateinit var navController : NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
-        if (!sharedText.isNullOrEmpty()) {
-            viewModel.siteInformation(url = sharedText)
-
-
-        }
-
-
         setContent {
+
+            val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
+            if (!sharedText.isNullOrEmpty()) {
+                viewModel.sendIntent(ClipboardSaveIntent.getUrlCrawlingInfo(sharedText))
+
+
+            }
+
             navController = rememberNavController()
+            val state = viewModel.uiState.collectAsState()
+            val clipboardItem= viewModel.clipboardItem.collectAsState()
+
+            when (state.value) {
+                ClipboardSaveState.Initialize ->{}
+
+                ClipboardSaveState.ClipboardCrawlingInfo -> {
+
+                }
+                ClipboardSaveState.ClipboardSaveLoading -> {
+
+                }
+                ClipboardSaveState.ClipboardSaveSuccess -> {
+                    navController.navigateClipboardSaveAnimation()
+                    Toast.makeText(this@ClipboardSaveActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+                }
+                ClipboardSaveState.ClipboardSaveFailure -> {
+
+                }
+
+
+            }
+
             NavHost(navController = navController, startDestination = ClipboardRoute.route ) {
                 clipboardNavGraph(
-                    mainViewModel = viewModel,
+                    title =clipboardItem.value.title,
+                    siteName =clipboardItem.value.type,
                     onSaveClick = {
-                        saveClipboard()
+                        saveClipboard(clipboardItem.value)
 
                     }, onEditClick = {
                         navController.navigateClipboardEdit()
                     }, onDismiss = {
 
                     })
-                clipboardEdit(mainViewModel = viewModel, onSaveClick = { type, title ->
-                    viewModel.updateClipboardItem(type = type , title= title)
-                    saveClipboard()
-
-                })
+//                clipboardEdit( onSaveClick = { type, title ->
+//                    viewModel.updateClipboardItem(type = type , title= title)
+//                    saveClipboard()
+//
+//                })
                 clipboardSaveAnimation(afterAnimation = {
                     finish()
                     exitProcess(0)  // 프로세스 종료
@@ -127,42 +142,44 @@ class ClipboardActivity : AppCompatActivity() {
         }
     }
 
-    fun saveClipboard() {
+    fun saveClipboard(ClipboardItem: ClipboardItem) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Shared Text", viewModel.clipboardItem.value.url)
         clipboard.setPrimaryClip(clip)
+        viewModel.sendIntent(ClipboardSaveIntent.postClipboarInsertIntent(PrefManager.folderIdList[0],ClipboardItem))
 
-        viewModel.processIntent(MainIntent.postClipboarInsertIntent(PrefManager.folderIdList[0]))
-        Toast.makeText(this@ClipboardActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
-        navController.navigateClipboardSaveAnimation()
+
+
     }
 }
 
 @Composable
 fun ClipboardSeen(
-    viewModel: MainViewModel,
+    title: String,
+    siteName: String,
     onSaveClick:()->Unit = {},
     onEditClick: () -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
 
-    ClipboardView(viewModel, onSaveClick,onEditClick, onDismiss)
+    ClipboardView(title,siteName,onSaveClick,onEditClick, onDismiss)
 }
 
 @Composable
 fun ClipboardView(
-    viewModel: MainViewModel ,
+    title: String,
+    siteName:String,
     onSaveClick:() ->Unit,
     onEditClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
 
 
-    val clipboardItem = viewModel.clipboardItem.collectAsState()
+
 
     ClipboardSaveView(
-        title = clipboardItem.value.title,
-        siteName = clipboardItem.value.type,
+        title = title,
+        siteName =siteName,
         isAnimation = true,
         onDismiss = {
 

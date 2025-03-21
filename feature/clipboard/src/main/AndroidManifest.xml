@@ -3,7 +3,7 @@
 
     <application>
         <activity
-            android:name=".ClipboardActivity"
+            android:name=".ClipboardSaveActivity"
             android:exported="true"
             android:theme="@style/Theme.TransparentActivity">
             <!-- ✅ 공유 기능 (다른 앱에서 텍스트 공유 시 실행) -->

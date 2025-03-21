@@ -5,8 +5,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardDeleteUseCase
-import com.polaris.domin.usecase.clipboard.clipboard.UpdateClipboardPinStateUseCase
+import com.polaris.domin.usecase.clipboard.remote.clipboard.PostClipboardDeleteUseCase
+import com.polaris.domin.usecase.clipboard.remote.clipboard.UpdateClipboardPinStateUseCase
 import com.polaris.model.model.ClipboardItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

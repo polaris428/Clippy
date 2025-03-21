@@ -17,7 +17,9 @@ data class ClipboardFolderEntity(
     var timestamp: Long = System.currentTimeMillis(),
     var name: String = "",
     var owner: String = "",
+    var isShare:Boolean = false,
     var clipboardDateList: List<ClipboardItem> = emptyList()
+
 
     )
 
@@ -35,3 +37,17 @@ class ClipboardItemListConverter {
         return Gson().fromJson(value, type)
     }
 }
+
+fun ClipboardFolder.toEntity():ClipboardFolderEntity{
+    return ClipboardFolderEntity(id, timestamp, name, owner, isShare,clipboardDateList)
+
+}
+fun ClipboardFolderEntity.toModel():ClipboardFolder{
+    return ClipboardFolder(id, timestamp, name, owner, isShare,clipboardDateList)
+
+}
+
+fun List<ClipboardFolderEntity>.toModel(): List<ClipboardFolder> {
+    return this.map { it.toModel() }
+}
+

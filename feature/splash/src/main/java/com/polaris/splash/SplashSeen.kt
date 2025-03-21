@@ -28,38 +28,76 @@ import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSColumn
 import com.polaris.designsystem.ui.theme.Gray40
+import com.polaris.model.model.ClipboardFolder
+import com.polaris.model.model.User
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
 import com.polaris.splash.intent.SplashIntent
+import com.polaris.splash.state.SplashState
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashSeen(viewModel: MainViewModel, splashViewModel: SplashViewModel= hiltViewModel(), onSplashCompleted:()->Unit){
+fun SplashSeen(viewModel: SplashViewModel = hiltViewModel(), onSplashCompleted: (List<ClipboardFolder>) -> Unit) {
 
-    val clipboardItem =  viewModel.clipboardItem.collectAsState()
+    val state = viewModel.uiState.collectAsState()
+    when (state.value) {
+        is SplashState.Initialize -> {
 
-    if (PrefManager.folderIdList.isNotEmpty()){
-        viewModel.processIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList))
+            if (PrefManager.folderIdList.isNotEmpty()){
+                Log.e("poalris0428","들어오나")
+                viewModel.sendIntent(SplashIntent.getAllClipboardListIntent(PrefManager.folderIdList))
+                viewModel.sendIntent(SplashIntent.getLocalAllClipboardListIntent)
+            }else{
+                Log.e("poalris0428","들어오나1")
+                viewModel.updateUiState(SplashState.Complete)
+            }
+
+
+        }
+
+        is SplashState.Loading -> {
+
+        }
+
+        is SplashState.ApiSuccess -> {
+
+            viewModel.sendIntent(SplashIntent.postLocalFolderSyncUseCase)
+        }
+        is SplashState.Complete->{
+
+        }
+
+        is SplashState.Error -> {
+
+        }
+
     }
 
-    LaunchedEffect(clipboardItem.value) {
-        delay(2000) // 3초 딜레이
-        onSplashCompleted()
-    }
+    LaunchedEffect(state.value == SplashState.Complete) {
+        if (state.value == SplashState.Complete) {
 
+            delay(2000)
+            onSplashCompleted(viewModel.clipboardDataList.value)
+        }
+    }
     if (!PrefManager.userSignInSkip) {
         //splashViewModel.processIntent(SplashIntent.initPostFolder())
     }
     SplashView()
 
 }
+
 @Composable
 @Preview(showBackground = true)
-fun SplashView(){
-    CDSColumn(horizontalAlignment = Alignment.CenterHorizontally){
+fun SplashView() {
+    CDSColumn(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(Modifier.weight(1f)) {
-            Column(modifier = Modifier.fillMaxSize(1f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier.fillMaxSize(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_logo),
                     contentDescription = null,

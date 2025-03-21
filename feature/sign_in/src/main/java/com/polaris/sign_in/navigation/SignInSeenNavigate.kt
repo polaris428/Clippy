@@ -11,9 +11,7 @@ import com.polaris.util.GoogleSignInHelper
 
 
 fun NavController.navigateSignIn() {
-    navigate(SignInRoute.route){
-
-    }
+    navigate(SignInRoute.route)
 }
 
 fun NavGraphBuilder.signInNavGraph(

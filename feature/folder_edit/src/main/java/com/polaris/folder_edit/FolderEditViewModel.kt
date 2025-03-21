@@ -2,11 +2,11 @@ package com.polaris.folder_edit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polaris.domin.usecase.clipboard.clipboard.GetClipboardAllUseCase
-import com.polaris.domin.usecase.clipboard.clipboard.PostClipboardInsertUseCase
-import com.polaris.domin.usecase.clipboard.clipboard.PostDataMigrationUseCase
-import com.polaris.domin.usecase.clipboard.clipboard.UpdateClipboardUseCase
-import com.polaris.domin.usecase.clipboard.folder.PostFolderUseCase
+import com.polaris.domin.usecase.clipboard.remote.clipboard.GetClipboardAllUseCase
+import com.polaris.domin.usecase.clipboard.remote.clipboard.PostClipboardInsertUseCase
+import com.polaris.domin.usecase.clipboard.remote.clipboard.PostDataMigrationUseCase
+import com.polaris.domin.usecase.clipboard.remote.clipboard.UpdateClipboardUseCase
+import com.polaris.domin.usecase.clipboard.remote.folder.PostFolderUseCase
 import com.polaris.folder_edit.intent.FolderEditIntent
 import com.polaris.folder_edit.state.FolderEditState
 import com.polaris.model.model.ClipboardFolder

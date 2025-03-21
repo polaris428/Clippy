@@ -13,12 +13,12 @@ fun NavController.navigateClipboardEdit() {
 }
 
 fun NavGraphBuilder.clipboardEdit(
-    mainViewModel: MainViewModel,
+
     onSaveClick: (type: String, title: String) -> Unit = { _, _ -> },
 ) {
     composable(route = ClipboardEditRoute.route) {
 
-        ClipboardEditSeen(mainViewModel,onSaveClick = onSaveClick)
+       // ClipboardEditSeen(mainViewModel,onSaveClick = onSaveClick)
     }
 }
 object ClipboardEditRoute {

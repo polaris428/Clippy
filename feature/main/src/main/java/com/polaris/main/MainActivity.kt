@@ -6,6 +6,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -19,11 +23,14 @@ import com.polaris.folder_join.navigation.folderJoinNavGraph
 import com.polaris.folder_join.navigation.navigateFolderJoin
 import com.polaris.model.dto.UserDTO
 import com.polaris.model.model.ClipboardItem
+import com.polaris.model.model.User
 import com.polaris.shared.MainViewModel
 import com.polaris.shared.intent.MainIntent
+import com.polaris.shared.state.MainState
 import com.polaris.sign_in.intent.SignInIntent
 import com.polaris.sign_in.navigation.navigateSignIn
 import com.polaris.sign_in.navigation.signInNavGraph
+import com.polaris.sign_in.state.SignInState
 import com.polaris.splash.navigation.SplashRoute
 import com.polaris.splash.navigation.navigateSplash
 import com.polaris.splash.navigation.splashNavGraph
@@ -35,7 +42,7 @@ import java.util.UUID
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var googleSignInHelper: GoogleSignInHelper
-    private val viewModel: MainViewModel by viewModels()
+
 
     lateinit var navController: NavHostController
 
@@ -55,17 +62,54 @@ class MainActivity : ComponentActivity() {
         })
         //googleSignInHelper.googleSignOut()
 
+
+
         setContent {
-
             navController = rememberNavController()
+            val viewModel: MainViewModel by viewModels()
+            val state = viewModel.uiState.collectAsState()
+            val clipboardDataList by viewModel.clipboardDataList.collectAsState()
 
+
+            when (state.value) {
+                is MainState.Initialize -> {
+
+
+
+                }
+
+
+
+
+
+                is MainState.Error -> {
+                    Toast.makeText(LocalContext.current, "오류가 발생했어요", Toast.LENGTH_SHORT).show()
+
+                }
+                is MainState.Complete ->{
+
+//                    onSignIncomplete((state.value as SignInState.Complete).clipboardFolder)
+//                    viewModel.updateState(SignInState.Initialize)
+                }
+            }
+
+
+            LaunchedEffect(clipboardDataList) {
+
+                if (clipboardDataList.isNotEmpty()) {
+                    navController.navigateClipboardList()
+                }
+            }
 
             NavHost(navController = navController, startDestination = SplashRoute.route) {
-                splashNavGraph(viewModel, onSplashCompleted = {
+                splashNavGraph( onSplashCompleted = {
+                    viewModel.mainSetClipboardDataList(it)
+
                     if (PrefManager.userSignInSkip) {
 
-                        navController.navigateClipboardList()
+
                     } else {
+
                         navController.navigateSignIn()
                     }
 
@@ -81,7 +125,7 @@ class MainActivity : ComponentActivity() {
 
                     })
                 clipboardListNavGraph(
-                    viewModel.clipboardDataList,
+                    clipboardDataList,
                     onEditClick = { item: ClipboardItem ->
                         viewModel.updateClipboardItem(item)
                         navController.navigateClipboardEdit()
@@ -93,7 +137,7 @@ class MainActivity : ComponentActivity() {
                         navController.navigateFolderJoin()
                     })
 
-                clipboardEdit(mainViewModel = viewModel, onSaveClick = { type, title ->
+                clipboardEdit( onSaveClick = { type, title ->
                     updateClipDate(type, title)
                     saveClipboard()
                 })
@@ -113,14 +157,14 @@ class MainActivity : ComponentActivity() {
     }
 
     fun updateClipDate(type: String, title: String) {
-        viewModel.updateClipboardItem(type, title)
+       // viewModel.updateClipboardItem(type, title)
     }
 
 
     fun saveClipboard() {
 
-
-        viewModel.processIntent(MainIntent.updateClipboarIntent)
+        TODO("엑티비티 별로 분리 필요")
+       // viewModel.processIntent(MainIntent.updateClipboarIntent)
 
         navController.navigateClipboardList()
 

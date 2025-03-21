@@ -2,8 +2,8 @@ package com.polaris.folder_join
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polaris.domin.usecase.clipboard.folder.PostFolderUseCase
-import com.polaris.domin.usecase.clipboard.folder.PostJoinFolderUseCase
+import com.polaris.domin.usecase.clipboard.remote.folder.PostFolderUseCase
+import com.polaris.domin.usecase.clipboard.remote.folder.PostJoinFolderUseCase
 import com.polaris.folder_join.intent.FolderJoinIntent
 import com.polaris.folder_join.state.FolderJoinState
 import com.polaris.model.model.ClipboardFolder

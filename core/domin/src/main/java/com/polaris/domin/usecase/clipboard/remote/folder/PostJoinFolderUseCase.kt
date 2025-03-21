@@ -1,4 +1,4 @@
-package com.polaris.domin.usecase.clipboard.folder
+package com.polaris.domin.usecase.clipboard.remote.folder
 
 import com.polaris.domin.repository.LocalClipboardRepository
 import com.polaris.domin.repository.RemoteClipboardRepository
