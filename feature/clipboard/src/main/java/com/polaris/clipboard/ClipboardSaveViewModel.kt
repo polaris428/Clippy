@@ -125,6 +125,17 @@ class ClipboardSaveViewModel @Inject constructor(
         _clipboardItem.emit(clipboardItem) // value 대신 emit 사용
     }
 
+    fun updateClipboardItem(type: String, title: String) {
+        _clipboardItem.value.type = type
+        _clipboardItem.value.title = title
+        _clipboardItem.value.timestamp = System.currentTimeMillis()
+
+
+    }
+
+
+
+
 }
 
 

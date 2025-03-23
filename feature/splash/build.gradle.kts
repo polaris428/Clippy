@@ -39,7 +39,6 @@ android {
 
 dependencies {
     implementation(projects.core.model)
-    implementation(projects.feature.shared)
     implementation(projects.core.domin)
     implementation(projects.core.data)
     implementation(projects.core.designsystem)

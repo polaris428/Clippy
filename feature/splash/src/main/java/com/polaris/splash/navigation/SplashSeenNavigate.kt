@@ -5,7 +5,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.polaris.model.model.ClipboardFolder
-import com.polaris.shared.MainViewModel
 import com.polaris.splash.SplashSeen
 
 

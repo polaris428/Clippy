@@ -37,7 +37,6 @@ android {
 
 dependencies {
     implementation(projects.core.model)
-    implementation(projects.feature.shared)
     implementation(projects.core.domin)
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
@@ -46,7 +45,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation (libs.androidx.lifecycle.viewmodel.compose)
-
+    implementation (libs.converter.gson)
     //hilt
     implementation (libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)

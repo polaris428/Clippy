@@ -3,7 +3,7 @@
 
     <style name="Theme.Clippy" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name="Theme.TransparentActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.TransparentActivity" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>

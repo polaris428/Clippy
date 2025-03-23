@@ -1,8 +1,6 @@
 package com.polaris.splash
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,13 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.polaris.designsystem.R
-import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSColumn
-import com.polaris.designsystem.ui.theme.Gray40
 import com.polaris.model.model.ClipboardFolder
-import com.polaris.model.model.User
-import com.polaris.shared.MainViewModel
-import com.polaris.shared.intent.MainIntent
 import com.polaris.splash.intent.SplashIntent
 import com.polaris.splash.state.SplashState
 import com.polaris.util.PrefManager
@@ -45,11 +38,11 @@ fun SplashSeen(viewModel: SplashViewModel = hiltViewModel(), onSplashCompleted: 
         is SplashState.Initialize -> {
 
             if (PrefManager.folderIdList.isNotEmpty()){
-                Log.e("poalris0428","들어오나")
+
                 viewModel.sendIntent(SplashIntent.getAllClipboardListIntent(PrefManager.folderIdList))
                 viewModel.sendIntent(SplashIntent.getLocalAllClipboardListIntent)
             }else{
-                Log.e("poalris0428","들어오나1")
+
                 viewModel.updateUiState(SplashState.Complete)
             }
 

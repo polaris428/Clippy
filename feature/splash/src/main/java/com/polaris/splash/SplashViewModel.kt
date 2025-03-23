@@ -1,20 +1,15 @@
 package com.polaris.splash
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.domin.usecase.clipboard.local.folder.GetLocalClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.GetClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.remote.folder.PostFolderSyncUseCase
-import com.polaris.domin.usecase.clipboard.remote.folder.PostFolderUseCase
 import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
 
-import com.polaris.shared.intent.MainIntent
-import com.polaris.shared.state.MainState
 import com.polaris.splash.intent.SplashIntent
 import com.polaris.splash.state.SplashState
-import com.polaris.util.PrefManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,7 +18,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

@@ -109,27 +109,27 @@ fun CDSButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit = {}
 ) {
-    ClippyTheme {
-        Button(
-            onClick = onClick,
-            modifier = modifier
-                .fillMaxWidth(1f)
-                .padding(0.dp),
-            enabled = enabled,
-            shape = shape,
-            colors = colors,
-            elevation = elevation,
-            border = border,
-            contentPadding = contentPadding,
-            interactionSource = interactionSource
-        ) {
-            Text(
-                text = buttonText,
-                modifier = Modifier.padding(6.dp),
-                style = MaterialTheme.typography.labelLarge
-            )
-            content()
-        }
+
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth(1f)
+            .padding(0.dp),
+        enabled = enabled,
+        shape = shape,
+        colors = colors,
+        elevation = elevation,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource
+    ) {
+        Text(
+            text = buttonText,
+            modifier = Modifier.padding(6.dp),
+            style = MaterialTheme.typography.labelLarge
+        )
+        content()
+
     }
 
 }

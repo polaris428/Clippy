@@ -49,7 +49,7 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.designsystem)
     implementation(projects.core.util)
-    implementation(projects.feature.shared)
+
     implementation(projects.feature.signIn)
     implementation(projects.feature.splash)
     implementation(projects.feature.clipboard)

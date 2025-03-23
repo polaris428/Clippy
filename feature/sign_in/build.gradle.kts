@@ -55,7 +55,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.2.0") // 최신 Firebase 인증
     implementation ("androidx.credentials:credentials:1.3.0")
 
-    implementation(projects.feature.shared)
     implementation(projects.core.domin)
     implementation(projects.core.model)
     implementation(projects.core.data)

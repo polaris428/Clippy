@@ -4,8 +4,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.polaris.clipboard.ClipboardSeen
-import com.polaris.model.model.ClipboardItem
-import com.polaris.shared.MainViewModel
 
 
 fun NavController.navigateClipboard() {

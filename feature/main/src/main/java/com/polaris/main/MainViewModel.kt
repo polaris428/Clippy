@@ -1,19 +1,15 @@
-package com.polaris.shared
+package com.polaris.main
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polaris.domin.usecase.clipboard.local.folder.GetLocalClipboardAllUseCase
-import com.polaris.domin.usecase.clipboard.remote.clipboard.GetClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.PostClipboardInsertUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.PostDataMigrationUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.UpdateClipboardUseCase
 import com.polaris.domin.usecase.clipboard.remote.folder.PostFolderSyncUseCase
+import com.polaris.main.state.MainState
 import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
-import com.polaris.shared.intent.MainIntent
-import com.polaris.shared.state.MainState
-import com.polaris.util.PrefManager
 import com.polaris.util.toJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -90,24 +86,7 @@ class MainViewModel @Inject constructor(
         _clipboardItem.value = item
     }
 
-    fun updateClipboardItem(type: String, title: String) {
-        _clipboardItem.value.type = type
-        _clipboardItem.value.title = title
-        _clipboardItem.value.timestamp = System.currentTimeMillis()
 
-
-    }
-
-
-    fun updateClipboard(): Job = viewModelScope.launch {
-        updateClipboardUseCase.execute(clipboardItem = clipboardItem.value, onComplete = {})
-            .collect {
-
-                //    processIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList))
-            }
-
-
-    }
 
     fun postClipboardMigrationUseCase(clipboardList: List<ClipboardItem>): Job =
         viewModelScope.launch {

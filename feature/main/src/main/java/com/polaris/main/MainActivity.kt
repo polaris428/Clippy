@@ -1,7 +1,6 @@
 package com.polaris.main
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,23 +20,17 @@ import com.polaris.folder_edit.navigation.folderEditNavGraph
 import com.polaris.folder_edit.navigation.navigateFolderEdit
 import com.polaris.folder_join.navigation.folderJoinNavGraph
 import com.polaris.folder_join.navigation.navigateFolderJoin
-import com.polaris.model.dto.UserDTO
+import com.polaris.main.state.MainState
 import com.polaris.model.model.ClipboardItem
-import com.polaris.model.model.User
-import com.polaris.shared.MainViewModel
-import com.polaris.shared.intent.MainIntent
-import com.polaris.shared.state.MainState
-import com.polaris.sign_in.intent.SignInIntent
+
 import com.polaris.sign_in.navigation.navigateSignIn
 import com.polaris.sign_in.navigation.signInNavGraph
-import com.polaris.sign_in.state.SignInState
 import com.polaris.splash.navigation.SplashRoute
 import com.polaris.splash.navigation.navigateSplash
 import com.polaris.splash.navigation.splashNavGraph
 import com.polaris.util.GoogleSignInHelper
 import com.polaris.util.PrefManager
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.UUID
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -91,6 +84,8 @@ class MainActivity : ComponentActivity() {
 //                    onSignIncomplete((state.value as SignInState.Complete).clipboardFolder)
 //                    viewModel.updateState(SignInState.Initialize)
                 }
+
+                MainState.ClipBoardDateLoading -> TODO()
             }
 
 
@@ -128,7 +123,7 @@ class MainActivity : ComponentActivity() {
                     clipboardDataList,
                     onEditClick = { item: ClipboardItem ->
                         viewModel.updateClipboardItem(item)
-                        navController.navigateClipboardEdit()
+                        navController.navigateClipboardEdit(item)
 
                     }, onAddFolderClick = {
                         navController.navigateFolderEdit()
@@ -137,7 +132,8 @@ class MainActivity : ComponentActivity() {
                         navController.navigateFolderJoin()
                     })
 
-                clipboardEdit( onSaveClick = { type, title ->
+                clipboardEdit(
+                    onSaveClick = { type, title ->
                     updateClipDate(type, title)
                     saveClipboard()
                 })
