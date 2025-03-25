@@ -661,32 +661,3 @@ fun openUrl(context: Context, url: String?) {
     }
 }
 
-
-@Preview
-@Composable
-fun CheckpointCard() {
-    Box(modifier = Modifier.padding(16.dp)) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp),
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            Text(
-                text = "카드 내용",
-                modifier = Modifier.padding(16.dp),
-                fontSize = 18.sp
-            )
-        }
-
-        // 체크 포인트 (아이콘, 점 등)
-        Box(
-            modifier = Modifier
-                .offset(y = -7.dp, x = 0.dp) // 위치 조정
-                .size(24.dp)
-                .background(Color.Red, shape = CircleShape)
-        )
-    }
-}

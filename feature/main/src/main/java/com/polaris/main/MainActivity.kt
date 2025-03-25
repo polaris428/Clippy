@@ -43,51 +43,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-
-        googleSignInHelper = GoogleSignInHelper(activity = this, onSignInSuccess = { task ->
-            PrefManager.userSignInCheck = true
-            PrefManager.userUid = task.result.user!!.uid
-            //  viewModel.postClipboardMigrationUseCase(viewModel.clipboardDataList.value)
-
-
-        }, onSignInFailure = { exception ->
-            Toast.makeText(this, "로그인에 실패했어요, 잠시 후에 다시 시도해주세요", Toast.LENGTH_SHORT).show()
-        })
-        //googleSignInHelper.googleSignOut()
-
+        initGoogleSignInHelper()
 
 
         setContent {
-            navController = rememberNavController()
+
             val viewModel: MainViewModel by viewModels()
-            val state = viewModel.uiState.collectAsState()
             val clipboardDataList by viewModel.clipboardDataList.collectAsState()
 
-
-            when (state.value) {
-                is MainState.Initialize -> {
-
-
-
-                }
-
-
-
-
-
-                is MainState.Error -> {
-                    Toast.makeText(LocalContext.current, "오류가 발생했어요", Toast.LENGTH_SHORT).show()
-
-                }
-                is MainState.Complete ->{
-
-//                    onSignIncomplete((state.value as SignInState.Complete).clipboardFolder)
-//                    viewModel.updateState(SignInState.Initialize)
-                }
-
-                MainState.ClipBoardDateLoading -> TODO()
-            }
-
+            navController = rememberNavController()
 
             LaunchedEffect(clipboardDataList) {
 
@@ -97,15 +61,12 @@ class MainActivity : ComponentActivity() {
             }
 
             NavHost(navController = navController, startDestination = SplashRoute.route) {
-                splashNavGraph( onSplashCompleted = {
+                splashNavGraph(onSplashCompleted = {
                     viewModel.mainSetClipboardDataList(it)
 
-                    if (PrefManager.userSignInSkip) {
-
-
-                    } else {
-
+                    if (!PrefManager.userSignInSkip) {
                         navController.navigateSignIn()
+
                     }
 
                 }
@@ -134,9 +95,9 @@ class MainActivity : ComponentActivity() {
 
                 clipboardEdit(
                     onSaveClick = { type, title ->
-                    updateClipDate(type, title)
-                    saveClipboard()
-                })
+                        updateClipDate(type, title)
+                        saveClipboard()
+                    })
 
                 folderEditNavGraph(onPostFolderSuccess = {
                     navController.popBackStack()
@@ -152,15 +113,28 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun initGoogleSignInHelper() {
+        googleSignInHelper = GoogleSignInHelper(activity = this, onSignInSuccess = { task ->
+            PrefManager.userSignInCheck = true
+            PrefManager.userUid = task.result.user!!.uid
+
+
+
+        }, onSignInFailure = { exception ->
+            Toast.makeText(this, "로그인에 실패했어요, 잠시 후에 다시 시도해주세요", Toast.LENGTH_SHORT).show()
+        })
+
+    }
+
     fun updateClipDate(type: String, title: String) {
-       // viewModel.updateClipboardItem(type, title)
+        // viewModel.updateClipboardItem(type, title)
     }
 
 
     fun saveClipboard() {
 
         TODO("엑티비티 별로 분리 필요")
-       // viewModel.processIntent(MainIntent.updateClipboarIntent)
+        // viewModel.processIntent(MainIntent.updateClipboarIntent)
 
         navController.navigateClipboardList()
 

@@ -10,6 +10,8 @@ import com.polaris.domin.usecase.clipboard.remote.folder.PostFolderSyncUseCase
 import com.polaris.main.state.MainState
 import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
+import com.polaris.sign_in.intent.SignInIntent
+import com.polaris.sign_in.state.SignInState
 import com.polaris.util.toJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,8 +37,6 @@ class MainViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MainState>(MainState.Initialize)
-    val uiState: StateFlow<MainState> get() = _uiState
 
     private val _intent = MutableSharedFlow<MainIntent>()
     val intent: SharedFlow<MainIntent> = _intent.asSharedFlow()
@@ -47,13 +47,12 @@ class MainViewModel @Inject constructor(
     val clipboardDataList: StateFlow<List<ClipboardFolder>> = _clipboardDataList
 
 
-
-
-    fun updateUiState(signInState: MainState) {
-        viewModelScope.launch {
-            _uiState.emit(signInState)
-        }
+    init {
+        handleIntent()
     }
+
+
+
 
     fun sendIntent(intent: MainIntent) {
         viewModelScope.launch {
@@ -67,19 +66,23 @@ class MainViewModel @Inject constructor(
         Log.e("polaris",clipboardFolderList.toJson())
         _clipboardDataList.value = clipboardFolderList
     }
+    private fun handleIntent() {
+        viewModelScope.launch {
+            intent.collect { intent ->
+                when (intent) {
+                    is MainIntent.getAllClipboardListIntent ->{
 
 
-    fun postClipboardInsert(id: String): Job = viewModelScope.launch(Dispatchers.IO) {
+                    }
 
-
-        postClipboardInsertUseCase.execute(
-            folderId = id,
-            item = clipboardItem.value,
-        ).collect {
-
+                    else -> {}
+                }
+            }
         }
-
     }
+
+
+
 
 
     fun updateClipboardItem(item: ClipboardItem) {

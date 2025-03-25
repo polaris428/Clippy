@@ -25,7 +25,6 @@ fun NavGraphBuilder.clipboardListNavGraph(
     onJoinFolderClick:()->Unit
 ) {
     composable(route = ClipboardList.route) {
-        Log.e("poalris찐",clipboardItemList?.toJson()?:"dsadsf")
         ClipboardListSeen(clipboardItemList, onEditClick = onEditClick,onAddFolderClick =onAddFolderClick,onJoinFolderClick)
     }
 }
