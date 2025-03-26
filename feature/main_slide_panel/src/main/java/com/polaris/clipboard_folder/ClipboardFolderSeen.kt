@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSColumn
+import com.polaris.designsystem.ui.theme.Header
 import com.polaris.designsystem.ui.theme.LineView
 import com.polaris.model.model.ClipboardFolder
 import com.polaris.util.toJson
@@ -89,30 +90,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-
-@Composable
-fun Header() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_logo),
-            contentDescription = null,
-            modifier = Modifier.size(32.dp),
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            "Clippy",
-            fontSize = 35.sp,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-            color = Color(0xFF333333)
-        )
-    }
-}
 
 
 
@@ -213,7 +190,7 @@ fun SlidePanel(
                             animatedOffsetX.roundToInt(),
                             0
                         )
-                    } // ✅ 드래그 중 즉시 반응 + 드래그 종료 후 애니메이션 적용
+                    }
                     .fillMaxHeight()
                     .fillMaxWidth(0.7f)
                     .background(
@@ -234,9 +211,6 @@ fun SlidePanel(
 }
 
 
-/**
- * ✅ 패널 내부 버튼 UI
- */
 @Composable
 @Preview(showBackground = true)
 fun SlidePanelContent(
@@ -252,7 +226,7 @@ fun SlidePanelContent(
         Header()
 
         LazyColumn(
-            modifier = Modifier // LazyColumn은 가변 크기
+            modifier = Modifier
                 .fillMaxWidth()
         ) {
             items(folderList) { item ->
@@ -296,21 +270,4 @@ fun SlidePanelContent(
 
     }
 }
-
-
-/**
- * ✅ 패널 내 버튼 컴포넌트
- */
-@Composable
-fun PanelButton(clipboardFolder: ClipboardFolder, onClick: (String) -> Unit) {
-    TextButton(
-        onClick = { onClick(clipboardFolder.id) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-    ) {
-        Text(clipboardFolder.name)
-    }
-}
-
 

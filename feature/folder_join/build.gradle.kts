@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.polaris.folder_join"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 28
