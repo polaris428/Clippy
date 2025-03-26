@@ -10,6 +10,7 @@ import com.polaris.designsystem.ui.theme.dummyData
 import kotlinx.coroutines.launch
 import com.polaris.domin.usecase.clipboard.remote.clipboard.PostClipboardDeleteUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.UpdateClipboardPinStateUseCase
+import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,9 @@ class ClipboardListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ClipboardState())
     val uiState: StateFlow<ClipboardState> = _uiState.asStateFlow()
 
+    private var _folderList = MutableStateFlow< List<ClipboardFolder>>(emptyList())
+    var folderList: StateFlow<List<ClipboardFolder>> = _folderList
+
     fun  indexUpdate(index:Int){
         _index.value= index
     }
@@ -59,9 +63,8 @@ class ClipboardListViewModel @Inject constructor(
     fun processIntent(intent: ClipboardListIntent) {
         when (intent) {
             is ClipboardListIntent.LoadInitialFolders -> {
-                _uiState.update {
-                    it.copy(folders = intent.folders)
-                }
+                _folderList.value = intent.folders
+
             }
             is ClipboardListIntent.ItemClicked -> {
                 // URL 열기 등의 직접 동작은 UI에서 하고, 상태는 굳이 바꾸지 않음
@@ -75,17 +78,18 @@ class ClipboardListViewModel @Inject constructor(
             }
 
             is ClipboardListIntent.Delete -> {
+                postClipboardDelete(intent.timestamp)
                 _uiState.update {
-                    val updatedFolders = it.folders.toMutableList()
-                    val currentFolder = updatedFolders.getOrNull(it.currentIndex)
+                    val newFolders = folderList.value.toMutableList()
+                    val currentFolder = newFolders.getOrNull(it.currentIndex)
                     if (currentFolder != null) {
                         val newClipboards = currentFolder.clipboardDateList.filterNot { item ->
                             item.timestamp == intent.timestamp
                         }
-                        updatedFolders[it.currentIndex] = currentFolder.copy(clipboardDateList = newClipboards)
+                        newFolders[it.currentIndex] = currentFolder.copy(clipboardDateList = newClipboards)
                     }
+                    updatefolders(newFolders)
                     it.copy(
-                        folders = updatedFolders,
                         selectedItem = null,
                         isSheetOpen = false
                     )
@@ -93,23 +97,33 @@ class ClipboardListViewModel @Inject constructor(
             }
 
             is ClipboardListIntent.TogglePin -> {
-                _uiState.update {
-                    val updatedFolders = it.folders.toMutableList()
-                    val currentFolder = updatedFolders.getOrNull(it.currentIndex)
+                updateClipboardPinState(folderId = intent.folderId,itemId = intent.itemtId, pinState = intent.currentPin)
+                _uiState.update { currentState ->
+
+
+                    val newFolders = folderList.value.toMutableList()
+                    val currentFolder = newFolders.getOrNull(currentState.currentIndex)
                     if (currentFolder != null) {
+
                         val newClipboards = currentFolder.clipboardDateList.map { item ->
-                            if (item.timestamp == intent.timestamp)
+                            if (item.itemId == intent.itemtId)
                                 item.copy(isPinned = !intent.currentPin)
                             else item
                         }
-                        updatedFolders[it.currentIndex] = currentFolder.copy(clipboardDateList = newClipboards)
+
+                        newFolders[currentState.currentIndex] =
+                            currentFolder.copy(clipboardDateList = newClipboards)
                     }
-                    it.copy(folders = updatedFolders)
+                    updatefolders(newFolders)
+
+                    currentState.copy()
                 }
+
             }
 
             is ClipboardListIntent.IndexUpdate -> {
-                _uiState.update { it.copy(currentIndex = intent.index) }
+                val index =folderList.value.indexOfFirst { it.id == intent.index }
+                _uiState.update { it.copy(currentIndex = index) }
             }
 
             ClipboardListIntent.BottomSheetDismissed -> {
@@ -124,7 +138,9 @@ class ClipboardListViewModel @Inject constructor(
         }
     }
 
-
+    fun updatefolders(list:List<ClipboardFolder>){
+        _folderList.value= list
+    }
     fun clearSelectedClipboard(){
         _selectedClipboardItem.value = dummyData
     }
@@ -138,8 +154,8 @@ class ClipboardListViewModel @Inject constructor(
         })
     }
 
-    fun updateClipboardPinState(timestamp: Long, pinState: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-        updateClipboardPinStateUseCase.execute(timestamp = timestamp, pinState = !pinState) {
+    fun updateClipboardPinState(folderId:String,itemId: String, pinState: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        updateClipboardPinStateUseCase.execute(folderId =folderId ,itemId = itemId, pinState = !pinState) {
 
         }.collect({
 

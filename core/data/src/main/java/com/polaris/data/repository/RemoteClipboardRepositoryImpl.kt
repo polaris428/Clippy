@@ -12,6 +12,7 @@ import com.polaris.model.dto.ClipboardFolderDTO
 import com.polaris.model.dto.ClipboardItemDTO
 import com.polaris.model.response.ClipboardFolderResponse
 import com.polaris.util.PrefManager
+import com.polaris.util.toJson
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -46,7 +47,11 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     override suspend fun insert(folderId: String, item: ClipboardItemDTO): Flow<Boolean> {
         return try {
-            folderDatabase.child(folderId).child("clipboard_dateList").push().setValue(item).await()
+            val itemId = folderDatabase.push().key!!
+            item.itemId= itemId
+
+            itemId.toJson()
+            folderDatabase.child(folderId).child("clipboard_dateList").child(itemId).setValue(item).await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)
@@ -127,10 +132,9 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun updatePinStatus(itemId: Int, pinState: Boolean): Flow<Boolean> {
+    override suspend fun updatePinStatus(folderId: String,itemId: String, pinState: Boolean): Flow<Boolean> {
         return try {
-            folderDatabase.child(itemId.toString()).child("pinned")
-                .setValue(pinState).await()
+            folderDatabase.child(folderId).child("clipboard_dateList").child(itemId).child("pinned").setValue(pinState).await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)

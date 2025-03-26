@@ -13,7 +13,7 @@ data class ClipboardItemEntity(
     var type: String = "",  // "text" 또는 "url" 구분
     val url: String? = null,
     var title: String = "",
-    val folderId: Long = 0,
+    val itemId: String = "",
     val faviconUrl: String? = null,
     val isPinned: Boolean = false
 )
@@ -24,9 +24,9 @@ fun ClipboardItemEntity.toResponse(): ClipboardItemResponse {
         type = type,
         url = url,
         title = title,
-        folderId = folderId,
+        itemId = itemId,
         faviconUrl = faviconUrl,
-        isPinned = isPinned
+        pinned = isPinned
 
     )
 }
@@ -37,7 +37,7 @@ fun ClipboardItemDTO.toEntity(): ClipboardItemEntity {
         type = type,
         url = url,
         title = title,
-        folderId = folderId,
+        itemId = itemId,
         faviconUrl = faviconUrl,
         isPinned = isPinned
     )
@@ -50,7 +50,7 @@ fun ClipboardItem.toEntity(): ClipboardItemEntity {
         type = type,
         url = url,
         title = title,
-        folderId = folderId,
+        itemId = itemId,
         faviconUrl = faviconUrl,
         isPinned = isPinned
     )

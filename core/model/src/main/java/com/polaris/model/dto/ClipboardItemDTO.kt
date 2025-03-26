@@ -9,7 +9,7 @@ data class ClipboardItemDTO(
     var type: String = "",  // "text" 또는 "url" 구분
     val url: String? = null,
     var title: String = "",
-    val folderId: Long = 0,
+    var itemId: String = "",
     val faviconUrl: String? = null,
     val isPinned: Boolean = false
 )
@@ -21,7 +21,7 @@ fun ClipboardItem.toDTO():ClipboardItemDTO {
         type = type,
         url = url,
         title = title,
-        folderId = folderId,
+        itemId = itemId,
         faviconUrl = faviconUrl,
         isPinned = isPinned
     )

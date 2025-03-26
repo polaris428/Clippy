@@ -9,10 +9,10 @@ data class ClipboardFolderResponse(
     var name: String = "",
     var owner: String = "",
     var share:Boolean = false,
-    var clipboard_dateList: Map<String, ClipboardItem> = emptyMap()
+    var clipboard_dateList: Map<String, ClipboardItemResponse> = emptyMap()
 
 )
 
 fun ClipboardFolderResponse.toModel():ClipboardFolder{
-    return ClipboardFolder(clipboardDateList =  clipboard_dateList.values.toList(),id=id, name = name, owner = owner)
+    return ClipboardFolder(clipboardDateList =  clipboard_dateList.map { it.value.toModel() },id=id, name = name, owner = owner)
 }

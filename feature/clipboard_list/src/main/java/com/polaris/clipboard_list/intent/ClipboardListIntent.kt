@@ -9,8 +9,8 @@ sealed class ClipboardListIntent {
     data class ItemClicked(val item: ClipboardItem) : ClipboardListIntent()
     data class ItemLongPressed(val item: ClipboardItem) : ClipboardListIntent()
     data class Delete(val timestamp: Long) : ClipboardListIntent()
-    data class TogglePin(val timestamp: Long, val currentPin: Boolean) : ClipboardListIntent()
-    data class IndexUpdate(val index: Int) : ClipboardListIntent()
+    data class TogglePin(val folderId:String,val itemtId: String, val currentPin: Boolean) : ClipboardListIntent()
+    data class IndexUpdate(val index: String) : ClipboardListIntent()
     object BottomSheetDismissed : ClipboardListIntent()
 
     object ClearSelection : ClipboardListIntent()

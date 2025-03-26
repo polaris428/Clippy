@@ -1,5 +1,6 @@
 package com.polaris.clipboard_list
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
 import com.polaris.util.getTodayStartTimestamp
 import com.polaris.util.getYearMonth
+import com.polaris.util.toJson
 
 
 @Composable
@@ -59,8 +61,9 @@ fun ClipboardListSeen(
 
     val viewModel: ClipboardListViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val folderList = viewModel.folderList.collectAsState()
     LaunchedEffect(key1 = clipboardFolder) {
-        if (!clipboardFolder.isNullOrEmpty() && uiState.folders.isEmpty()) {
+        if (!clipboardFolder.isNullOrEmpty() && folderList.value.isEmpty()) {
             viewModel.processIntent(ClipboardListIntent.LoadInitialFolders(clipboardFolder))
         }
     }
@@ -69,6 +72,7 @@ fun ClipboardListSeen(
     }else{
         ClipboardListView(
             uiState = uiState,
+            clipboardFolderList=folderList.value,
             onIntent = viewModel::processIntent,
             onEditClick = { item -> onEditClick(item) },
             onAddFolderClick = { onAddFolderClick() },
@@ -86,7 +90,9 @@ fun ClipboardListSeen(
 
 @Composable
 fun ClipboardListView(
-    uiState: ClipboardState,
+    uiState:ClipboardState,
+    clipboardFolderList:List<ClipboardFolder>,
+
     onIntent: (ClipboardListIntent) -> Unit,
     onEditClick: (ClipboardItem) -> Unit,
     onAddFolderClick: () -> Unit,
@@ -98,15 +104,15 @@ fun ClipboardListView(
 
         panelContent = {
             SlidePanel(
-                folderList = uiState.folders,
-                onItemClick = { onIntent(ClipboardListIntent.IndexUpdate(it.toInt())) },
+                folderList = clipboardFolderList,
+                onItemClick = { onIntent(ClipboardListIntent.IndexUpdate(it)) },
                 onAddFolderClick = onAddFolderClick,
                 onJoinFolderClick = onJoinFolderClick
             )
         }
     ) {
         ClipboardListContent(
-            clipboardDateList = uiState.folders.getOrNull(uiState.currentIndex)?.clipboardDateList ?: listOf(),
+            clipboardDateList = clipboardFolderList.getOrNull(uiState.currentIndex)?.clipboardDateList ?: listOf(),
             selectedClipboardItem = uiState.selectedItem,
             onClick = { item ->
                 item.url?.let { openUrl(context, it) }
@@ -114,6 +120,7 @@ fun ClipboardListView(
             onLongPress = { onIntent(ClipboardListIntent.ItemLongPressed(it)) }
         )
     }
+
 
     CustomBottomSheet(
         isOpen = uiState.isSheetOpen,
@@ -124,7 +131,7 @@ fun ClipboardListView(
         onCopy = { item -> copyToClipboard(context, item.url ?: item.title) },
         onShare = { item -> shareText(context, item.url ?: item.title) },
         onDelete = { item -> onIntent(ClipboardListIntent.Delete(item.timestamp)) },
-        onPin = { item -> onIntent(ClipboardListIntent.TogglePin(item.timestamp, item.isPinned)) }
+        onPin = { item -> onIntent(ClipboardListIntent.TogglePin(  clipboardFolderList[uiState.currentIndex].id,item.itemId, item.isPinned)) }
     )
 }
 
@@ -145,7 +152,7 @@ fun ClipboardListContent(
     onLongPress: (ClipboardItem) -> Unit = {},
 ) {
     val todayStartTimestamp = getTodayStartTimestamp()
-
+    Log.e("polaris0428",clipboardDateList.toJson())
     val pinnedItems = clipboardDateList
         .filter { it.isPinned }
         .sortedByDescending { it.timestamp }
