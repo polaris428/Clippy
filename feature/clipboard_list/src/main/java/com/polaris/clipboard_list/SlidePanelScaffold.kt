@@ -41,59 +41,48 @@ fun SlidePanelScaffold(
 ) {
     val density = LocalDensity.current
     val panelWidthPx = with(density) { 300.dp.toPx() }
-    val rawDragOffset = remember { Animatable(-panelWidthPx) } // 초기 닫힘 상태
     var isPanelOpen by remember { mutableStateOf(false) }
+    var rawDragOffset by remember { mutableStateOf(if (isPanelOpen) 0f else -panelWidthPx.toFloat()) }
+
     val velocityTracker = remember { VelocityTracker() }
     var isDragging by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+
     val backgroundAlpha by animateFloatAsState(
         targetValue = if (isPanelOpen) 0.5f else 0f,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "backgroundAlpha"
     )
 
-    LaunchedEffect(isPanelOpen) {
-        coroutineScope.launch {
-            if (isPanelOpen) {
-                rawDragOffset.animateTo(
-                    targetValue = 0f,
-                    animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-                )
-            } else {
-                rawDragOffset.animateTo(
-                    targetValue = -panelWidthPx,
-                    animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-                )
-            }
-        }
-    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
+
+
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = {
                         velocityTracker.resetTracking()
-                        isDragging = true
+                        isDragging = true // ✅ 드래그 시작 시 즉시 반영
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()
-                        coroutineScope.launch {
-                            rawDragOffset.snapTo((rawDragOffset.value + dragAmount.x).coerceIn(-panelWidthPx, 0f))
-                        }
+                        rawDragOffset =
+                            (rawDragOffset + dragAmount.x).coerceIn(-panelWidthPx.toFloat(), 0f)
                         velocityTracker.addPosition(change.uptimeMillis, change.position)
+
                     },
                     onDragEnd = {
-                        isDragging = false
+                        isDragging = false // ✅ 드래그 종료 후 애니메이션 적용
                         val velocity = velocityTracker.calculateVelocity().x
                         val threshold = panelWidthPx / 2
 
-                        coroutineScope.launch {
-                            if (velocity > 1000 || rawDragOffset.value > -threshold) {
-                                isPanelOpen = true
-                            } else {
-                                isPanelOpen = false
-                            }
+                        rawDragOffset = if (velocity > 1000 || rawDragOffset > -threshold) {
+                            isPanelOpen = true
+                            0f
+                        } else {
+                            isPanelOpen = false
+                            -panelWidthPx.toFloat()
                         }
                     }
                 )
@@ -110,12 +99,7 @@ fun SlidePanelScaffold(
                         interactionSource = remember { MutableInteractionSource() },
                         onClick = {
                             isPanelOpen = false
-                            coroutineScope.launch {
-                                rawDragOffset.animateTo(
-                                    -panelWidthPx,
-                                    animationSpec = tween(300, easing = FastOutSlowInEasing)
-                                )
-                            }
+                            rawDragOffset = -panelWidthPx.toFloat()
                         }
                     )
                     .background(Color.Black.copy(alpha = backgroundAlpha))
@@ -126,7 +110,7 @@ fun SlidePanelScaffold(
             modifier = Modifier
                 .fillMaxHeight()
                 .width(panelWidth)
-                .offset { IntOffset(rawDragOffset.value.roundToInt(), 0) }
+                .offset { IntOffset(rawDragOffset.roundToInt(), 0) }
         ) {
             panelContent()
         }
