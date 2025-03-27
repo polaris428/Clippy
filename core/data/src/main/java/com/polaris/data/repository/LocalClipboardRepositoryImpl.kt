@@ -28,6 +28,9 @@ internal class LocalClipboardRepositoryImpl @Inject constructor(
        return flowOf( clipboardFolderDao.getAllFolders())
 
     }
+    override suspend fun getAllFolderNamesList():Flow<List<String>>{
+        return  flowOf(clipboardFolderDao.getAllFolderNames())
+    }
 
 
     override suspend fun delete(itemId: Long): Flow<Boolean> {

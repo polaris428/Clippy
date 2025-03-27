@@ -8,6 +8,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ripple.rememberRipple
@@ -582,6 +585,70 @@ fun Header() {
             fontSize = 35.sp,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
             color = Color(0xFF333333)
+        )
+    }
+}
+
+
+@Composable
+fun DynamicSegmentedButtons(
+    items: List<String>,
+    selectedIndex: Int,
+    onItemSelected: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(8.dp)
+    ) {
+        items.forEachIndexed { index, item ->
+            val isSelected = index == selectedIndex
+            Button(
+                onClick = { onItemSelected(index) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isSelected) Color(0xFF1976D2) else Color(0xFFE0E0E0),
+                    contentColor = if (isSelected) Color.White else Color.Black
+                ),
+                shape = RoundedCornerShape(
+                    topStart = if (index == 0) 12.dp else 0.dp,
+                    bottomStart = if (index == 0) 12.dp else 0.dp,
+                    topEnd = if (index == items.lastIndex) 12.dp else 0.dp,
+                    bottomEnd = if (index == items.lastIndex) 12.dp else 0.dp
+                ),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .height(40.dp)
+                    .wrapContentWidth()
+            ) {
+                Text(text = item)
+            }
+
+            // 버튼 사이에 Divider 대신 간격
+            if (index != items.lastIndex) {
+                Spacer(modifier = Modifier.width(2.dp))
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DynamicSegmentedButtonsPreview() {
+    var selectedIndex by remember { mutableStateOf(0) }
+    val options = listOf("Home", "Explore", "Profile", "Settings", "More")
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Selected: ${options[selectedIndex]}",
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        DynamicSegmentedButtons(
+            items = options,
+            selectedIndex = selectedIndex,
+            onItemSelected = { selectedIndex = it }
         )
     }
 }

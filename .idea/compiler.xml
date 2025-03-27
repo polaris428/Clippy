@@ -3,6 +3,7 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
       <module name="Clippy.feature.clipboard_folder" target="21" />
+      <module name="Clippy.feature.mylibrary" target="21" />
       <module name="Clippy.feature.shared" target="21" />
     </bytecodeTargetLevel>
   </component>

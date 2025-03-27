@@ -1,4 +1,4 @@
-package com.polaris.clipboard
+package com.polaris.main_save
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -15,27 +15,25 @@ import kotlin.system.exitProcess
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.polaris.clipboard.intent.ClipboardSaveIntent
 import com.polaris.clipboard.navigation.ClipboardRoute
 import com.polaris.clipboard.navigation.clipboardNavGraph
-import com.polaris.clipboard.state.ClipboardSaveState
 import com.polaris.clipboard_edit.navigation.clipboardEdit
 import com.polaris.clipboard_edit.navigation.navigateClipboardEdit
 import com.polaris.clipboard_save_animation.navigation.clipboardSaveAnimation
 import com.polaris.clipboard_save_animation.navigation.navigateClipboardSaveAnimation
+import com.polaris.main_save.state.ClipboardSaveState.*
 import com.polaris.model.model.ClipboardItem
 import com.polaris.util.PrefManager
 
 @AndroidEntryPoint
 class ClipboardSaveActivity : AppCompatActivity() {
-    private val viewModel: ClipboardSaveViewModel by viewModels()
+    private val viewModel: com.polaris.main_save.ClipboardSaveViewModel by viewModels()
     lateinit var navController : NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
         if (!sharedText.isNullOrEmpty()) {
-            viewModel.sendIntent(ClipboardSaveIntent.getUrlCrawlingInfo(sharedText))
 
 
         }
@@ -46,24 +44,25 @@ class ClipboardSaveActivity : AppCompatActivity() {
             navController = rememberNavController()
             val state = viewModel.uiState.collectAsState()
             val clipboardItem= viewModel.clipboardItem.collectAsState()
+            val folderNameList = viewModel.folderNameList.collectAsState()
 
             when (state.value) {
-                ClipboardSaveState.Initialize ->{
+                Initialize ->{
 
 
                 }
 
-                ClipboardSaveState.ClipboardCrawlingInfo -> {
+                ClipboardCrawlingInfo -> {
 
                 }
-                ClipboardSaveState.ClipboardSaveLoading -> {
+                ClipboardSaveLoading -> {
 
                 }
-                ClipboardSaveState.ClipboardSaveSuccess -> {
-                    navController.navigateClipboardSaveAnimation()
-                    Toast.makeText(this@ClipboardSaveActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+                ClipboardSaveSuccess -> {
+
+
                 }
-                ClipboardSaveState.ClipboardSaveFailure -> {
+                ClipboardSaveFailure -> {
 
                 }
 
@@ -72,13 +71,12 @@ class ClipboardSaveActivity : AppCompatActivity() {
 
             NavHost(navController = navController, startDestination = ClipboardRoute.route ) {
                 clipboardNavGraph(
-                    title =clipboardItem.value.title,
-                    siteName =clipboardItem.value.type,
-                    onSaveClick = {
-                        saveClipboard(clipboardItem.value)
-
-                    }, onEditClick = {
-                        navController.navigateClipboardEdit(clipboardItem.value)
+                    url = sharedText.toString(),
+                    onSaveSuccess ={
+                        navController.navigateClipboardSaveAnimation()
+                    },
+                    onEditClick = {
+                        navController.navigateClipboardEdit(it)
                     }, onDismiss = {
 
                     })
@@ -88,6 +86,7 @@ class ClipboardSaveActivity : AppCompatActivity() {
 
                 })
                 clipboardSaveAnimation(afterAnimation = {
+                    Toast.makeText(this@ClipboardSaveActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
                     finish()
                     exitProcess(0)  // 프로세스 종료
                 })
@@ -101,7 +100,7 @@ class ClipboardSaveActivity : AppCompatActivity() {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Shared Text", viewModel.clipboardItem.value.url)
         clipboard.setPrimaryClip(clip)
-        viewModel.sendIntent(ClipboardSaveIntent.postClipboarInsertIntent(PrefManager.folderIdList[0],ClipboardItem))
+        viewModel.sendIntent(com.polaris.main_save.intent.ClipboardSaveIntent.postClipboarInsertIntent(PrefManager.folderIdList[0],ClipboardItem))
 
 
 

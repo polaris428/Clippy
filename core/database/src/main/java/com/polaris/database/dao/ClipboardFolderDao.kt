@@ -14,7 +14,8 @@ interface ClipboardFolderDao {
 
     @Query("SELECT * FROM clipboard_folders ORDER BY timestamp DESC")
     fun getAllFolders(): List<ClipboardFolderEntity>
-
+    @Query("SELECT name FROM clipboard_folders ORDER BY timestamp DESC")
+    fun getAllFolderNames(): List<String>
     @Update
     suspend fun updateFolders(folder: List<ClipboardFolderEntity>)
 

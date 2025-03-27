@@ -1,11 +1,12 @@
-package com.polaris.clipboard
+package com.polaris.main_save
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.polaris.clipboard.intent.ClipboardSaveIntent
-import com.polaris.clipboard.state.ClipboardSaveState
+import com.polaris.domin.usecase.clipboard.local.folder.GetLocalClipboardFolderNameUseCase
 
 import com.polaris.domin.usecase.clipboard.remote.clipboard.PostClipboardInsertUseCase
+import com.polaris.main_save.intent.ClipboardSaveIntent
+import com.polaris.main_save.state.ClipboardSaveState
 import com.polaris.model.model.ClipboardItem
 import com.polaris.util.extractUrl
 import com.polaris.util.fetchWebTitle
@@ -30,6 +31,7 @@ class ClipboardSaveViewModel @Inject constructor(
 
 
     private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
+    private val getLocalClipboardFolderNameUseCase: GetLocalClipboardFolderNameUseCase,
 
 
     ) : ViewModel() {
@@ -43,7 +45,8 @@ class ClipboardSaveViewModel @Inject constructor(
     private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
     val clipboardItem: StateFlow<ClipboardItem> = _clipboardItem
 
-
+    private val _folderNameList = MutableStateFlow<List<String>>(listOf())
+    val folderNameList:StateFlow <List<String>> = _folderNameList
     init {
         handleIntent()
     }
@@ -65,10 +68,6 @@ class ClipboardSaveViewModel @Inject constructor(
             intent.collect { intent ->
                 when (intent) {
 
-                    is ClipboardSaveIntent.getUrlCrawlingInfo -> {
-                        updateUiState(ClipboardSaveState.ClipboardCrawlingInfo)
-                        getUrlCrawlingInfo(intent.url)
-                    }
 
                     is ClipboardSaveIntent.postClipboarInsertIntent -> {
                         updateUiState(ClipboardSaveState.ClipboardSaveLoading)
@@ -94,36 +93,7 @@ class ClipboardSaveViewModel @Inject constructor(
 
         }
 
-    fun getUrlCrawlingInfo(url: String): Job = viewModelScope.launch {
 
-        val clipboardItem = if (isUrl(url)) {
-            val urlPreprocessing = extractUrl(url)
-
-            // 비동기 처리 보장
-            val type = withContext(Dispatchers.IO) {
-                getWebTitle(urlPreprocessing)
-            }
-            val title = withContext(Dispatchers.IO) {
-                fetchWebTitle(urlPreprocessing)
-            }
-
-            ClipboardItem(
-                type = type,
-                url = urlPreprocessing,
-                title = title ?: "",
-                faviconUrl = getGoogleFaviconUrl(urlPreprocessing)
-            )
-        } else {
-            ClipboardItem(
-                type = "text",
-                url = null,
-                title = url,
-                faviconUrl = null
-            )
-        }
-
-        _clipboardItem.emit(clipboardItem) // value 대신 emit 사용
-    }
 
     fun updateClipboardItem(type: String, title: String) {
         _clipboardItem.value.type = type

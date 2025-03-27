@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.polaris.clipboard.ClipboardSeen
+import com.polaris.model.model.ClipboardItem
 
 
 fun NavController.navigateClipboard() {
@@ -13,14 +14,13 @@ fun NavController.navigateClipboard() {
 }
 
 fun NavGraphBuilder.clipboardNavGraph(
-    title: String,
-    siteName: String,
-    onSaveClick:()->Unit,
-    onEditClick:()->Unit,
+    url: String,
+    onSaveSuccess:()->Unit,
+    onEditClick:(item: ClipboardItem)->Unit,
     onDismiss : () ->Unit
 ) {
     composable(route = ClipboardRoute.route) {
-        ClipboardSeen(title,siteName,onSaveClick = onSaveClick,onEditClick = onEditClick , onDismiss = onDismiss)
+        ClipboardSeen(url,onSaveSuccess = onSaveSuccess,onEditClick = onEditClick , onDismiss = onDismiss)
     }
 }
 

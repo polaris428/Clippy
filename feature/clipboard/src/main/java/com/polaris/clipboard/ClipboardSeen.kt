@@ -1,6 +1,10 @@
 package com.polaris.clipboard
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity.CLIPBOARD_SERVICE
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
@@ -24,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,46 +38,74 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.polaris.clipboard.state.ClipboardState
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.CDSTransparentButton
 import com.polaris.designsystem.ui.theme.ClippyTheme
 import com.polaris.designsystem.ui.theme.textColorGray
+import com.polaris.model.model.ClipboardItem
+import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun ClipboardSeen(
-    title: String,
-    siteName: String,
-    onSaveClick:()->Unit = {},
-    onEditClick: () -> Unit = {},
+    url: String,
+    onSaveSuccess:() -> Unit = {},
+    onEditClick: (item: ClipboardItem) -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
+    val viewModel: ClipboardViewModel = hiltViewModel()
 
-    ClipboardView(title,siteName,onSaveClick,onEditClick, onDismiss)
+    val clipboardItem = viewModel.clipboardItem.collectAsState()
+
+    val uiState = viewModel.uiState.collectAsState()
+
+    when(uiState.value){
+        ClipboardState.Initialize -> {
+
+            viewModel.sendIntent(ClipboardIntent.getLocalClipboardFolderName)
+        }
+        ClipboardState.SiteCrawlingStart->{
+            viewModel.sendIntent(ClipboardIntent.getUrlCrawlingInfo(url))
+        }
+        ClipboardState.SiteCrawlingComplete->{
+
+        }
+        ClipboardState.ClipboardSaveSuccess -> {
+            onSaveSuccess()
+        }
+    }
+    ClipboardView(
+        clipboardItem.value,
+        onSaveClick = {
+            viewModel.sendIntent(ClipboardIntent.postClipboarInsertIntent)
+        },
+        onEditClick = onEditClick,
+        onDismiss = onDismiss
+    )
 }
 
 @Composable
 fun ClipboardView(
-    title: String,
-    siteName:String,
-    onSaveClick:() ->Unit,
-    onEditClick: () -> Unit,
+    clipboardItem: ClipboardItem,
+    onSaveClick: () -> Unit,
+    onEditClick: (item: ClipboardItem) -> Unit,
     onDismiss: () -> Unit
 ) {
 
 
-
-
     ClipboardSaveView(
-        title = title,
-        siteName =siteName,
+        clipboardItem,
         isAnimation = true,
         onDismiss = {
 
@@ -83,33 +116,32 @@ fun ClipboardView(
             onSaveClick()
 
 
-
         },
-        onEditClick  = onEditClick
+        onEditClick = onEditClick
     )
 
 
 }
 
 
-
-
 @Composable
 @Preview
 fun ClipboardSaveView(
-    title: String = "제목",
-    siteName: String = "사이트 제목",
+    clipboardItem: ClipboardItem = ClipboardItem(),
     onDismiss: () -> Unit = {},
     onConfirm: () -> Unit = {},
-    onEditClick:()-> Unit ={},
+    onEditClick: (item: ClipboardItem) -> Unit = {},
     isAnimation: Boolean = false
 ) {
+    Log.e("polaris 제목","asdfsfsafa")
     var isVisible by remember { mutableStateOf(isAnimation) }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
 
         if (isAnimation) isVisible = false
     }
+
 
     ClippyTheme {
         Box(
@@ -157,7 +189,7 @@ fun ClipboardSaveView(
                             color = textColorGray
                         )
                         Text(
-                            text = title,
+                            text = clipboardItem.title,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -169,18 +201,21 @@ fun ClipboardSaveView(
                             color = textColorGray,
                         )
                         Text(
-                            text = siteName,
+                            text = clipboardItem.type,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Spacer(modifier = Modifier.height(32.dp))
                         CDSButton(buttonText = "저장 하기", onClick = {
+                            saveClipboard(context = context, clipboardItem = clipboardItem)
                             onConfirm()
                             onDismiss()
                         })
                         Spacer(modifier = Modifier.height(12.dp))
-                        CDSTransparentButton(buttonText = "편집", onClick = onEditClick)
+                        CDSTransparentButton(
+                            buttonText = "편집",
+                            onClick = { onEditClick(clipboardItem) })
                     }
                 }
             }
@@ -230,4 +265,15 @@ fun ClipboardSaveViewTest(
             }
         }
     }
+}
+
+
+fun saveClipboard(context: Context, clipboardItem: ClipboardItem) {
+    val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Shared Text", clipboardItem.url)
+    clipboard.setPrimaryClip(clip)
+
+
+
+
 }

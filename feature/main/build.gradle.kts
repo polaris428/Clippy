@@ -58,6 +58,7 @@ dependencies {
     implementation(projects.feature.clipboardEdit)
     implementation(projects.feature.folderEdit)
     implementation(projects.feature.folderJoin)
+    implementation(projects.feature.mainSave)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
