@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -35,12 +36,17 @@ import kotlin.math.roundToInt
 @Composable
 fun SlidePanelScaffold(
     modifier: Modifier = Modifier,
-    panelWidth: Dp = 300.dp,
     panelContent: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
+
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val panelWidth = screenWidth * 0.7f
+
+
     val density = LocalDensity.current
-    val panelWidthPx = with(density) { 300.dp.toPx() }
+    val panelWidthPx = with(density) { panelWidth.toPx() }
     var isPanelOpen by remember { mutableStateOf(false) }
     var rawDragOffset by remember { mutableStateOf(if (isPanelOpen) 0f else -panelWidthPx.toFloat()) }
 

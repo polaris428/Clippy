@@ -38,6 +38,7 @@ import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
@@ -604,11 +605,16 @@ fun DynamicSegmentedButtons(
     ) {
         items.forEachIndexed { index, item ->
             val isSelected = index == selectedIndex
-            Button(
+
+            OutlinedButton(
                 onClick = { onItemSelected(index) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSelected) Color(0xFF1976D2) else Color(0xFFE0E0E0),
-                    contentColor = if (isSelected) Color.White else Color.Black
+                border = BorderStroke(
+                    width = 2.dp,
+                    color = if (isSelected) PrimaryColor else Gray60
+                ),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = if (isSelected) Gray10 else Gray60
                 ),
                 shape = RoundedCornerShape(
                     topStart = if (index == 0) 12.dp else 0.dp,
@@ -624,7 +630,6 @@ fun DynamicSegmentedButtons(
                 Text(text = item)
             }
 
-            // 버튼 사이에 Divider 대신 간격
             if (index != items.lastIndex) {
                 Spacer(modifier = Modifier.width(2.dp))
             }

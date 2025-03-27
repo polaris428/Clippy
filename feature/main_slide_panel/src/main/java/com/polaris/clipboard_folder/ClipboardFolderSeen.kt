@@ -192,10 +192,9 @@ fun SlidePanel(
                         )
                     }
                     .fillMaxHeight()
-                    .fillMaxWidth(0.7f)
                     .background(
                         Color.White,
-                        shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+                        shape = RoundedCornerShape(topEnd = 16.dp)
                     )
                     .padding(16.dp),
                 onItemClick = onItemClick,
