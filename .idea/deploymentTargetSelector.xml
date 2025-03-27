@@ -22,6 +22,9 @@
       <SelectionState runConfigName="feature.feature_url_list">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="DynamicSegmentedButtonsPreview">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

@@ -78,7 +78,8 @@ class ClipboardSaveActivity : AppCompatActivity() {
                     onEditClick = {
                         navController.navigateClipboardEdit(it)
                     }, onDismiss = {
-
+                        finish()
+                        exitProcess(0)  // 프로세스 종료
                     })
                 clipboardEdit( onSaveClick = { type, title ->
                     viewModel.updateClipboardItem(type = type , title= title)
