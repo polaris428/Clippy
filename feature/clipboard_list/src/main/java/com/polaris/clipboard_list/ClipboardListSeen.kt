@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,31 +69,28 @@ fun ClipboardListSeen(
             viewModel.processIntent(ClipboardListIntent.LoadInitialFolders(clipboardFolder))
         }
     }
-    if (clipboardFolder.isNullOrEmpty()){
+    if (clipboardFolder.isNullOrEmpty()) {
         EmptyListView()
-    }else{
+    } else {
         ClipboardListView(
             uiState = uiState,
-            clipboardFolderList=folderList.value,
+            clipboardFolderList = folderList.value,
             onIntent = viewModel::processIntent,
             onEditClick = { item -> onEditClick(item) },
             onAddFolderClick = { onAddFolderClick() },
-            onJoinFolderClick = {onJoinFolderClick()}
+            onJoinFolderClick = { onJoinFolderClick() }
         )
 
     }
 
 
-
 }
-
-
 
 
 @Composable
 fun ClipboardListView(
-    uiState:ClipboardState,
-    clipboardFolderList:List<ClipboardFolder>,
+    uiState: ClipboardState,
+    clipboardFolderList: List<ClipboardFolder>,
 
     onIntent: (ClipboardListIntent) -> Unit,
     onEditClick: (ClipboardItem) -> Unit,
@@ -99,20 +98,25 @@ fun ClipboardListView(
     onJoinFolderClick: () -> Unit
 ) {
     val context = LocalContext.current
-
+    val (isPanelOpen, setPanelOpen) = remember { mutableStateOf(false) }
     SlidePanelScaffold(
-
+        isPanelOpen = isPanelOpen,
+        onPanelStateChange = setPanelOpen,
         panelContent = {
             SlidePanel(
                 folderList = clipboardFolderList,
-                onItemClick = { onIntent(ClipboardListIntent.IndexUpdate(it)) },
+                onItemClick = {
+                    setPanelOpen(false)
+                    onIntent(ClipboardListIntent.IndexUpdate(it))
+                },
                 onAddFolderClick = onAddFolderClick,
                 onJoinFolderClick = onJoinFolderClick
             )
         }
     ) {
         ClipboardListContent(
-            clipboardDateList = clipboardFolderList.getOrNull(uiState.currentIndex)?.clipboardDateList ?: listOf(),
+            clipboardDateList = clipboardFolderList.getOrNull(uiState.currentIndex)?.clipboardDateList
+                ?: listOf(),
             selectedClipboardItem = uiState.selectedItem,
             onClick = { item ->
                 item.url?.let { openUrl(context, it) }
@@ -131,14 +135,22 @@ fun ClipboardListView(
         onCopy = { item -> copyToClipboard(context, item.url ?: item.title) },
         onShare = { item -> shareText(context, item.url ?: item.title) },
         onDelete = { item -> onIntent(ClipboardListIntent.Delete(item.timestamp)) },
-        onPin = { item -> onIntent(ClipboardListIntent.TogglePin(  clipboardFolderList[uiState.currentIndex].id,item.itemId, item.isPinned)) }
+        onPin = { item ->
+            onIntent(
+                ClipboardListIntent.TogglePin(
+                    clipboardFolderList[uiState.currentIndex].id,
+                    item.itemId,
+                    item.isPinned
+                )
+            )
+        }
     )
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun ClipboardViewPreView(){
+fun ClipboardViewPreView() {
     ClipboardListContent(listOf(dummyData))
 }
 
@@ -152,7 +164,7 @@ fun ClipboardListContent(
     onLongPress: (ClipboardItem) -> Unit = {},
 ) {
     val todayStartTimestamp = getTodayStartTimestamp()
-    Log.e("polaris0428",clipboardDateList.toJson())
+    Log.e("polaris0428", clipboardDateList.toJson())
     val pinnedItems = clipboardDateList
         .filter { it.isPinned }
         .sortedByDescending { it.timestamp }
@@ -221,7 +233,6 @@ fun SectionHeader(title: String) {
 }
 
 
-
 @Composable
 fun ClipboardCardList(
     items: List<ClipboardItem>,
@@ -249,8 +260,6 @@ fun ClipboardCardList(
 }
 
 
-
-
 @Composable
 @Preview(showBackground = true)
 fun EmptyListView() {
@@ -265,10 +274,6 @@ fun EmptyListView() {
 }
 
 
-
-
-
-
 @Preview(showBackground = true)
 @Composable
 fun preView() {
@@ -277,8 +282,6 @@ fun preView() {
         selectedClipboardItem = dummyData,
         onLongPress = {})
 }
-
-
 
 
 @Preview

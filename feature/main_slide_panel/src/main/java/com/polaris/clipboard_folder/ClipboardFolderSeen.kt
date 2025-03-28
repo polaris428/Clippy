@@ -140,7 +140,7 @@ fun folderItem(
             modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "0", style = MaterialTheme.typography.bodyLarge)
+            Text(text = clipboardFolder.clipboardDateList.size.toString(), style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.width(8.dp))
             Image(
                 modifier = Modifier.size(12.dp),

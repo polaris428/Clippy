@@ -36,6 +36,8 @@ import kotlin.math.roundToInt
 @Composable
 fun SlidePanelScaffold(
     modifier: Modifier = Modifier,
+    isPanelOpen: Boolean,
+    onPanelStateChange: (Boolean) -> Unit,
     panelContent: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -47,7 +49,7 @@ fun SlidePanelScaffold(
 
     val density = LocalDensity.current
     val panelWidthPx = with(density) { panelWidth.toPx() }
-    var isPanelOpen by remember { mutableStateOf(false) }
+
     var rawDragOffset by remember { mutableStateOf(if (isPanelOpen) 0f else -panelWidthPx.toFloat()) }
 
     val velocityTracker = remember { VelocityTracker() }
@@ -58,7 +60,13 @@ fun SlidePanelScaffold(
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "backgroundAlpha"
     )
-
+    LaunchedEffect(isPanelOpen) {
+        rawDragOffset = if (isPanelOpen) {
+            0f
+        } else {
+            -panelWidthPx
+        }
+    }
 
     Box(
         modifier = modifier
@@ -84,10 +92,10 @@ fun SlidePanelScaffold(
                         val threshold = panelWidthPx / 2
 
                         rawDragOffset = if (velocity > 1000 || rawDragOffset > -threshold) {
-                            isPanelOpen = true
+                            onPanelStateChange(true)
                             0f
                         } else {
-                            isPanelOpen = false
+                            onPanelStateChange(false)
                             -panelWidthPx.toFloat()
                         }
                     }
@@ -104,7 +112,8 @@ fun SlidePanelScaffold(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
                         onClick = {
-                            isPanelOpen = false
+                            onPanelStateChange(false)
+
                             rawDragOffset = -panelWidthPx.toFloat()
                         }
                     )
