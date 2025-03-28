@@ -1,6 +1,7 @@
 package com.polaris.clipboard_edit
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,21 +15,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.polaris.designsystem.R
 import com.polaris.designsystem.ui.theme.CDSButton
 import com.polaris.designsystem.ui.theme.CDSTextField
+import com.polaris.designsystem.ui.theme.ClippyTheme
 import com.polaris.model.model.ClipboardItem
 
 @Composable
 fun ClipboardEditSeen(clipboardFolder: ClipboardItem, onSaveClick: (type: String, title: String) -> Unit = { _, _ -> }) {
+    ClippyTheme {
+        ClipboardEditView(
+            clipboardItem = clipboardFolder,
+            onSaveClick = { type, title -> onSaveClick(type, title) }
+        )
+    }
 
-    ClipboardEditView(
-        clipboardItem = clipboardFolder,
-        onSaveClick = { type, title -> onSaveClick(type, title) }
-    )
 }
 
 @Composable
@@ -42,6 +47,7 @@ fun ClipboardEditView(
 
     Column(
         Modifier
+            .background(Color.White)
             .fillMaxSize()
             .systemBarsPadding()
 
