@@ -35,13 +35,13 @@ abstract class ClipboardFolderDatabase: RoomDatabase(){
 
     companion object {
         @Volatile
-        private var INSTANCE: ClipboardDatabase? = null
+        private var INSTANCE: ClipboardFolderDatabase? = null
 
-        fun getDatabase(context: Context): ClipboardDatabase {
+        fun getDatabase(context: Context): ClipboardFolderDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    ClipboardDatabase::class.java,
+                    ClipboardFolderDatabase::class.java,
                     "clipboard_folders_database"
                 ) .fallbackToDestructiveMigration().build()
                 INSTANCE = instance

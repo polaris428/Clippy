@@ -5,6 +5,7 @@ import com.polaris.database.dao.ClipboardDao
 import com.polaris.database.dao.ClipboardFolderDao
 import com.polaris.database.model.ClipboardFolderEntity
 import com.polaris.database.model.ClipboardItemEntity
+import com.polaris.database.model.FolderInfoEntity
 import com.polaris.database.model.toResponse
 import com.polaris.domin.repository.LocalClipboardRepository
 import com.polaris.model.response.ClipboardFolderResponse
@@ -28,7 +29,7 @@ internal class LocalClipboardRepositoryImpl @Inject constructor(
        return flowOf( clipboardFolderDao.getAllFolders())
 
     }
-    override suspend fun getAllFolderNamesList():Flow<List<String>>{
+    override suspend fun getAllFolderNamesList():Flow<List<FolderInfoEntity>>{
         return  flowOf(clipboardFolderDao.getAllFolderNames())
     }
 

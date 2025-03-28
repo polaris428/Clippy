@@ -28,11 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ClipboardSaveViewModel @Inject constructor(
-
-
     private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
-    private val getLocalClipboardFolderNameUseCase: GetLocalClipboardFolderNameUseCase,
-
 
     ) : ViewModel() {
 

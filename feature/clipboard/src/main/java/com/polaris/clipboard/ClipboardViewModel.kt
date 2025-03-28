@@ -7,6 +7,7 @@ import com.polaris.clipboard.state.ClipboardState
 import com.polaris.domin.usecase.clipboard.local.folder.GetLocalClipboardFolderNameUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.PostClipboardInsertUseCase
 import com.polaris.model.model.ClipboardItem
+import com.polaris.model.model.FolderInfo
 import com.polaris.util.extractUrl
 import com.polaris.util.fetchWebTitle
 import com.polaris.util.getGoogleFaviconUrl
@@ -35,11 +36,10 @@ class ClipboardViewModel @Inject constructor(
     private val _clipboardItem = MutableStateFlow<ClipboardItem>(ClipboardItem())
     val clipboardItem: StateFlow<ClipboardItem> = _clipboardItem
 
-    private val _selectFolderId = MutableStateFlow<String>("")
-    val selectFolderId: StateFlow<String> = _selectFolderId
 
-    private val _folderNameList = MutableStateFlow<List<String>>(listOf())
-    val folderNameList: StateFlow<List<String>> = _folderNameList
+
+    private val _folderNameList = MutableStateFlow<List<FolderInfo>>(listOf())
+    val folderNameList: StateFlow<List<FolderInfo>> = _folderNameList
 
     private val _intent = MutableSharedFlow<ClipboardIntent>()
     private val intent: SharedFlow<ClipboardIntent> = _intent.asSharedFlow()
@@ -76,7 +76,7 @@ class ClipboardViewModel @Inject constructor(
                     }
 
                     is ClipboardIntent.postClipboarInsertIntent -> {
-                        postClipboardInsert(clipboardItem = clipboardItem.value , id = selectFolderId.value)
+                        postClipboardInsert(clipboardItem = clipboardItem.value , id = intent.folderInfo.id)
                     }
                 }
             }

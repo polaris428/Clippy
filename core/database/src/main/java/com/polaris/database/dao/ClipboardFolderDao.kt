@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.polaris.database.model.ClipboardFolderEntity
+import com.polaris.database.model.FolderInfoEntity
 
 
 @Dao
@@ -14,8 +15,8 @@ interface ClipboardFolderDao {
 
     @Query("SELECT * FROM clipboard_folders ORDER BY timestamp DESC")
     fun getAllFolders(): List<ClipboardFolderEntity>
-    @Query("SELECT name FROM clipboard_folders ORDER BY timestamp DESC")
-    fun getAllFolderNames(): List<String>
+    @Query("SELECT id, name FROM clipboard_folders ORDER BY timestamp DESC")
+    fun getAllFolderNames(): List<FolderInfoEntity>
     @Update
     suspend fun updateFolders(folder: List<ClipboardFolderEntity>)
 

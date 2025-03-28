@@ -592,16 +592,17 @@ fun Header() {
 
 
 @Composable
-fun DynamicSegmentedButtons(
+fun CDSSegmentedButtons(
     items: List<String>,
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit
 ) {
+    onItemSelected(selectedIndex)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
-            .padding(8.dp)
+
     ) {
         items.forEachIndexed { index, item ->
             val isSelected = index == selectedIndex
@@ -617,12 +618,12 @@ fun DynamicSegmentedButtons(
                     contentColor = if (isSelected) Gray10 else Gray60
                 ),
                 shape = RoundedCornerShape(
-                    topStart = if (index == 0) 12.dp else 0.dp,
-                    bottomStart = if (index == 0) 12.dp else 0.dp,
-                    topEnd = if (index == items.lastIndex) 12.dp else 0.dp,
-                    bottomEnd = if (index == items.lastIndex) 12.dp else 0.dp
+                    topStart = if (index == 0) 8.dp else 0.dp,
+                    bottomStart = if (index == 0) 8.dp else 0.dp,
+                    topEnd = if (index == items.lastIndex) 8.dp else 0.dp,
+                    bottomEnd = if (index == items.lastIndex) 8.dp else 0.dp
                 ),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                 modifier = Modifier
                     .height(40.dp)
                     .wrapContentWidth()
@@ -650,7 +651,7 @@ fun DynamicSegmentedButtonsPreview() {
             style = MaterialTheme.typography.bodyLarge
         )
 
-        DynamicSegmentedButtons(
+        CDSSegmentedButtons(
             items = options,
             selectedIndex = selectedIndex,
             onItemSelected = { selectedIndex = it }

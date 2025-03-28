@@ -1,5 +1,6 @@
 package com.polaris.splash
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polaris.domin.usecase.clipboard.local.folder.GetLocalClipboardAllUseCase
@@ -10,6 +11,7 @@ import com.polaris.model.model.ClipboardItem
 
 import com.polaris.splash.intent.SplashIntent
 import com.polaris.splash.state.SplashState
+import com.polaris.util.toJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -42,7 +44,7 @@ class SplashViewModel @Inject constructor(
     val clipboardDataList: StateFlow<List<ClipboardFolder>> = _clipboardDataList
 
     private val _localClipboardDataList = MutableStateFlow<List<ClipboardFolder>>(listOf())
-    val localClipboardDataList: StateFlow<List<ClipboardFolder>> = _clipboardDataList
+    val localClipboardDataList: StateFlow<List<ClipboardFolder>> = _localClipboardDataList
 
     private val _remoteApiComplete = MutableStateFlow<Boolean>(false)
     val remoteApiComplete: StateFlow<Boolean> = _remoteApiComplete

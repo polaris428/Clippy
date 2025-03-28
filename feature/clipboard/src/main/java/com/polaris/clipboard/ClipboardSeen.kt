@@ -47,11 +47,13 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.polaris.clipboard.state.ClipboardState
 import com.polaris.designsystem.ui.theme.CDSButton
+import com.polaris.designsystem.ui.theme.CDSSegmentedButtons
 import com.polaris.designsystem.ui.theme.CDSTextField
 import com.polaris.designsystem.ui.theme.CDSTransparentButton
 import com.polaris.designsystem.ui.theme.ClippyTheme
 import com.polaris.designsystem.ui.theme.textColorGray
 import com.polaris.model.model.ClipboardItem
+import com.polaris.model.model.FolderInfo
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,35 +62,39 @@ import kotlinx.coroutines.launch
 @Composable
 fun ClipboardSeen(
     url: String,
-    onSaveSuccess:() -> Unit = {},
+    onSaveSuccess: () -> Unit = {},
     onEditClick: (item: ClipboardItem) -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
     val viewModel: ClipboardViewModel = hiltViewModel()
 
     val clipboardItem = viewModel.clipboardItem.collectAsState()
-
+    val folderNameList = viewModel.folderNameList.collectAsState()
     val uiState = viewModel.uiState.collectAsState()
 
-    when(uiState.value){
+    when (uiState.value) {
         ClipboardState.Initialize -> {
 
             viewModel.sendIntent(ClipboardIntent.getLocalClipboardFolderName)
         }
-        ClipboardState.SiteCrawlingStart->{
+
+        ClipboardState.SiteCrawlingStart -> {
             viewModel.sendIntent(ClipboardIntent.getUrlCrawlingInfo(url))
         }
-        ClipboardState.SiteCrawlingComplete->{
+
+        ClipboardState.SiteCrawlingComplete -> {
 
         }
+
         ClipboardState.ClipboardSaveSuccess -> {
             onSaveSuccess()
         }
     }
     ClipboardView(
         clipboardItem.value,
+        nameList = folderNameList.value,
         onSaveClick = {
-            viewModel.sendIntent(ClipboardIntent.postClipboarInsertIntent)
+            viewModel.sendIntent(ClipboardIntent.postClipboarInsertIntent(it))
         },
         onEditClick = onEditClick,
         onDismiss = onDismiss
@@ -98,7 +104,8 @@ fun ClipboardSeen(
 @Composable
 fun ClipboardView(
     clipboardItem: ClipboardItem,
-    onSaveClick: () -> Unit,
+    nameList: List<FolderInfo>,
+    onSaveClick: (FolderInfo) -> Unit,
     onEditClick: (item: ClipboardItem) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -106,6 +113,7 @@ fun ClipboardView(
 
     ClipboardSaveView(
         clipboardItem,
+        nameList,
         isAnimation = true,
         onDismiss = {
 
@@ -113,7 +121,7 @@ fun ClipboardView(
 
         },
         onConfirm = {
-            onSaveClick()
+            onSaveClick(it)
 
 
         },
@@ -128,15 +136,20 @@ fun ClipboardView(
 @Preview
 fun ClipboardSaveView(
     clipboardItem: ClipboardItem = ClipboardItem(),
+    nameList: List<FolderInfo> = listOf(),
     onDismiss: () -> Unit = {},
-    onConfirm: () -> Unit = {},
+    onConfirm: (FolderInfo) -> Unit = {},
     onEditClick: (item: ClipboardItem) -> Unit = {},
     isAnimation: Boolean = false
 ) {
-    Log.e("polaris 제목","asdfsfsafa")
+    Log.e("polaris 제목", "asdfsfsafa")
     var isVisible by remember { mutableStateOf(isAnimation) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    var selectedIndex by remember { mutableStateOf(0) }
+    val title = if (clipboardItem.title.isBlank()) "사이트 정보 수집중..." else clipboardItem.title
+    val siteName = if (clipboardItem.type.isBlank()) "사이트 정보 수집중..." else clipboardItem.type
+    var folder = FolderInfo()
     LaunchedEffect(Unit) {
 
         if (isAnimation) isVisible = false
@@ -189,7 +202,7 @@ fun ClipboardSaveView(
                             color = textColorGray
                         )
                         Text(
-                            text = clipboardItem.title,
+                            text = title,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -201,16 +214,27 @@ fun ClipboardSaveView(
                             color = textColorGray,
                         )
                         Text(
-                            text = clipboardItem.type,
+                            text = siteName,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "폴더 선택",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = textColorGray,
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        CDSSegmentedButtons(nameList.map { it.name }, selectedIndex, {
+                            selectedIndex = it
+                            folder =  nameList[it]
+                        })
                         Spacer(modifier = Modifier.height(32.dp))
                         CDSButton(buttonText = "저장 하기", onClick = {
                             saveClipboard(context = context, clipboardItem = clipboardItem)
-                            onConfirm()
-                            onDismiss()
+                            onConfirm(folder)
+
                         })
                         Spacer(modifier = Modifier.height(12.dp))
                         CDSTransparentButton(
@@ -224,56 +248,10 @@ fun ClipboardSaveView(
 }
 
 
-@Composable
-@Preview(showBackground = true)
-fun ClipboardSaveViewTest(
-    title: String = "",
-    siteName: String = "",
-    onDismiss: () -> Unit = {},
-    onConfirm: () -> Unit = {}
-) {
-
-    var url by remember { mutableStateOf(TextFieldValue(title)) }
-    var siteNameState by remember { mutableStateOf(TextFieldValue(siteName)) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Column(Modifier.padding(horizontal = 20.dp)) {
-            Text(text = "클리피가 링크를 잘 저장할께요!")
-
-            CDSTextField(
-                label = "URL",
-                value = url.text,
-                onValueChange = { url = url.copy(text = it) },
-                onFocusChange = {
-                    Log.e("FocusChanged", "URL 입력란에 포커스됨")
-                    //  viewModel.expandView()  // ✅ ViewModel의 상태를 변경
-                }
-            )
-
-            CDSTextField(
-                label = "사이트 이름",
-                value = siteNameState.text,
-                onValueChange = { siteNameState = siteNameState.copy(text = it) }
-            )
-
-            CDSButton(buttonText = "저장하기") {
-                // viewModel.collapseView() // ✅ 저장 버튼 누르면 축소되도록 설정
-            }
-        }
-    }
-}
-
-
 fun saveClipboard(context: Context, clipboardItem: ClipboardItem) {
     val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("Shared Text", clipboardItem.url)
     clipboard.setPrimaryClip(clip)
-
-
 
 
 }

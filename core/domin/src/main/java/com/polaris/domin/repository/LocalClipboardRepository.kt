@@ -4,6 +4,7 @@ package com.polaris.domin.repository
 
 import com.polaris.database.model.ClipboardFolderEntity
 import com.polaris.database.model.ClipboardItemEntity
+import com.polaris.database.model.FolderInfoEntity
 import com.polaris.model.dto.ClipboardFolderDTO
 import com.polaris.model.dto.ClipboardItemDTO
 import com.polaris.model.response.ClipboardFolderResponse
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface LocalClipboardRepository {
     suspend fun insert(item: ClipboardItemEntity) : Flow<Boolean>
     suspend fun getAll():Flow<List<ClipboardFolderEntity>>
-    suspend fun getAllFolderNamesList():Flow<List<String>>
+    suspend fun getAllFolderNamesList():Flow<List<FolderInfoEntity>>
 
     suspend fun delete(timestamp: Long) :Flow<Boolean>
     suspend fun updatePinStatus(timestamp: Long,pinState:Boolean) :Flow<Boolean>
