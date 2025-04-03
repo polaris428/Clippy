@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -197,7 +198,7 @@ fun ClipboardListContent(
 
     val todayItems = otherItems.filter { it.timestamp >= todayStartTimestamp }
     val previousItems = otherItems.filter { it.timestamp < todayStartTimestamp }
-    val groupedByMonth = previousItems.groupBy { getYearMonth(it.timestamp) }
+    val groupedByMonth = previousItems.groupBy {  stringResource(R.string.month_format,getYearMonth(it.timestamp)) }
 
     Column(
         modifier = Modifier

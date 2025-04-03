@@ -49,6 +49,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -116,14 +117,15 @@ fun SignInSeen(
                     user = User(
                         id = PrefManager.userUid,
                         folderList = arrayListOf()
-                    )
+                    ),
+                    folderName = stringResource(R.string.base_folder_name)
                 )
             )
 
         }
 
         is SignInState.Error -> {
-            Toast.makeText(LocalContext.current, "오류가 발생했어요", Toast.LENGTH_SHORT).show()
+            Toast.makeText(LocalContext.current, stringResource(R.string.error), Toast.LENGTH_SHORT).show()
 
         }
         is SignInState.Complete ->{
@@ -184,13 +186,13 @@ fun SignInView(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    "Clippy",
+                    stringResource(R.string.title),
                     fontSize = 35.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF333333)
                 )
                 Text(
-                    "복사 그 이상, 더 스마트한 클립보드.",
+                    stringResource(R.string.catchphrase),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF333333)
                 )
@@ -203,22 +205,21 @@ fun SignInView(
                 indication = null // 클릭 효과 제거
             ) {
                 onSignInAnonymouslyClick()
-                //onSignIncomplete()
+
             },
-            text = "로그인 없이 계속하기",
+            text = stringResource(R.string.guest_login),
             style = MaterialTheme.typography.bodyMedium,
             color = Gray40
         )
         Spacer(modifier = Modifier.height(12.dp))
-        CDSButton(buttonText = "로그인 하기", onClick = {
+        CDSButton(buttonText = stringResource(R.string.log_in), onClick = {
             onSignInClick()
-            // onSignIncomplete()
+
         })
     }
 }
 
 
-fun initGoogleSignIn(){}
 
 
 

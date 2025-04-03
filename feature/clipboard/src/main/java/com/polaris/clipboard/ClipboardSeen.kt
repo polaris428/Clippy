@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,7 +58,7 @@ import com.polaris.model.model.FolderInfo
 import com.polaris.util.PrefManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import com.polaris.designsystem.R
 
 @Composable
 fun ClipboardSeen(
@@ -142,13 +143,13 @@ fun ClipboardSaveView(
     onEditClick: (item: ClipboardItem) -> Unit = {},
     isAnimation: Boolean = false
 ) {
-    Log.e("polaris 제목", "asdfsfsafa")
+
     var isVisible by remember { mutableStateOf(isAnimation) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     var selectedIndex by remember { mutableStateOf(0) }
-    val title = if (clipboardItem.title.isBlank()) "사이트 정보 수집중..." else clipboardItem.title
-    val siteName = if (clipboardItem.type.isBlank()) "사이트 정보 수집중..." else clipboardItem.type
+    val title = if (clipboardItem.title.isBlank()) stringResource(R.string.site_crawling_message) else clipboardItem.title
+    val siteName = if (clipboardItem.type.isBlank())  stringResource(R.string.site_crawling_message)  else clipboardItem.type
     var folder = FolderInfo()
     LaunchedEffect(Unit) {
 
@@ -192,12 +193,12 @@ fun ClipboardSaveView(
                 ) {
                     Column(Modifier.padding(20.dp)) {
                         Text(
-                            text = "클리피가 링크를 저장할께요!",
+                            text = stringResource(R.string.clipboard_data_save_message),
                             style = MaterialTheme.typography.headlineMedium
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "링크 제목",
+                            text = stringResource(R.string.link_title),
                             style = MaterialTheme.typography.bodySmall,
                             color = textColorGray
                         )
@@ -209,7 +210,7 @@ fun ClipboardSaveView(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "사이트 제목",
+                            text = stringResource(R.string.site_title),
                             style = MaterialTheme.typography.bodySmall,
                             color = textColorGray,
                         )
@@ -221,7 +222,7 @@ fun ClipboardSaveView(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "폴더 선택",
+                            text = stringResource(R.string.select_folder),
                             style = MaterialTheme.typography.bodySmall,
                             color = textColorGray,
                         )
@@ -231,14 +232,14 @@ fun ClipboardSaveView(
                             folder =  nameList[it]
                         })
                         Spacer(modifier = Modifier.height(32.dp))
-                        CDSButton(buttonText = "저장 하기", onClick = {
+                        CDSButton(buttonText = stringResource(R.string.clipboard_data_save), onClick = {
                             saveClipboard(context = context, clipboardItem = clipboardItem)
                             onConfirm(folder)
 
                         })
                         Spacer(modifier = Modifier.height(12.dp))
                         CDSTransparentButton(
-                            buttonText = "편집",
+                            buttonText = stringResource(R.string.clipboard_data_edit),
                             onClick = { onEditClick(clipboardItem) })
                     }
                 }

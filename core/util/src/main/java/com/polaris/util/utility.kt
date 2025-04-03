@@ -92,7 +92,7 @@ fun extractMainDomainUrl(url: String): String {
     return mainDomain?.let { "https://$it/" } ?: url
 }
 fun convertTimestampToMonthDay(timestamp: Long): String {
-    val formatter = DateTimeFormatter.ofPattern("MM.dd") // "M월 d일" 로 바꾸려면 "M월 d일" 사용
+    val formatter = DateTimeFormatter.ofPattern("MM.dd")
     val instant = Instant.ofEpochMilli(timestamp)
     val localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDate()
     return formatter.format(localDateTime)
@@ -106,11 +106,11 @@ fun getTodayStartTimestamp(): Long {
     return calendar.timeInMillis
 }
 
-fun getYearMonth(timestamp: Long): String {
+fun getYearMonth(timestamp: Long): Int {
     val calendar = Calendar.getInstance().apply {
         timeInMillis = timestamp
     }
     //val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH는 0부터 시작
-    return "${month}월"
+    return month
 }

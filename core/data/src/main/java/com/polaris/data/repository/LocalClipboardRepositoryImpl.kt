@@ -20,7 +20,6 @@ internal class LocalClipboardRepositoryImpl @Inject constructor(
     private val clipboardFolderDao: ClipboardFolderDao
 ) : LocalClipboardRepository {
     override suspend fun insert(item: ClipboardItemEntity): Flow<Boolean> {
-        Log.e("polaris428", "저장")
         clipboardDao.insertClipboardItem(item)
         return flowOf(true)
     }

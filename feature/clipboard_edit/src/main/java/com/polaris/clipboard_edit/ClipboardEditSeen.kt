@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.polaris.designsystem.R
@@ -60,11 +61,11 @@ fun ClipboardEditView(
                 modifier = Modifier.size(40.dp),
             )
             Spacer(modifier = Modifier.height(8.dp))
-            CDSTextField(label = "사이트 설명", value = type, onValueChange = { type = it })
+            CDSTextField(label = stringResource(R.string.site_explanation), value = type, onValueChange = { type = it })
             Spacer(modifier = Modifier.height(8.dp))
-            CDSTextField(label = "사이트 제목", value = title, onValueChange = { title = it })
+            CDSTextField(label = stringResource(R.string.site_title), value = title, onValueChange = { title = it })
         }
         Spacer(modifier = Modifier.weight(1f))
-        CDSButton(buttonText = "저장하기", onClick = { onSaveClick(type, title) })
+        CDSButton(buttonText = stringResource(R.string.clipboard_data_save), onClick = { onSaveClick(type, title) })
     }
 }

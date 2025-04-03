@@ -1,1 +1,25 @@
-<resources></resources>
+<resources>
+    <string name="app_name">Clippy</string>
+    <string name="title">Clippy</string>
+
+    <string name="month_format">%1$d월</string>
+    <string name="catchphrase">복사 그 이상, 더 스마트한 클립보드</string>
+    <string name="guest_login">로그인 없이 계속하기</string>
+    <string name="log_in">복사 그 이상, 더 스마트한 클립보드</string>
+    <string name="error">오류가 발생했어요</string>
+
+    <string name="add_folder">폴더 추가하기</string>
+    <string name="base_folder_name">기본 폴더 추가하기</string>
+
+    <string name="link_title">링크 제목</string>
+    <string name="site_title">사이트 제목</string>
+    <string name="site_explanation">사이트 설명</string>
+    <string name="select_folder">폴더 선택</string>
+    <string name="clipboard_data_save">저장 하기</string>
+    <string name="clipboard_data_save_message">클리피가 링크를 저장할께요!</string>
+    <string name="clipboard_data_edit">편집</string>
+
+    <string name="site_crawling_message">사이트 정보 수집중…</string>
+
+
+</resources>

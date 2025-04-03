@@ -65,9 +65,9 @@ class SignInViewModel @Inject constructor(
         viewModelScope.launch {
             intent.collect { intent ->
                 when (intent) {
-                    is SignInIntent.PostUserInfoIntent -> postUserInfo(intent.user)
+                    is SignInIntent.PostUserInfoIntent -> postUserInfo(intent.user,intent.folderName)
                     is SignInIntent.GetCheckIfUserExists -> getCheckIfUserExists(intent.uid)
-                    is SignInIntent.PostInitFolderIntent -> postBaseFolder()
+                    is SignInIntent.PostInitFolderIntent -> postBaseFolder(intent.folderName)
                     is SignInIntent.PostInitClipboardData -> initClipboardDate(intent.folderId)
                     is SignInIntent.GetClipboardData -> getClipboardFolder()
 
@@ -77,8 +77,8 @@ class SignInViewModel @Inject constructor(
     }
 
 
-    fun postBaseFolder() = viewModelScope.launch {
-        val initFolder = ClipboardFolder(owner = PrefManager.userUid, name = "기본 폴더")
+    fun postBaseFolder(folderName:String) = viewModelScope.launch {
+        val initFolder = ClipboardFolder(owner = PrefManager.userUid, name = folderName)
 
         postFolderUseCase.execute( initFolder).collect {
             if (it){
@@ -92,11 +92,11 @@ class SignInViewModel @Inject constructor(
 
     }
 
-    fun postUserInfo(user: User) = viewModelScope.launch {
+    fun postUserInfo(user: User,folderName:String) = viewModelScope.launch {
 
         postUserInfoUseCase.execute(user).collect {
             if (it){
-                sendIntent(SignInIntent.PostInitFolderIntent)
+                sendIntent(SignInIntent.PostInitFolderIntent(folderName))
             }else{
                 updateState(SignInState.Error(""))
             }

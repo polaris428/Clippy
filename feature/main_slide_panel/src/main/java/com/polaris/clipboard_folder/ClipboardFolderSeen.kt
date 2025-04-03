@@ -71,6 +71,7 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -97,7 +98,7 @@ import kotlin.math.roundToInt
 @Composable
 @Preview(showBackground = true)
 fun folderItem(
-    clipboardFolder: ClipboardFolder = ClipboardFolder(name = "기본 폴더"),
+    clipboardFolder: ClipboardFolder = ClipboardFolder(name = stringResource(R.string.base_folder_name)),
     onClick: (String) -> Unit = {}
 ) {
     Row(
@@ -234,15 +235,15 @@ fun SlidePanelContent(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            folderItem(clipboardFolder = ClipboardFolder(id = "0", name = "고정됨"))
-            folderItem(clipboardFolder = ClipboardFolder(id = "-1", name = "최근 삭제됨"))
-        }
+        //TODO 추후 고정된것과 최근 삭제 된것을 볼 수 있도록 개발
+//        Card(
+//            modifier = Modifier.fillMaxWidth(),
+//            shape = RoundedCornerShape(12.dp),
+//            colors = CardDefaults.cardColors(containerColor = Color.White)
+//        ) {
+//            folderItem(clipboardFolder = ClipboardFolder(id = "0", name = "고정됨"))
+//            folderItem(clipboardFolder = ClipboardFolder(id = "-1", name = "최근 삭제됨"))
+//        }
 
         // 📌 여기에 Spacer(weight=1f)를 추가하여 아래 여백을 만듦!
         Spacer(modifier = Modifier.weight(1f))
@@ -257,7 +258,7 @@ fun SlidePanelContent(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "폴더 추가하기",
+                stringResource(R.string.add_folder),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onAddFolderClick() }

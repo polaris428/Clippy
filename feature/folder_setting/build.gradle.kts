@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.polaris.folder_setting"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 28
