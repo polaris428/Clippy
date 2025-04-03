@@ -47,7 +47,8 @@ include(":core:model")
 
 include(":feature:clipboard_shared_list")
 include(":feature:main_slide_panel")
-include(":core:init_date")
+
 include(":core:database")
 include(":feature:folder_join")
 include(":feature:main_save")
+include(":feature:folder_setting")

@@ -1,5 +1,6 @@
 package com.polaris.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -91,12 +92,22 @@ class MainActivity : ComponentActivity() {
                     },
                     onJoinFolderClick = {
                         navController.navigateFolderJoin()
+                    },
+                    onSettingClick = {
+
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"  // 공유할 데이터 타입
+                            putExtra(Intent.EXTRA_TEXT,"폴더를 참가하기를 통해 ID를 입력해주세요" + it.id)  // 실제 공유할 내용
+                        }
+
+                        val chooser = Intent.createChooser(shareIntent, "앱을 선택해주세요")  // 시스템 바텀 시트(공유 패널) 생성
+                        startActivity(chooser)
                     })
 
                 clipboardEdit(
                     onSaveClick = { type, title ->
                         updateClipDate(type, title)
-                        saveClipboard()
+                        navController.navigateClipboardList()
                     })
 
                 folderEditNavGraph(onPostFolderSuccess = {

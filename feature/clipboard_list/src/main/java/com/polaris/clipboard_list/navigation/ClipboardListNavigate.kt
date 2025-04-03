@@ -22,10 +22,11 @@ fun NavGraphBuilder.clipboardListNavGraph(
     clipboardItemList:List<ClipboardFolder>?,
     onEditClick:(item: ClipboardItem)->Unit,
     onAddFolderClick :()->Unit,
-    onJoinFolderClick:()->Unit
+    onJoinFolderClick:()->Unit,
+    onSettingClick:(ClipboardFolder) -> Unit
 ) {
     composable(route = ClipboardList.route) {
-        ClipboardListSeen(clipboardItemList, onEditClick = onEditClick,onAddFolderClick =onAddFolderClick,onJoinFolderClick)
+        ClipboardListSeen(clipboardItemList, onEditClick = onEditClick,onAddFolderClick =onAddFolderClick,onJoinFolderClick,onSettingClick)
     }
 }
 object ClipboardList {

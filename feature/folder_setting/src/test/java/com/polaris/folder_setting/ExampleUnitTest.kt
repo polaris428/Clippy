@@ -1,4 +1,4 @@
-package com.polaris.init_data
+package com.polaris.folder_setting
 
 import org.junit.Test
 

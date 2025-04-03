@@ -2,19 +2,27 @@ package com.polaris.clipboard_list
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +59,7 @@ import com.polaris.model.model.ClipboardItem
 import com.polaris.util.getTodayStartTimestamp
 import com.polaris.util.getYearMonth
 import com.polaris.util.toJson
+import okhttp3.internal.http2.Header
 
 
 @Composable
@@ -58,30 +67,29 @@ fun ClipboardListSeen(
     clipboardFolder: List<ClipboardFolder>? = null,
     onEditClick: (item: ClipboardItem) -> Unit,
     onAddFolderClick: () -> Unit,
-    onJoinFolderClick: () -> Unit
+    onJoinFolderClick: () -> Unit,
+    onShareClick: (ClipboardFolder) -> Unit
 ) {
 
     val viewModel: ClipboardListViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val folderList = viewModel.folderList.collectAsState()
+    val currentList = folderList.value.getOrNull(uiState.currentIndex)
     LaunchedEffect(key1 = clipboardFolder) {
         if (!clipboardFolder.isNullOrEmpty() && folderList.value.isEmpty()) {
             viewModel.processIntent(ClipboardListIntent.LoadInitialFolders(clipboardFolder))
         }
     }
-    if (clipboardFolder.isNullOrEmpty()) {
-        EmptyListView()
-    } else {
-        ClipboardListView(
-            uiState = uiState,
-            clipboardFolderList = folderList.value,
-            onIntent = viewModel::processIntent,
-            onEditClick = { item -> onEditClick(item) },
-            onAddFolderClick = { onAddFolderClick() },
-            onJoinFolderClick = { onJoinFolderClick() }
-        )
 
-    }
+    ClipboardListView(
+        uiState = uiState,
+        clipboardFolderList = folderList.value,
+        onShareClick = { item -> onShareClick(item) },
+        onIntent = viewModel::processIntent,
+        onEditClick = { item -> onEditClick(item) },
+        onAddFolderClick = { onAddFolderClick() },
+        onJoinFolderClick = { onJoinFolderClick() }
+    )
 
 
 }
@@ -91,7 +99,7 @@ fun ClipboardListSeen(
 fun ClipboardListView(
     uiState: ClipboardState,
     clipboardFolderList: List<ClipboardFolder>,
-
+    onShareClick: (ClipboardFolder) -> Unit,
     onIntent: (ClipboardListIntent) -> Unit,
     onEditClick: (ClipboardItem) -> Unit,
     onAddFolderClick: () -> Unit,
@@ -99,6 +107,7 @@ fun ClipboardListView(
 ) {
     val context = LocalContext.current
     val (isPanelOpen, setPanelOpen) = remember { mutableStateOf(false) }
+    val currentList = clipboardFolderList.getOrNull(uiState.currentIndex)
     SlidePanelScaffold(
         isPanelOpen = isPanelOpen,
         onPanelStateChange = setPanelOpen,
@@ -114,15 +123,25 @@ fun ClipboardListView(
             )
         }
     ) {
-        ClipboardListContent(
-            clipboardDateList = clipboardFolderList.getOrNull(uiState.currentIndex)?.clipboardDateList
-                ?: listOf(),
-            selectedClipboardItem = uiState.selectedItem,
-            onClick = { item ->
-                item.url?.let { openUrl(context, it) }
-            },
-            onLongPress = { onIntent(ClipboardListIntent.ItemLongPressed(it)) }
-        )
+        if (currentList?.clipboardDateList.isNullOrEmpty()) {
+            EmptyListView(
+                isShare = currentList?.isShare ?: true,
+                onHamburgerBarClick = { setPanelOpen(true) },
+                onShareClick = { onShareClick(currentList ?: ClipboardFolder()) })
+        } else {
+            ClipboardListContent(
+                clipboardDateList = currentList?.clipboardDateList ?: listOf(),
+                onShareClick = { onShareClick(currentList ?: ClipboardFolder()) },
+                isShare = currentList?.isShare ?: true,
+                selectedClipboardItem = uiState.selectedItem,
+                onHamburgerBarClick = { setPanelOpen(true) },
+                onItemClick = { item ->
+                    item.url?.let { openUrl(context, it) }
+                },
+                onItemLongPress = { onIntent(ClipboardListIntent.ItemLongPressed(it)) }
+            )
+        }
+
     }
 
 
@@ -159,9 +178,12 @@ fun ClipboardViewPreView() {
 fun ClipboardListContent(
     clipboardDateList: List<ClipboardItem>,
     selectedClipboardItem: ClipboardItem? = null,
+    isShare: Boolean = true,
     clickable: Boolean = true,
-    onClick: (ClipboardItem) -> Unit = {},
-    onLongPress: (ClipboardItem) -> Unit = {},
+    onShareClick: () -> Unit = {},
+    onHamburgerBarClick: () -> Unit = {},
+    onItemClick: (ClipboardItem) -> Unit = {},
+    onItemLongPress: (ClipboardItem) -> Unit = {},
 ) {
     val todayStartTimestamp = getTodayStartTimestamp()
     Log.e("polaris0428", clipboardDateList.toJson())
@@ -183,7 +205,10 @@ fun ClipboardListContent(
             .verticalScroll(rememberScrollState())
             .padding(20.dp)
     ) {
-        Header()
+
+
+        HeaderView(isShare, onHamburgerBarClick, onShareClick)
+
 
         if (pinnedItems.isNotEmpty()) {
             SectionHeader("Pinned")
@@ -191,8 +216,8 @@ fun ClipboardListContent(
                 items = pinnedItems,
                 selectedItem = selectedClipboardItem,
                 clickable = clickable,
-                onClick = onClick,
-                onLongPress = onLongPress
+                onClick = onItemClick,
+                onLongPress = onItemLongPress
             )
         }
 
@@ -202,8 +227,8 @@ fun ClipboardListContent(
                 items = todayItems,
                 selectedItem = selectedClipboardItem,
                 clickable = clickable,
-                onClick = onClick,
-                onLongPress = onLongPress
+                onClick = onItemClick,
+                onLongPress = onItemLongPress
             )
         }
 
@@ -213,13 +238,71 @@ fun ClipboardListContent(
                 items = items,
                 selectedItem = selectedClipboardItem,
                 clickable = clickable,
-                onClick = onClick,
-                onLongPress = onLongPress
+                onClick = onItemClick,
+                onLongPress = onItemLongPress
+            )
+        }
+    }
+
+}
+
+@Composable
+fun HeaderView(
+    isShare: Boolean,
+    onHamburgerBarClick: () -> Unit = {},
+    onShareClick: () -> Unit = {}
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+    ) {
+        // 햄버거 아이콘
+        Image(
+            painter = painterResource(id = R.drawable.ic_hamburger_bar),
+            contentDescription = "메뉴",
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 16.dp)
+                .size(24.dp)
+                .offset(y = (-1).dp) // 살짝 위로 올림 (핵심!)
+                .clickable { onHamburgerBarClick() }
+        )
+        Row(
+            modifier = Modifier.align(Alignment.Center),
+            verticalAlignment = Alignment.CenterVertically
+
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_logo),
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                "Clippy",
+                fontSize = 35.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                color = Color(0xFF333333)
+            )
+        }
+        // 가운데 Header
+
+        // 공유 아이콘
+        if (isShare) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_share),
+                contentDescription = "공유",
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.dp)
+                    .size(24.dp)
+                    .offset(y = (-1).dp) // 위로 약간 올려서 정렬 맞춤
+                    .clickable { onShareClick() }
             )
         }
     }
 }
-
 
 @Composable
 fun SectionHeader(title: String) {
@@ -262,13 +345,22 @@ fun ClipboardCardList(
 
 @Composable
 @Preview(showBackground = true)
-fun EmptyListView() {
+fun EmptyListView(
+    isShare: Boolean = true,
+    onHamburgerBarClick: () -> Unit = {},
+    onShareClick: () -> Unit = {},
+) {
+    Column (  modifier = Modifier
+        .fillMaxSize()
+        .padding(20.dp)){
+        HeaderView(isShare, onHamburgerBarClick, onShareClick)
+    }
     CDSColumn(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Header()
 
+        Header()
         Text("추가된 클립이 없어요")
     }
 }

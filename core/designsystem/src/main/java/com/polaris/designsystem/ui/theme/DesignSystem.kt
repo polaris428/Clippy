@@ -565,16 +565,16 @@ fun preViewSwitch() {
     }
 
 }
+
+
 @Preview
 @Composable
-fun Header() {
+fun Header(modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .padding(bottom = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
+
+        ) {
         Image(
             painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = null,

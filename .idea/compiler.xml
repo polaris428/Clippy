@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
+      <module name="Clippy.core.init_date" target="21" />
       <module name="Clippy.feature.clipboard_folder" target="21" />
       <module name="Clippy.feature.mylibrary" target="21" />
       <module name="Clippy.feature.shared" target="21" />
