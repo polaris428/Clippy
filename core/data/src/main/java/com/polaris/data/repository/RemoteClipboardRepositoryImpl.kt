@@ -69,25 +69,26 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
             val resultList = Collections.synchronizedList(mutableListOf<ClipboardFolderResponse>())
             val listeners = mutableListOf<ValueEventListener>()
-            val remainingCount = AtomicInteger(ids.size) // AtomicInteger로 동기화 처리
+            val remainingCount = AtomicInteger(ids.size)
 
             for (id in ids) {
                 val listener = object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         snapshot.getValue(ClipboardFolderResponse::class.java)?.let { item ->
-                            resultList.add(item) // 동기화 리스트 사용
+                            resultList.add(item)
                         }
 
                         if (remainingCount.decrementAndGet() == 0) {
-                            trySend(resultList.toList()).isSuccess
-                            close() // 모든 데이터가 로드되었으면 한 번만 방출 후 종료
+                            val sortedList = resultList.sortedBy  { it.timestamp }
+                            trySend(sortedList).isSuccess
+                            close()
                         }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        // 특정 요청이 실패해도 진행 가능하도록 처리 (완전 실패로 간주하지 않음)
                         if (remainingCount.decrementAndGet() == 0) {
-                            trySend(resultList.toList()).isSuccess
+                            val sortedList = resultList.sortedBy  { it.timestamp } // 실패해도 정렬 후 전송
+                            trySend(sortedList).isSuccess
                             close()
                         }
                     }
