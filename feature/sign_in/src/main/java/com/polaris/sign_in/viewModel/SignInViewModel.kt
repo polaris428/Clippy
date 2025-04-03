@@ -103,7 +103,7 @@ class SignInViewModel @Inject constructor(
 
         }
     }
-    //TODO : 마이그레이션
+
     fun getCheckIfUserExists(uid:String) = viewModelScope.launch {
         getCheckIfUserExistsUseCase.execute(uid).collect{
 

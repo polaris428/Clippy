@@ -176,9 +176,6 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getFolderList(): Flow<List<ClipboardFolderResponse>> {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun joinFolder(folderId: String): Flow<Boolean> = flow {
         try {

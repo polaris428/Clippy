@@ -142,14 +142,6 @@ class MainActivity : ComponentActivity() {
     }
 
 
-    fun saveClipboard() {
-
-        TODO("엑티비티 별로 분리 필요")
-        // viewModel.processIntent(MainIntent.updateClipboarIntent)
-
-        navController.navigateClipboardList()
-
-    }
 
 
 }
