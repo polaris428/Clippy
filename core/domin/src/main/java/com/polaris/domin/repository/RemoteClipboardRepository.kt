@@ -14,7 +14,7 @@ interface RemoteClipboardRepository {
     suspend fun insert(folderId:String,item: ClipboardItemDTO) : Flow<Boolean>
     suspend fun getAll(ids: List<String>): Flow<List<ClipboardFolderResponse>>
     suspend fun getClipboardFolder(id:String): Flow<ClipboardFolderResponse>
-    suspend fun delete(itemId: Int) : Flow<Boolean>
+    suspend fun delete(  folderId: String, itemId:String,) : Flow<Boolean>
     suspend fun updatePinStatus(folderId: String,itemId: String,pinState:Boolean) : Flow<Boolean>
     suspend fun updateClipboardItem(clipboardItem: ClipboardItemDTO): Flow<Boolean>
     suspend fun clearAll():Flow<Boolean>

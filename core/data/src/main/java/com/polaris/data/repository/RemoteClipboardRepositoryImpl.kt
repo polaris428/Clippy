@@ -122,9 +122,10 @@ internal class RemoteClipboardRepositoryImpl @Inject constructor(
         }
 
 
-    override suspend fun delete(itemId: Int): Flow<Boolean> {
+    override suspend fun delete(folderId: String,itemId: String): Flow<Boolean> {
         return try {
-            // clipboardDatabase.child(itemId.toString()).removeValue().await()
+            folderDatabase.child(folderId).child("clipboard_dateList").child(itemId).removeValue().await()
+            folderDatabase.child(itemId.toString()).removeValue().await()
             flowOf(true)
         } catch (e: Exception) {
             flowOf(false)

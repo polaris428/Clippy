@@ -153,7 +153,7 @@ fun ClipboardListView(
         onEdit = onEditClick,
         onCopy = { item -> copyToClipboard(context, item.url ?: item.title) },
         onShare = { item -> shareText(context, item.url ?: item.title) },
-        onDelete = { item -> onIntent(ClipboardListIntent.Delete(item.timestamp)) },
+        onDelete = { item -> onIntent(ClipboardListIntent.Delete(folderId =currentList?.id ?:"" ,itemId = item.itemId,)) },
         onPin = { item ->
             onIntent(
                 ClipboardListIntent.TogglePin(

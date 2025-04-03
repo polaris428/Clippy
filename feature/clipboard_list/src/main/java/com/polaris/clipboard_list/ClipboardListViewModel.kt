@@ -78,13 +78,13 @@ class ClipboardListViewModel @Inject constructor(
             }
 
             is ClipboardListIntent.Delete -> {
-                postClipboardDelete(intent.timestamp)
+                postClipboardDelete(itemId =  intent.itemId, folderId =  intent.folderId)
                 _uiState.update {
                     val newFolders = folderList.value.toMutableList()
                     val currentFolder = newFolders.getOrNull(it.currentIndex)
                     if (currentFolder != null) {
                         val newClipboards = currentFolder.clipboardDateList.filterNot { item ->
-                            item.timestamp == intent.timestamp
+                            item.itemId == intent.itemId
                         }
                         newFolders[it.currentIndex] = currentFolder.copy(clipboardDateList = newClipboards)
                     }
@@ -145,8 +145,8 @@ class ClipboardListViewModel @Inject constructor(
         _selectedClipboardItem.value = dummyData
     }
 
-    fun postClipboardDelete(timestamp: Long) = viewModelScope.launch(Dispatchers.IO) {
-        postClipboardDeleteUseCase.execute(timestamp = timestamp) {
+    fun postClipboardDelete(  folderId: String, itemId:String,) = viewModelScope.launch(Dispatchers.IO) {
+        postClipboardDeleteUseCase.execute(folderId = folderId,itemId= itemId) {
 
         }.collect({ result ->
 
