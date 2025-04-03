@@ -27,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SplashViewModel @Inject constructor(
 
-    private val getClipboardALlFolderUseCase: GetClipboardAllUseCase,
+    private val getClipboardAllFolderUseCase: GetClipboardAllUseCase,
     private val getLocalClipboardAllUseCase: GetLocalClipboardAllUseCase,
     private val postFolderSyncUseCase: PostFolderSyncUseCase,
 
@@ -92,7 +92,7 @@ class SplashViewModel @Inject constructor(
 
     fun getClipboardFolder(folderId: List<String>): Job = viewModelScope.launch {
 
-        getClipboardALlFolderUseCase.execute(folderId).collect {
+        getClipboardAllFolderUseCase.execute(folderId).collect {
             _clipboardDataList.value = it
             _remoteApiComplete.value =true
             if (remoteApiComplete.value && localApiComplete.value){

@@ -111,7 +111,8 @@ class MainActivity : ComponentActivity() {
                     })
 
                 folderEditNavGraph(onPostFolderSuccess = {
-                    navController.popBackStack()
+                    viewModel.sendIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList))
+                   // navController.navigateClipboardList()
                 }, onPostFolderFile = {
                     navController.navigateClipboardList()
                 })

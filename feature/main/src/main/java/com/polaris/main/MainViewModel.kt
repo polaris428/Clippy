@@ -3,6 +3,7 @@ package com.polaris.main
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.polaris.domin.usecase.clipboard.remote.clipboard.GetClipboardAllUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.PostClipboardInsertUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.PostDataMigrationUseCase
 import com.polaris.domin.usecase.clipboard.remote.clipboard.UpdateClipboardUseCase
@@ -12,6 +13,7 @@ import com.polaris.model.model.ClipboardFolder
 import com.polaris.model.model.ClipboardItem
 import com.polaris.sign_in.intent.SignInIntent
 import com.polaris.sign_in.state.SignInState
+import com.polaris.splash.state.SplashState
 import com.polaris.util.toJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,8 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
 
-    private val postClipboardInsertUseCase: PostClipboardInsertUseCase,
-    private val updateClipboardUseCase: UpdateClipboardUseCase,
+    private val getClipboardAllFolderUseCase: GetClipboardAllUseCase,
     private val postClipboardMigrationUseCase: PostDataMigrationUseCase,
     private val postFolderSyncUseCase: PostFolderSyncUseCase,
 
@@ -71,7 +72,7 @@ class MainViewModel @Inject constructor(
             intent.collect { intent ->
                 when (intent) {
                     is MainIntent.getAllClipboardListIntent ->{
-
+                        getClipboardFolder(intent.folderIdList)
 
                     }
 
@@ -89,7 +90,16 @@ class MainViewModel @Inject constructor(
         _clipboardItem.value = item
     }
 
+    fun getClipboardFolder(folderId: List<String>): Job = viewModelScope.launch {
 
+        getClipboardAllFolderUseCase.execute(folderId).collect {
+            _clipboardDataList.value = it
+
+
+        }
+
+
+    }
 
     fun postClipboardMigrationUseCase(clipboardList: List<ClipboardItem>): Job =
         viewModelScope.launch {
