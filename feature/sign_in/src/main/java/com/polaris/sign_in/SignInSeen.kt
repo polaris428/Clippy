@@ -48,6 +48,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.res.stringResource
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -59,6 +64,8 @@ import com.google.firebase.BuildConfig
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.polaris.designsystem.ui.theme.CDSTextButton
+import com.polaris.designsystem.ui.theme.CircleLoadingView
 import com.polaris.model.model.ClipboardFolder
 
 @Composable
@@ -125,39 +132,51 @@ fun SignInSeen(
         }
 
         is SignInState.Error -> {
-            Toast.makeText(LocalContext.current, stringResource(R.string.error), Toast.LENGTH_SHORT).show()
+            Toast.makeText(LocalContext.current, stringResource(R.string.error), Toast.LENGTH_SHORT)
+                .show()
 
         }
-        is SignInState.Complete ->{
+
+        is SignInState.Complete -> {
 
             onSignIncomplete((state.value as SignInState.Complete).clipboardFolder)
             viewModel.updateState(SignInState.Initialize)
         }
     }
-    SignInView(
-        onSignInClick = {
+    Box() {
+        SignInView(
+            onSignInClick = {
+                viewModel.updateState(SignInState.Loading)
+                oneTapClient.beginSignIn(signInRequest)
+                    .addOnSuccessListener { result ->
+                        googleSignInLauncher.launch(
+                            IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
+                        )
+                    }
+                    .addOnFailureListener {
+                        //TODO: UI 에러처리 필요
+                        println("Google One Tap 로그인 실패: ${it.message}")
+                    }
+            },
+            onSignInAnonymouslyClick = {
+                viewModel.updateState(SignInState.Loading)
+                googleSignInHelper.signInAnonymously(
+                    onSuccess = {
+                        viewModel.updateState(SignInState.SignInSuccess)
+                    }, onFailure = {
 
-            oneTapClient.beginSignIn(signInRequest)
-                .addOnSuccessListener { result ->
-                    googleSignInLauncher.launch(
-                        IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
-                    )
-                }
-                .addOnFailureListener {
-                    //TODO: UI 에러처리 필요
-                    println("Google One Tap 로그인 실패: ${it.message}")
-                }
-        },
-        onSignInAnonymouslyClick = {
-            googleSignInHelper.signInAnonymously(
-                onSuccess = {
-                    viewModel.updateState(SignInState.SignInSuccess)
-                }, onFailure = {
+                    })
+            },
 
-                })
-        },
+            )
 
-        )
+        if (state.value == SignInState.Loading|| state.value == SignInState.SignInSuccess) {
+
+            CircleLoadingView()
+        }
+
+
+    }
 
 
 }
@@ -199,18 +218,14 @@ fun SignInView(
 
             }
         }
-        Text(
-            modifier = Modifier.clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null // 클릭 효과 제거
-            ) {
-                onSignInAnonymouslyClick()
-
-            },
+        CDSTextButton(
+            onClick = { onSignInAnonymouslyClick() },
             text = stringResource(R.string.guest_login),
             style = MaterialTheme.typography.bodyMedium,
             color = Gray40
         )
+
+
         Spacer(modifier = Modifier.height(12.dp))
         CDSButton(buttonText = stringResource(R.string.log_in), onClick = {
             onSignInClick()

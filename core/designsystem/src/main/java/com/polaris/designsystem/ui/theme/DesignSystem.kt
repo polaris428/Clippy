@@ -1,14 +1,23 @@
 package com.polaris.designsystem.ui.theme
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,17 +35,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -44,6 +61,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -55,6 +73,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -63,15 +82,23 @@ import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -95,6 +122,41 @@ fun LineView(modifier: Modifier = Modifier) {
 
 
 }
+
+
+@Composable
+fun CDSTextButton(
+    text: String = "",
+    modifier: Modifier = Modifier,
+    color: Color = Color.Blue,
+    style: TextStyle = LocalTextStyle.current,
+    onClick: () -> Unit = {}
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Box(
+        modifier = modifier
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) {
+                onClick()
+            }
+    ) {
+        Text(
+            text = text,
+            style = style.merge(
+                TextStyle(
+                    fontSize = 16.sp,
+                    color = color,
+                    fontWeight = FontWeight.Medium
+                )
+            ),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp) // ✅ 시각적 여백 + 터치 영역 확보
+        )
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -387,7 +449,7 @@ var dummyDateList = listOf(
         isPinned = false
     ),
 
-)
+    )
 val dummyData = ClipboardItem(
     type = "GitHub",
     url = "https://www.github.com",
@@ -642,4 +704,76 @@ fun DynamicSegmentedButtonsPreview() {
             onItemSelected = { selectedIndex = it }
         )
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun CircleLoadingView(
+    modifier: Modifier = Modifier,
+    circleDiameter: Dp = 60.dp,
+    dotSize: Dp = 10.dp,
+    spaceBetween: Dp = 10.dp,
+    travelDistance: Dp = 8.dp
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0x54C9C9D0)),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = modifier
+                .size(circleDiameter)
+                .clip(CircleShape)
+                .background(LoadingBackground),
+            contentAlignment = Alignment.Center
+        ) {
+            val delays = listOf(0, 150, 300)
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(spaceBetween),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(3) { index ->
+                    val transition = rememberInfiniteTransition(label = "dot-$index")
+
+                    val offsetY by transition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = -travelDistance.value,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(
+                                durationMillis = 500,
+                                delayMillis = delays[index],
+                                easing = FastOutSlowInEasing
+                            ),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "offsetY"
+                    )
+
+                    val alpha by transition.animateFloat(
+                        initialValue = 0.4f,
+                        targetValue = 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(
+                                durationMillis = 500,
+                                delayMillis = delays[index],
+                                easing = FastOutSlowInEasing
+                            ),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "alpha"
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .offset(y = offsetY.dp)
+                            .size(dotSize)
+                            .background(PrimaryColor.copy(alpha = alpha), CircleShape)
+                    )
+                }
+            }
+        }
+    }
+
 }

@@ -22,7 +22,19 @@
       <SelectionState runConfigName="feature.feature_url_list">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DynamicSegmentedButtonsPreview">
+      <SelectionState runConfigName="BouncingDotsLoading">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="BouncingDotsInCircle">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="BouncingDotsInCircleBox">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="PerfectCircleLoadingDots">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="CircleLoadingView">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -27,3 +27,4 @@ val PrimaryGray = Gray70
 val bottomSheetTextColor = Color(0xFF5F6368)
 val textColorGray = Gray40
 val UnderlineColor =Gray60
+val LoadingBackground= Color(0xFFFFF8E1)
