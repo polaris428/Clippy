@@ -2,6 +2,7 @@ package com.polaris.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
             navController = rememberNavController()
 
             LaunchedEffect(clipboardDataList) {
-
+                Log.e("poalris0428","새로고침됨")
                 if (clipboardDataList.isNotEmpty()) {
                     navController.navigateClipboardList()
                 }
@@ -105,9 +106,8 @@ class MainActivity : ComponentActivity() {
                     })
 
                 clipboardEdit(
-                    onSaveClick = { type, title ->
-                        updateClipDate(type, title)
-                        navController.navigateClipboardList()
+                    onSaveSuccess = {
+                        viewModel.sendIntent(MainIntent.getAllClipboardListIntent(PrefManager.folderIdList))
                     })
 
                 folderEditNavGraph(onPostFolderSuccess = {

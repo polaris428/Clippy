@@ -639,12 +639,17 @@ fun Header(modifier: Modifier = Modifier) {
 
 
 @Composable
+@Preview(showBackground = true)
 fun CDSSegmentedButtons(
-    items: List<String>,
-    selectedIndex: Int,
-    onItemSelected: (Int) -> Unit
+    items: List<String> = listOf(),
+    selectedIndex: Int = 0,
+    onItemSelected: (Int) -> Unit={}
 ) {
-    onItemSelected(selectedIndex)
+    if (items.isNotEmpty() && selectedIndex in items.indices) {
+
+        onItemSelected(selectedIndex)
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()

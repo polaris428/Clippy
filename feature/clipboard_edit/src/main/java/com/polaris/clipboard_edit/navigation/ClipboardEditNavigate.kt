@@ -21,12 +21,12 @@ fun NavController.navigateClipboardEdit(item: ClipboardItem) {
 }
 
 fun NavGraphBuilder.clipboardEdit(
-    onSaveClick: (type: String, title: String) -> Unit = { _, _ -> },
+    onSaveSuccess:()->Unit
 ) {
     composable(route = ClipboardEditRoute.routeWithArgs) { backStackEntry ->
         val clipboardItem = rememberClipboardItem(backStackEntry)
         if (clipboardItem != null) {
-            ClipboardEditSeen(clipboardItem, onSaveClick = onSaveClick)
+            ClipboardEditSeen(clipboardItem, onSaveSuccess)
 
         }
     }

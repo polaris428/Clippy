@@ -27,8 +27,8 @@ import com.polaris.util.PrefManager
 
 @AndroidEntryPoint
 class ClipboardSaveActivity : AppCompatActivity() {
-    private val viewModel: com.polaris.main_save.ClipboardSaveViewModel by viewModels()
-    lateinit var navController : NavHostController
+    private val viewModel: ClipboardSaveViewModel by viewModels()
+    lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,14 +40,13 @@ class ClipboardSaveActivity : AppCompatActivity() {
         setContent {
 
 
-
             navController = rememberNavController()
             val state = viewModel.uiState.collectAsState()
-            val clipboardItem= viewModel.clipboardItem.collectAsState()
+            val clipboardItem = viewModel.clipboardItem.collectAsState()
             val folderNameList = viewModel.folderNameList.collectAsState()
 
             when (state.value) {
-                Initialize ->{
+                Initialize -> {
 
 
                 }
@@ -55,13 +54,16 @@ class ClipboardSaveActivity : AppCompatActivity() {
                 ClipboardCrawlingInfo -> {
 
                 }
+
                 ClipboardSaveLoading -> {
 
                 }
+
                 ClipboardSaveSuccess -> {
 
 
                 }
+
                 ClipboardSaveFailure -> {
 
                 }
@@ -69,26 +71,28 @@ class ClipboardSaveActivity : AppCompatActivity() {
 
             }
 
-            NavHost(navController = navController, startDestination = ClipboardRoute.route ) {
+            NavHost(navController = navController, startDestination = ClipboardRoute.route) {
                 clipboardNavGraph(
                     url = sharedText.toString(),
-                    onSaveSuccess ={
+                    onSaveSuccess = {
                         navController.navigateClipboardSaveAnimation()
                     },
                     onEditClick = {
+                        viewModel.updateClipboardItem(it)
                         navController.navigateClipboardEdit(it)
                     }, onDismiss = {
 
                         finish()
 
                     })
-                clipboardEdit( onSaveClick = { type, title ->
-                    viewModel.updateClipboardItem(type = type , title= title)
-                    saveClipboard(clipboardItem.value)
-
-                })
+                clipboardEdit(
+                    onSaveSuccess = {
+                        navController.navigateClipboardSaveAnimation()
+                    },
+                )
                 clipboardSaveAnimation(afterAnimation = {
-                    Toast.makeText(this@ClipboardSaveActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ClipboardSaveActivity, "클리퍼가 잘 저장했어요", Toast.LENGTH_SHORT)
+                        .show()
                     finish()
                     exitProcess(0)  // 프로세스 종료
                 })
@@ -98,13 +102,4 @@ class ClipboardSaveActivity : AppCompatActivity() {
         }
     }
 
-    fun saveClipboard(ClipboardItem: ClipboardItem) {
-        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("Shared Text", viewModel.clipboardItem.value.url)
-        clipboard.setPrimaryClip(clip)
-        viewModel.sendIntent(com.polaris.main_save.intent.ClipboardSaveIntent.postClipboarInsertIntent(PrefManager.folderIdList[0],ClipboardItem))
-
-
-
-    }
 }

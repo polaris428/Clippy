@@ -7,19 +7,19 @@ import com.polaris.clipboard_save_animation.SaveAnimationSeen
 
 
 fun NavController.navigateClipboardSaveAnimation() {
-    navigate(ClipboardRoute.route){
-
+    navigate(ClipboardSaveAnimationRoute.route){
+        launchSingleTop = true
     }
 }
 
 fun NavGraphBuilder.clipboardSaveAnimation(
     afterAnimation:()->Unit
 ) {
-    composable(route = ClipboardRoute.route) {
+    composable(route = ClipboardSaveAnimationRoute.route) {
         SaveAnimationSeen(afterAnimation)
     }
 }
 
-object ClipboardRoute {
+object ClipboardSaveAnimationRoute {
     const val route = "clipboard_save_animation"
 }

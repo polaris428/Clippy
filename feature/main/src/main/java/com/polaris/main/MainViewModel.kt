@@ -91,7 +91,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun getClipboardFolder(folderId: List<String>): Job = viewModelScope.launch {
-
+        Log.e("polaris","한번 실행됨")
         getClipboardAllFolderUseCase.execute(folderId).collect {
             _clipboardDataList.value = it
 
