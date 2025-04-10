@@ -37,7 +37,7 @@ android {
 
 dependencies {
     implementation(projects.core.model)
-    implementation(projects.core.domin)
+    implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
     implementation(libs.androidx.core.ktx)

@@ -5,7 +5,7 @@ plugins {
     id ("kotlin-kapt")
     id ("com.google.dagger.hilt.android") // Hilt 플러그인 추가
     id ("com.google.gms.google-services")
-
+    id("com.vanniktech.dependency.graph.generator") version "0.6.0"
 }
 
 android {

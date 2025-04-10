@@ -1,4 +1,7 @@
 pluginManagement {
+    plugins {
+        id("com.vanniktech.dependency.graph.generator") version "0.6.0"
+    }
     repositories {
         google {
             content {
@@ -35,7 +38,7 @@ include(":core:data")
 
 
 
-include(":core:domin")
+include(":core:domain")
 include(":feature:clipboard_edit")
 
 include(":feature:clipboard_save_animation")

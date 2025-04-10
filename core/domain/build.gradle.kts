@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.polaris.domin"
+    namespace = "com.polaris.domain"
     compileSdk = 35
 
     defaultConfig {

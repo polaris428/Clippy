@@ -39,7 +39,7 @@ dependencies {
 
     implementation(projects.core.util)
     implementation(projects.core.model)
-    implementation (projects.core.domin)
+    implementation (projects.core.domain)
     implementation (libs.androidx.room.runtime)
     implementation(libs.firebase.database)
     kapt (libs.androidx.room.compiler)

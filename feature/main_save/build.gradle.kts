@@ -41,7 +41,7 @@ dependencies {
     implementation (libs.firebase.auth)
     implementation (libs.play.services.auth)
     implementation (platform(libs.firebase.bom))
-    implementation(projects.core.domin)
+    implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
     implementation(projects.core.designsystem)
