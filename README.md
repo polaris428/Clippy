@@ -75,9 +75,6 @@
 
 ## 🛠 주요 구현 내용 (Highlights)
 
-## 🌟 주요 기능 (Key Features)
-
-## 🌟 주요 기능 (Key Features)
 
 - ✅ **비회원 사용 가능 / 로그인 기능 포함**  
   Firebase Authentication을 통해 비회원인 상태와 로그인 상태 둘다 사용 가능하도록 개발
@@ -102,9 +99,7 @@
 
 
 
-
 ---
-
 
 
 ## 📌 배운 점 (Lessons Learned)
@@ -119,6 +114,8 @@
 - [ ] 게스트 계정 마이그레이션 기능 
 - [ ] 태그 기반 클립 관리
 - [ ] 웹 사이트 인앱 브라우저로 열기
+- [ ] [모듈 구조 개선 관련 이슈 #1](https://github.com/polaris428/Clippy/issues/1)
+
 - [ ] 다국어 지원
 - [ ] 테스트 커버리지 강화 (Unit/UI Test)
 
